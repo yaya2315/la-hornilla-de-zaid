@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú — La Hornilla de Zaid</title>
+    <meta name="description" content="Menú completo: tacos, burritos, tortas, nachos, quesadillas, sopa de tortilla, pupusas con un toque mexicano, papa asada y bebidas.">
+    <meta name="theme-color" content="#120600">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="menu.css">
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="main-header">
+        <a class="logo-box" href="index.html" aria-label="Inicio">
+            <img src="Imagenes/IMG-20260215-WA0049.jpg.png" alt="La Hornilla de Zaid" class="main-logo">
+        </a>
+        <button class="menu-toggle" id="menuBtn" aria-label="Abrir menú" aria-controls="sidebar" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
+    </header>
+
+    <main class="page-main">
+
+        <!-- ===== HERO ===== -->
+        <section class="page-hero">
+            <span class="eyebrow">La Hornilla de Zaid</span>
+            <h1>Menú</h1>
+            <p class="horario">
+                Martes a Sábado · 10:30 a.m. – 2:00 p.m. y 5:00 p.m. – 9:30 p.m.<br>
+                Domingo · 5:00 p.m. – 9:30 p.m.
+            </p>
+        </section>
+
+        <!-- ===== ⭐ COMBO DE LA SEMANA ===== -->
+        <section class="combo-week reveal" id="comboSemana" aria-label="Combo de la semana">
+            <span class="combo-badge"><span class="dot"></span> Combo de la semana</span>
+            <p class="combo-vigencia">Promoción disponible de martes a viernes</p>
+            <div class="combo-grid">
+                <div>
+                    <h2 class="combo-name" data-combo="nombre">Combo de la semana</h2>
+                    <p class="combo-desc" data-combo="descripcion">Esta semana tenemos una promoción especial para ti.</p>
+                </div>
+                <div class="combo-price">
+                    <small>Precio</small>
+                    <span data-combo="precio">$8.99</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== PLATILLOS ===== -->
+        <section class="menu-section" id="platillos">
+            <div class="section-header reveal">
+                <span class="eyebrow">Lo mejor de la casa</span>
+                <h2>Platillos</h2>
+            </div>
+
+            <div class="platillos-grid">
+
+                <article class="platillo-card reveal" data-delay="1">
+                    <div class="platillo-head">
+                        <h3>Tacos</h3>
+                        <span class="platillo-nota">Orden de 4</span>
+                    </div>
+                    <div class="platillo-rows">
+                        <div class="row"><span>Pastor · Pollo pastor · Suadero</span><span class="precio">$4.99</span></div>
+                        <div class="row"><span>Cochinita pibil · Birria</span><span class="precio">$5.99</span></div>
+                    </div>
+                </article>
+
+                <article class="platillo-card reveal" data-delay="2">
+                    <div class="platillo-head"><h3>Burrito</h3></div>
+                    <div class="platillo-rows">
+                        <div class="row"><span>Pastor · Pollo pastor · Suadero</span><span class="precio">$4.99</span></div>
+                        <div class="row"><span>Cochinita pibil · Birria</span><span class="precio">$5.99</span></div>
+                    </div>
+                </article>
+
+                <article class="platillo-card reveal" data-delay="1">
+                    <div class="platillo-head"><h3>Tortas</h3></div>
+                    <div class="platillo-rows">
+                        <div class="row"><span>Pastor · Pollo pastor · Suadero</span><span class="precio">$4.99</span></div>
+                        <div class="row"><span>Cochinita pibil · Birria</span><span class="precio">$5.99</span></div>
+                    </div>
+                </article>
+
+                <article class="platillo-card reveal" data-delay="2">
+                    <div class="platillo-head"><h3>Nachos</h3></div>
+                    <div class="platillo-rows">
+                        <div class="row"><span>Pastor · Pollo pastor · Suadero</span><span class="precio">$4.50</span></div>
+                        <div class="row"><span>Cochinita pibil · Birria</span><span class="precio">$5.50</span></div>
+                    </div>
+                </article>
+
+                <article class="platillo-card reveal" data-delay="1">
+                    <div class="platillo-head">
+                        <h3>Quesadillas</h3>
+                        <span class="platillo-nota">Orden de 3</span>
+                    </div>
+                    <div class="platillo-rows">
+                        <div class="row"><span>Pastor · Pollo pastor · Suadero</span><span class="precio">$4.99</span></div>
+                        <div class="row"><span>Cochinita pibil · Birria</span><span class="precio">$5.99</span></div>
+                    </div>
+                </article>
+
+                <article class="platillo-card reveal" data-delay="2">
+                    <div class="platillo-head">
+                        <h3>Sopa de Tortilla</h3>
+                        <span class="platillo-nota">Carne a elección</span>
+                    </div>
+                    <div class="platillo-rows">
+                        <div class="row"><span>Media (16 oz)</span><span class="precio">$3.00</span></div>
+                        <div class="row"><span>Entera (32 oz)</span><span class="precio">$5.00</span></div>
+                    </div>
+                </article>
+
+                <!-- LO NUEVO: Papa Asada -->
+                <article class="platillo-card nuevo-card reveal">
+                    <span class="nuevo-tag">Lo nuevo</span>
+                    <div>
+                        <h3>Papa Asada</h3>
+                        <p>Base de papa asada con mezcla de queso gratinado y cheddar, crema, tu carne a elección, pico de gallo y un toque de salsa de aguacate.</p>
+                    </div>
+                    <span class="precio">$5.50</span>
+                </article>
+
+            </div>
+
+            <!-- Extras -->
+            <div class="extras-box reveal">
+                <h3>Extras</h3>
+                <div class="extras-grid">
+                    <div class="extra-row"><span>Aguacate</span><span class="precio">$0.75</span></div>
+                    <div class="extra-row"><span>Queso fundido</span><span class="precio">$1.25</span></div>
+                    <div class="extra-row"><span>Piña</span><span class="precio">$0.75</span></div>
+                    <div class="extra-row"><span>Jalapeño toreado</span><span class="precio">$0.50</span></div>
+                </div>
+            </div>
+
+            <p class="propina reveal">Propina: 5% sobre el consumo en el local</p>
+        </section>
+
+        <!-- ===== PUPUSAS ===== -->
+        <section class="menu-section dark" id="pupusas">
+            <div class="inner">
+                <div class="section-header reveal">
+                    <span class="eyebrow">Especialidad de la casa</span>
+                    <h2>Pupusas con un toque mexicano</h2>
+                </div>
+
+                <div class="pupusas-grid">
+                    <div class="pupusa-row reveal" data-delay="1">
+                        <div class="pupusa-top"><h4>Birria con Queso</h4><span class="precio">$1.50</span></div>
+                        <small>Acompañada de su caldo, cilantro y cebolla</small>
+                    </div>
+                    <div class="pupusa-row reveal" data-delay="2">
+                        <div class="pupusa-top"><h4>Pollo Pastor con Queso y Piña</h4><span class="precio">$1.50</span></div>
+                        <small>Acompañada de cilantro y cebolla</small>
+                    </div>
+                    <div class="pupusa-row reveal" data-delay="3">
+                        <div class="pupusa-top"><h4>Pastor con Queso y Piña</h4><span class="precio">$1.50</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== BEBIDAS ===== -->
+        <section class="menu-section" id="bebidas">
+            <div class="section-header reveal">
+                <span class="eyebrow">Para acompañar</span>
+                <h2>Bebidas</h2>
+            </div>
+
+            <div class="bebidas-generales reveal">
+                <div class="bebida-row"><span>Latas (Pepsi, Uva, Mirinda)</span><span class="precio">$0.90</span></div>
+                <div class="bebida-row"><span>Salutaris (Limón, Naranja, Toronja, Simple)</span><span class="precio">$0.90</span></div>
+                <div class="bebida-row"><span>Té Lipton (Durazno, Frambuesa, Limón)</span><span class="precio">$0.90</span></div>
+                <div class="bebida-row"><span>Botella con agua</span><span class="precio">$0.70</span></div>
+            </div>
+
+            <div class="bebidas-cols">
+                <div class="bebidas-grupo reveal" data-delay="1">
+                    <h3>Bebidas con leche</h3>
+                    <div class="bebida-row"><span>Zapote</span><span class="precio">$1.50</span></div>
+                    <div class="bebida-row"><span>Guineo</span><span class="precio">$1.50</span></div>
+                    <div class="bebida-row"><span>Fresa natural</span><span class="precio">$1.50</span></div>
+                    <div class="bebida-row"><span>Esencia de fresa</span><span class="precio">$1.25</span></div>
+                    <div class="bebida-row"><span>Vainilla</span><span class="precio">$1.25</span></div>
+                    <div class="bebida-row"><span>Galleta</span><span class="precio">$1.50</span></div>
+                    <div class="bebida-row"><span>Chocolate</span><span class="precio">$1.50</span></div>
+                </div>
+
+                <div class="bebidas-grupo reveal" data-delay="2">
+                    <h3>Bebidas naturales</h3>
+                    <div class="bebida-row"><span>Sandía</span><span class="precio">$1.25</span></div>
+                    <div class="bebida-row"><span>Piña</span><span class="precio">$1.25</span></div>
+                    <div class="bebida-row"><span>Melón</span><span class="precio">$1.25</span></div>
+                    <div class="bebida-row"><span>Limonada fresa</span><span class="precio">$1.50</span></div>
+                    <div class="bebida-row"><span>Limonada H.B.</span><span class="precio">$1.50</span></div>
+                    <div class="bebida-row"><span>Limonada natural</span><span class="precio">$1.50</span></div>
+                    <span class="sub">Café</span>
+                    <div class="bebida-row"><span>Café negro</span><span class="precio">$0.50</span></div>
+                    <div class="bebida-row"><span>Café con leche</span><span class="precio">$0.75</span></div>
+                    <div class="bebida-row"><span>Café con cremora</span><span class="precio">$0.75</span></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="main-footer">
+        <div class="footer-content">
+            <img src="Imagenes/IMG-20260215-WA0049.jpg.png" alt="La Hornilla de Zaid" class="footer-logo-img">
+            <nav class="footer-links">
+                <a href="index.html">Inicio</a>
+                <a href="menu.html">Menú</a>
+                <a href="ubicacion.html">Ubicación</a>
+            </nav>
+            <div class="footer-social social-row">
+                <a class="social-link" href="https://wa.me/50370991660" target="_blank" rel="noopener" aria-label="WhatsApp">
+                    <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.4A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-2.9.8.8-2.8-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-5.8c-.3-.2-1.7-.8-2-.9-.3-.1-.5-.2-.7.2-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5 0-.2-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3z"/></svg>
+                </a>
+                <a class="social-link" href="https://www.instagram.com/la_hornilla_de_zaid" target="_blank" rel="noopener" aria-label="Instagram">
+                    <svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.9.1 1.2.1 1.8.2 2.2.4.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.2.4.3 1 .4 2.2.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c-.1 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1 .3-2.2.4-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2-.1-1.8-.2-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.4-.3-1-.4-2.2-.1-1.3-.1-1.7-.1-4.9s0-3.6.1-4.9c.1-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.3 2.2-.4C8.4 2.2 8.8 2.2 12 2.2zm0 1.8c-3.1 0-3.5 0-4.7.1-1.1.1-1.7.2-2.1.4-.5.2-.9.4-1.3.8-.4.4-.6.8-.8 1.3-.2.4-.3 1-.4 2.1C2.6 9.5 2.6 9.9 2.6 12s0 3.5.1 4.7c.1 1.1.2 1.7.4 2.1.2.5.4.9.8 1.3.4.4.8.6 1.3.8.4.2 1 .3 2.1.4 1.2.1 1.6.1 4.7.1s3.5 0 4.7-.1c1.1-.1 1.7-.2 2.1-.4.5-.2.9-.4 1.3-.8.4-.4.6-.8.8-1.3.2-.4.3-1 .4-2.1.1-1.2.1-1.6.1-4.7s0-3.5-.1-4.7c-.1-1.1-.2-1.7-.4-2.1-.2-.5-.4-.9-.8-1.3-.4-.4-.8-.6-1.3-.8-.4-.2-1-.3-2.1-.4C15.5 4 15.1 4 12 4zm0 3.1a4.9 4.9 0 1 1 0 9.8 4.9 4.9 0 0 1 0-9.8zm0 8.1a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4zM17.1 5.8a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2z"/></svg>
+                </a>
+                <a class="social-link" href="https://www.facebook.com/profile.php?id=100090295385638&locale=es_LA" target="_blank" rel="noopener" aria-label="Facebook">
+                    <svg viewBox="0 0 24 24"><path d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.3-1.5 1.6-1.5h1.7V3.6c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.1v2.3H7.6V13h2.8v8h3.1z"/></svg>
+                </a>
+                <a class="social-link" href="https://www.tiktok.com/@lahornilladezaid" target="_blank" rel="noopener" aria-label="TikTok">
+                    <svg viewBox="0 0 24 24"><path d="M16.5 3c.3 2 1.5 3.6 3.5 3.9v2.7c-1.3.1-2.5-.3-3.5-1v5.9c0 3.3-2.5 5.6-5.6 5.6-2.9 0-5.3-2.2-5.3-5.1 0-3.1 2.6-5.3 5.8-4.9v2.8c-.4-.1-.8-.2-1.2-.2-1.3 0-2.4 1-2.4 2.4 0 1.4 1.1 2.4 2.5 2.4 1.5 0 2.7-1.1 2.7-2.8V3h3.5z"/></svg>
+                </a>
+            </div>
+            <p class="footer-copy">© 2026 La Hornilla de Zaid. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- ===== BACKDROP + SIDEBAR ===== -->
+    <div class="backdrop" id="backdrop"></div>
+
+    <aside class="sidebar" id="sidebar" aria-label="Menú de navegación">
+        <nav class="nav-menu">
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="menu.html" aria-current="page">Menú</a></li>
+                <li><a href="ubicacion.html">Ubicación</a></li>
+            </ul>
+        </nav>
+
+        <div class="sidebar-contact">
+            <p class="eyebrow">Síguenos y contáctanos</p>
+            <div class="social-row">
+                <a class="social-link" href="https://wa.me/50370991660" target="_blank" rel="noopener" aria-label="WhatsApp">
+                    <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.4A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-2.9.8.8-2.8-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-5.8c-.3-.2-1.7-.8-2-.9-.3-.1-.5-.2-.7.2-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5 0-.2-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3z"/></svg>
+                </a>
+                <a class="social-link" href="https://www.instagram.com/la_hornilla_de_zaid" target="_blank" rel="noopener" aria-label="Instagram">
+                    <svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.9.1 1.2.1 1.8.2 2.2.4.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.2.4.3 1 .4 2.2.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c-.1 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1 .3-2.2.4-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2-.1-1.8-.2-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.4-.3-1-.4-2.2-.1-1.3-.1-1.7-.1-4.9s0-3.6.1-4.9c.1-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.3 2.2-.4C8.4 2.2 8.8 2.2 12 2.2zm0 1.8c-3.1 0-3.5 0-4.7.1-1.1.1-1.7.2-2.1.4-.5.2-.9.4-1.3.8-.4.4-.6.8-.8 1.3-.2.4-.3 1-.4 2.1C2.6 9.5 2.6 9.9 2.6 12s0 3.5.1 4.7c.1 1.1.2 1.7.4 2.1.2.5.4.9.8 1.3.4.4.8.6 1.3.8.4.2 1 .3 2.1.4 1.2.1 1.6.1 4.7.1s3.5 0 4.7-.1c1.1-.1 1.7-.2 2.1-.4.5-.2.9-.4 1.3-.8.4-.4.6-.8.8-1.3.2-.4.3-1 .4-2.1.1-1.2.1-1.6.1-4.7s0-3.5-.1-4.7c-.1-1.1-.2-1.7-.4-2.1-.2-.5-.4-.9-.8-1.3-.4-.4-.8-.6-1.3-.8-.4-.2-1-.3-2.1-.4C15.5 4 15.1 4 12 4zm0 3.1a4.9 4.9 0 1 1 0 9.8 4.9 4.9 0 0 1 0-9.8zm0 8.1a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4zM17.1 5.8a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2z"/></svg>
+                </a>
+                <a class="social-link" href="https://www.facebook.com/profile.php?id=100090295385638&locale=es_LA" target="_blank" rel="noopener" aria-label="Facebook">
+                    <svg viewBox="0 0 24 24"><path d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.3-1.5 1.6-1.5h1.7V3.6c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.1v2.3H7.6V13h2.8v8h3.1z"/></svg>
+                </a>
+                <a class="social-link" href="https://www.tiktok.com/@lahornilladezaid" target="_blank" rel="noopener" aria-label="TikTok">
+                    <svg viewBox="0 0 24 24"><path d="M16.5 3c.3 2 1.5 3.6 3.5 3.9v2.7c-1.3.1-2.5-.3-3.5-1v5.9c0 3.3-2.5 5.6-5.6 5.6-2.9 0-5.3-2.2-5.3-5.1 0-3.1 2.6-5.3 5.8-4.9v2.8c-.4-.1-.8-.2-1.2-.2-1.3 0-2.4 1-2.4 2.4 0 1.4 1.1 2.4 2.5 2.4 1.5 0 2.7-1.1 2.7-2.8V3h3.5z"/></svg>
+                </a>
+            </div>
+            <div class="sidebar-direct">
+                <span class="lbl">WhatsApp</span>
+                <a href="https://wa.me/50370991660" target="_blank" rel="noopener">7099-1660</a>
+                <span class="lbl">Correo</span>
+                <a href="mailto:hornillaz.14@gmail.com">hornillaz.14@gmail.com</a>
+            </div>
+        </div>
+    </aside>
+
+    <script src="script.js"></script>
+</body>
+</html>
