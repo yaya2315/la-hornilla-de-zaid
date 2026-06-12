@@ -32,7 +32,7 @@
 .hero-slide:nth-child(1)  { background-image: url('Imagenes/Quesadilla.jpg');   animation-delay: 0s;    }
 .hero-slide:nth-child(2)  { background-image: url('Imagenes/Tacos 1.jpg');     animation-delay: 4.5s;  }
 .hero-slide:nth-child(3)  { background-image: url('Imagenes/torta 1.jpg');     animation-delay: 9s;    }
-.hero-slide:nth-child(4)  { background-image: url('Imagenes/Tacos.png'); animation-delay: 13.5s; }
+.hero-slide:nth-child(4)  { background-image: url('Imagenes/papa asada.png'); animation-delay: 13.5s; }
 .hero-slide:nth-child(5)  { background-image: url('Imagenes/Minitorta.jpg');   animation-delay: 18s;   }
 .hero-slide:nth-child(6)  { background-image: url('Imagenes/Tacos\ 1.jpg');   animation-delay: 22.5s; }
 .hero-slide:nth-child(7)  { background-image: url('Imagenes/Quesadilla.jpg'); animation-delay: 27s;   }
@@ -40,7 +40,7 @@
 /* --- 3 espacios nuevos: coloca aquí tus nuevas fotos --- */
 .hero-slide:nth-child(9)  { background-image: url('Imagenes/Tacos.png');   animation-delay: 36s;   }
 .hero-slide:nth-child(10) { background-image: url('Imagenes/Minitorta.jpg'); animation-delay: 40.5s; }
-.hero-slide:nth-child(11) { background-image: url('Imagenes/quesadilla.jpg');   animation-delay: 45s;   }
+.hero-slide:nth-child(11) { background-image: url('Imagenes/papa asada.jpg');   animation-delay: 45s;   }
 
 @keyframes heroKen {
     0%   { opacity: 0; transform: scale(1.05); }
