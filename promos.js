@@ -1,85 +1,93 @@
 /* =====================================================================
-   PROMOS.JS — Muestra el "Combo de la semana" leyendo desde Firebase
+   PROMOS.JS — Muestra las promociones del día, leyendo desde Firebase
    ---------------------------------------------------------------------
-   • Lee las promociones marcadas como ACTIVAS en el panel.
-   • Si hay varias activas, rota una distinta cada semana (igual que antes).
+   • Cada promoción tiene SUS PROPIOS días (los eliges en el panel).
+   • En el menú se muestran TODAS las promociones que estén ACTIVAS
+     y cuyos días incluyan el día de HOY.
    • Si Firebase no responde, usa la lista de respaldo de más abajo,
-     así la página NUNCA se queda sin combo.
+     así la página nunca queda rota.
    ===================================================================== */
 
 import { db, COLECCION } from './firebase-config.js';
-import { collection, query, where, orderBy, getDocs }
+import { collection, query, orderBy, getDocs }
     from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
 
-/* ── AJUSTE RÁPIDO ──────────────────────────────────────────────────
-   Si quieres que el combo se vea TODOS los días, pon esto en false. */
-const SOLO_DE_MARTES_A_VIERNES = true;
-
-/* ── Respaldo: se usa solo si Firebase aún no está configurado o falla.
-   Puedes dejarlo tal cual; el panel reemplaza estos valores en línea. */
+/* Respaldo: solo se usa si Firebase aún no está configurado o falla.
+   Cada promoción lleva sus días (0=Dom, 1=Lun … 6=Sáb). */
 const RESPALDO = [
-    { nombre: "Combo Mega Quesadilla", descripcion: "1/2 Sopa de tortilla + Mega Quesadilla + Bebida.", precio: "$5.50" },
-    { nombre: "Combo Mini Torta",      descripcion: "1/2 Sopa de tortilla + Mini Torta + Bebida.",      precio: "$5.50" },
-    { nombre: "Combo Nachos",          descripcion: "1/2 Sopa de tortilla + 1/2 Orden de Nachos + Bebida.", precio: "$5.00" },
-    { nombre: "Combo Tacos",           descripcion: "1/2 Sopa de tortilla + 2 Tacos + Bebida.",          precio: "$5.00" }
+    { nombre: "Combo Mega Quesadilla", descripcion: "1/2 Sopa de tortilla + Mega Quesadilla + Bebida.", precio: "$5.50", activa: true, dias: [2, 3, 4, 5] },
+    { nombre: "Combo Mini Torta",      descripcion: "1/2 Sopa de tortilla + Mini Torta + Bebida.",      precio: "$5.50", activa: true, dias: [2, 3, 4, 5] }
 ];
 
-/* Número de semana ISO — para rotar el combo automáticamente */
-function getWeekNumber(d) {
-    d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-    const day = d.getUTCDay() || 7;
-    d.setUTCDate(d.getUTCDate() + 4 - day);
-    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+/* ── Nombres de los días ───────────────────────────────────────────── */
+const ORDEN_SEM = [1, 2, 3, 4, 5, 6, 0];   // Lun → Dom
+const NOMBRE = { 0: 'domingo', 1: 'lunes', 2: 'martes', 3: 'miércoles', 4: 'jueves', 5: 'viernes', 6: 'sábado' };
+
+/* Convierte [2,3,4,5] en un texto legible: "martes a viernes", "sábado", etc. */
+function textoDias(dias) {
+    if (!Array.isArray(dias) || dias.length === 0 || dias.length >= 7) return 'todos los días';
+    const arr = [...dias].sort((a, b) => ORDEN_SEM.indexOf(a) - ORDEN_SEM.indexOf(b));
+    const idx = arr.map(d => ORDEN_SEM.indexOf(d));
+    const contiguo = idx.every((v, i) => i === 0 || v === idx[i - 1] + 1);
+    if (contiguo && arr.length >= 3) return `${NOMBRE[arr[0]]} a ${NOMBRE[arr[arr.length - 1]]}`;
+    if (arr.length === 1) return NOMBRE[arr[0]];
+    return arr.slice(0, -1).map(d => NOMBRE[d]).join(', ') + ' y ' + NOMBRE[arr[arr.length - 1]];
 }
 
-async function cargarActivas() {
+async function cargar() {
     try {
-        const q = query(
-            collection(db, COLECCION),
-            where('activa', '==', true),
-            orderBy('orden', 'asc')
-        );
+        const q = query(collection(db, COLECCION), orderBy('orden', 'asc'));
         const snap = await getDocs(q);
-        const lista = snap.docs.map(d => d.data());
-        return lista.length ? lista : null;   // null → no hay activas
+        return snap.docs.map(d => d.data());
     } catch (err) {
         console.warn('[promos] No se pudo leer Firebase, uso respaldo:', err);
-        return RESPALDO;                       // respaldo ante cualquier fallo
+        return RESPALDO;
     }
 }
 
-function pintar(combo) {
-    const box = document.getElementById('comboSemana');
-    if (!box) return;
-
-    const n = box.querySelector('[data-combo="nombre"]');
-    const d = box.querySelector('[data-combo="descripcion"]');
-    const p = box.querySelector('[data-combo="precio"]');
-    if (n) n.textContent = combo.nombre;
-    if (d) d.textContent = combo.descripcion;
-    if (p) p.textContent = combo.precio;
-
-    box.style.display = '';   // visible (respeta el display de tu CSS)
+/* ¿Esta promoción se muestra hoy? Activa + el día de hoy está en su lista. */
+function seMuestraHoy(p, hoy) {
+    if (p.activa !== true) return false;
+    const dias = (Array.isArray(p.dias) && p.dias.length) ? p.dias : [0, 1, 2, 3, 4, 5, 6];
+    return dias.includes(hoy);
 }
 
-function ocultar() {
-    const box = document.getElementById('comboSemana');
-    if (box) box.style.display = 'none';
+function esc(s = '') {
+    return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+}
+
+function tarjeta(p) {
+    return `
+        <section class="combo-week" aria-label="Promoción">
+            <span class="combo-badge"><span class="dot"></span> Combo de la semana</span>
+            <p class="combo-vigencia">Disponible: ${esc(textoDias(p.dias))}</p>
+            <div class="combo-grid">
+                <div>
+                    <h2 class="combo-name">${esc(p.nombre)}</h2>
+                    <p class="combo-desc">${esc(p.descripcion || '')}</p>
+                </div>
+                <div class="combo-price">
+                    <small>Precio</small>
+                    <span>${esc(p.precio || '')}</span>
+                </div>
+            </div>
+        </section>`;
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const box = document.getElementById('comboSemana');
-    if (!box) return;   // esta página no tiene combo
+    const wrap = document.getElementById('combosActivos');
+    if (!wrap) return;   // esta página no tiene zona de promociones
 
-    const dia = new Date().getDay();          // 0 = domingo … 6 = sábado
-    const enTemporada = !SOLO_DE_MARTES_A_VIERNES || (dia >= 2 && dia <= 5);
+    const hoy = new Date().getDay();   // 0 = domingo … 6 = sábado
+    const promos = await cargar();
+    const delDia = promos.filter(p => seMuestraHoy(p, hoy));
 
-    if (!enTemporada) { ocultar(); return; }
+    if (delDia.length === 0) {
+        wrap.innerHTML = '';
+        wrap.classList.remove('has-combos');   // sin promos hoy → no ocupa espacio
+        return;
+    }
 
-    const activas = await cargarActivas();
-    if (!activas) { ocultar(); return; }      // ninguna promo activa → ocultar
-
-    const idx = getWeekNumber(new Date()) % activas.length;
-    pintar(activas[idx]);
+    wrap.innerHTML = delDia.map(tarjeta).join('');
+    wrap.classList.add('has-combos');
 });
