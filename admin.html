@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel · La Hornilla de Zaid</title>
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#120600">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root{
+            --ember:#ff6600; --ember-deep:#d44e00; --ember-soft:#ff8533;
+            --glow:rgba(255,102,0,.35); --line:rgba(255,102,0,.18);
+            --char-900:#0a0300; --char-800:#120600; --char-700:#1a0a02;
+            --card:rgba(40,18,5,.95); --card-soft:rgba(122,63,29,.4);
+            --cream:#f3e9dd; --text:#e3d6c8; --muted:#9d8b7c;
+            --ok:#3ddc84; --bad:#ff5c5c;
+            --radius:16px; --radius-lg:22px;
+            --ease:cubic-bezier(.22,1,.36,1); --maxw:920px;
+        }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{
+            font-family:'Inter',system-ui,sans-serif;
+            background:
+                radial-gradient(80% 60% at 50% 0%, rgba(255,102,0,.10), transparent 60%),
+                var(--char-700);
+            color:var(--text); line-height:1.6; min-height:100vh;
+            -webkit-font-smoothing:antialiased;
+        }
+        h1,h2,h3{font-family:'Oswald',sans-serif;font-weight:700;line-height:1.05;text-transform:uppercase;letter-spacing:1px}
+        .eyebrow{font-size:.72rem;letter-spacing:3px;text-transform:uppercase;color:var(--ember);font-weight:600}
+        button{font-family:inherit;cursor:pointer;border:none}
+
+        /* ===== Botones reutilizables ===== */
+        .btn{display:inline-flex;align-items:center;gap:8px;font-family:'Oswald',sans-serif;font-weight:700;
+            text-transform:uppercase;letter-spacing:1.5px;font-size:.85rem;padding:13px 24px;border-radius:12px;
+            transition:transform .25s var(--ease),box-shadow .25s var(--ease),background .25s var(--ease),color .25s var(--ease)}
+        .btn-primary{background:linear-gradient(135deg,var(--ember-soft),var(--ember-deep));color:#fff;box-shadow:0 10px 30px var(--glow)}
+        .btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 40px var(--glow)}
+        .btn-ghost{border:1.5px solid var(--line);color:var(--text);background:transparent}
+        .btn-ghost:hover{border-color:var(--ember);color:var(--ember)}
+        .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+        /* ===== LOGIN ===== */
+        .login-wrap{min-height:100vh;display:grid;place-items:center;padding:24px}
+        .login-card{width:min(400px,100%);background:var(--card);border:1px solid var(--line);
+            border-radius:var(--radius-lg);padding:clamp(28px,5vw,42px);box-shadow:0 24px 60px rgba(0,0,0,.5)}
+        .login-card .brand{text-align:center;margin-bottom:28px}
+        .login-card .brand h1{color:#fff;font-size:1.7rem}
+        .login-card .brand span{color:var(--muted);font-size:.8rem;letter-spacing:2px;text-transform:uppercase}
+        .field{margin-bottom:16px}
+        .field label{display:block;font-size:.74rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+        .field input{width:100%;background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:12px;
+            padding:14px 16px;color:var(--cream);font-size:1rem;transition:border-color .25s var(--ease)}
+        .field input:focus{outline:none;border-color:var(--ember)}
+        .login-card .btn{width:100%;justify-content:center;margin-top:6px}
+        .form-msg{min-height:20px;margin-top:14px;font-size:.85rem;text-align:center}
+        .form-msg.error{color:var(--bad)}
+
+        /* ===== PANEL ===== */
+        .panel{max-width:var(--maxw);margin:0 auto;padding:clamp(20px,4vw,40px)}
+        .panel-top{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;margin-bottom:8px}
+        .panel-top h1{color:#fff;font-size:clamp(1.6rem,5vw,2.2rem)}
+        .panel-sub{color:var(--muted);font-size:.9rem;margin-bottom:30px}
+        .panel-actions{display:flex;gap:10px;flex-wrap:wrap}
+
+        .promo-list{display:flex;flex-direction:column;gap:14px}
+        .promo{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+            padding:20px 22px;display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;
+            transition:border-color .3s var(--ease)}
+        .promo.inactiva{opacity:.6}
+        .promo:hover{border-color:rgba(255,102,0,.4)}
+
+        /* Interruptor activar/desactivar */
+        .switch{position:relative;width:52px;height:30px;flex-shrink:0}
+        .switch input{position:absolute;opacity:0;width:100%;height:100%;cursor:pointer;margin:0;z-index:2}
+        .switch .track{position:absolute;inset:0;background:rgba(255,255,255,.12);border-radius:30px;transition:background .25s var(--ease)}
+        .switch .thumb{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;
+            transition:transform .25s var(--ease)}
+        .switch input:checked ~ .track{background:linear-gradient(135deg,var(--ember-soft),var(--ember-deep))}
+        .switch input:checked ~ .thumb{transform:translateX(22px)}
+        .switch input:focus-visible ~ .track{outline:2px solid var(--ember-soft);outline-offset:2px}
+
+        .promo-info h3{color:var(--cream);font-size:1.2rem;letter-spacing:.5px}
+        .promo-info .estado{font-size:.68rem;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;margin-left:10px}
+        .estado.on{color:var(--ok)} .estado.off{color:var(--muted)}
+        .promo-info p{color:var(--muted);font-size:.88rem;margin-top:4px}
+        .promo-info .precio{font-family:'Oswald';font-weight:700;color:var(--ember);font-size:1.15rem;margin-top:6px}
+
+        .promo-tools{display:flex;align-items:center;gap:6px}
+        .icon-btn{width:38px;height:38px;display:grid;place-items:center;border-radius:10px;background:rgba(255,255,255,.05);
+            border:1px solid var(--line);color:var(--text);transition:background .25s var(--ease),color .25s var(--ease)}
+        .icon-btn:hover{background:var(--ember);color:#fff}
+        .icon-btn.danger:hover{background:var(--bad)}
+        .icon-btn:disabled{opacity:.3;cursor:not-allowed}
+        .icon-btn svg{width:18px;height:18px;fill:currentColor}
+
+        .empty{text-align:center;padding:60px 20px;color:var(--muted);border:1px dashed var(--line);border-radius:var(--radius)}
+        .empty h3{color:var(--cream);margin-bottom:8px}
+        .loading{text-align:center;color:var(--muted);padding:50px}
+
+        /* ===== MODAL (crear / editar) ===== */
+        .modal-bg{position:fixed;inset:0;background:rgba(5,2,0,.72);backdrop-filter:blur(4px);
+            display:none;place-items:center;padding:24px;z-index:100}
+        .modal-bg.open{display:grid}
+        .modal{width:min(480px,100%);background:var(--char-800);border:1px solid var(--line);
+            border-radius:var(--radius-lg);padding:clamp(24px,4vw,34px);box-shadow:0 30px 70px rgba(0,0,0,.6)}
+        .modal h2{color:#fff;font-size:1.4rem;margin-bottom:22px}
+        .modal textarea{width:100%;background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:12px;
+            padding:14px 16px;color:var(--cream);font-size:1rem;font-family:inherit;resize:vertical;min-height:78px}
+        .modal textarea:focus{outline:none;border-color:var(--ember)}
+        .modal-foot{display:flex;gap:10px;justify-content:flex-end;margin-top:24px}
+
+        /* ===== TOAST ===== */
+        .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
+            background:var(--char-900);border:1px solid var(--line);color:var(--cream);padding:13px 22px;
+            border-radius:30px;font-size:.9rem;box-shadow:0 12px 36px rgba(0,0,0,.5);opacity:0;pointer-events:none;
+            transition:opacity .3s var(--ease),transform .3s var(--ease);z-index:200}
+        .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+        .toast.ok{border-color:rgba(61,220,132,.5)} .toast.bad{border-color:rgba(255,92,92,.5)}
+
+        .hidden{display:none!important}
+
+        @media(max-width:560px){
+            .promo{grid-template-columns:auto 1fr;gap:14px}
+            .promo-tools{grid-column:1 / -1;justify-content:flex-end}
+        }
+        @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+    </style>
+</head>
+<body>
+
+    <!-- ========== LOGIN ========== -->
+    <section class="login-wrap" id="loginView">
+        <div class="login-card">
+            <div class="brand">
+                <span class="eyebrow">Panel privado</span>
+                <h1>La Hornilla de Zaid</h1>
+                <span>Gestión de promociones</span>
+            </div>
+            <div class="field">
+                <label for="email">Correo</label>
+                <input type="email" id="email" autocomplete="username" placeholder="tucorreo@ejemplo.com">
+            </div>
+            <div class="field">
+                <label for="pass">Contraseña</label>
+                <input type="password" id="pass" autocomplete="current-password" placeholder="••••••••">
+            </div>
+            <button class="btn btn-primary" id="btnLogin">Entrar</button>
+            <p class="form-msg" id="loginMsg"></p>
+        </div>
+    </section>
+
+    <!-- ========== PANEL ========== -->
+    <main class="panel hidden" id="panelView">
+        <div class="panel-top">
+            <div>
+                <span class="eyebrow">Panel</span>
+                <h1>Promociones</h1>
+            </div>
+            <div class="panel-actions">
+                <button class="btn btn-primary" id="btnNueva">+ Nueva promoción</button>
+                <button class="btn btn-ghost" id="btnLogout">Cerrar sesión</button>
+            </div>
+        </div>
+        <p class="panel-sub">Enciende el interruptor para mostrar una promoción en el sitio. Apágalo para ocultarla.</p>
+
+        <div id="listaWrap">
+            <p class="loading" id="loadingMsg">Cargando promociones…</p>
+            <div class="promo-list" id="lista"></div>
+            <div class="empty hidden" id="vacio">
+                <h3>Aún no hay promociones</h3>
+                <p>Crea la primera con el botón “Nueva promoción”.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- ========== MODAL ========== -->
+    <div class="modal-bg" id="modalBg">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitulo">
+            <h2 id="modalTitulo">Nueva promoción</h2>
+            <div class="field">
+                <label for="mNombre">Nombre</label>
+                <input type="text" id="mNombre" placeholder="Combo Mega Quesadilla">
+            </div>
+            <div class="field">
+                <label for="mDesc">Descripción</label>
+                <textarea id="mDesc" placeholder="1/2 Sopa de tortilla + Mega Quesadilla + Bebida."></textarea>
+            </div>
+            <div class="field">
+                <label for="mPrecio">Precio</label>
+                <input type="text" id="mPrecio" placeholder="$5.50">
+            </div>
+            <p class="form-msg error" id="modalMsg"></p>
+            <div class="modal-foot">
+                <button class="btn btn-ghost" id="btnCancelar">Cancelar</button>
+                <button class="btn btn-primary" id="btnGuardar">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <!-- ========== LÓGICA ========== -->
+    <script type="module">
+        import { auth, db, COLECCION } from './firebase-config.js';
+        import {
+            signInWithEmailAndPassword, signOut, onAuthStateChanged
+        } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js';
+        import {
+            collection, query, orderBy, onSnapshot,
+            addDoc, updateDoc, deleteDoc, doc, serverTimestamp
+        } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
+
+        const $ = id => document.getElementById(id);
+        const loginView = $('loginView'), panelView = $('panelView');
+
+        /* ---------- TOAST ---------- */
+        let toastTimer;
+        function toast(texto, tipo = 'ok') {
+            const t = $('toast');
+            t.textContent = texto;
+            t.className = 'toast show ' + tipo;
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => t.className = 'toast', 2600);
+        }
+
+        /* ---------- AUTENTICACIÓN ---------- */
+        const erroresAuth = {
+            'auth/invalid-email': 'El correo no es válido.',
+            'auth/user-not-found': 'No existe una cuenta con ese correo.',
+            'auth/wrong-password': 'Contraseña incorrecta.',
+            'auth/invalid-credential': 'Correo o contraseña incorrectos.',
+            'auth/too-many-requests': 'Demasiados intentos. Espera un momento.',
+            'auth/network-request-failed': 'Sin conexión. Revisa tu internet.'
+        };
+
+        $('btnLogin').addEventListener('click', login);
+        $('pass').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+        $('email').addEventListener('keydown', e => { if (e.key === 'Enter') $('pass').focus(); });
+
+        async function login() {
+            const email = $('email').value.trim();
+            const pass = $('pass').value;
+            const msg = $('loginMsg');
+            msg.textContent = '';
+            if (!email || !pass) { msg.textContent = 'Escribe tu correo y contraseña.'; msg.className = 'form-msg error'; return; }
+            $('btnLogin').disabled = true;
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+            } catch (err) {
+                msg.textContent = erroresAuth[err.code] || 'No se pudo iniciar sesión.';
+                msg.className = 'form-msg error';
+            } finally {
+                $('btnLogin').disabled = false;
+            }
+        }
+
+        $('btnLogout').addEventListener('click', () => signOut(auth));
+
+        let desuscribir = null;
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                loginView.classList.add('hidden');
+                panelView.classList.remove('hidden');
+                escuchar();
+            } else {
+                panelView.classList.add('hidden');
+                loginView.classList.remove('hidden');
+                $('pass').value = '';
+                if (desuscribir) { desuscribir(); desuscribir = null; }
+            }
+        });
+
+        /* ---------- LISTA EN VIVO ---------- */
+        let promos = [];   // [{id, ...datos}]
+        function escuchar() {
+            const q = query(collection(db, COLECCION), orderBy('orden', 'asc'));
+            desuscribir = onSnapshot(q, snap => {
+                promos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                $('loadingMsg').classList.add('hidden');
+                render();
+            }, err => {
+                $('loadingMsg').textContent = 'No se pudieron cargar las promociones.';
+                console.error(err);
+            });
+        }
+
+        function esc(s = '') { return s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+        function render() {
+            const cont = $('lista');
+            $('vacio').classList.toggle('hidden', promos.length > 0);
+            cont.innerHTML = promos.map((p, i) => `
+                <article class="promo ${p.activa ? '' : 'inactiva'}">
+                    <label class="switch" title="${p.activa ? 'Activa' : 'Inactiva'}">
+                        <input type="checkbox" ${p.activa ? 'checked' : ''} data-toggle="${p.id}" aria-label="Activar o desactivar">
+                        <span class="track"></span><span class="thumb"></span>
+                    </label>
+                    <div class="promo-info">
+                        <h3>${esc(p.nombre)}<span class="estado ${p.activa ? 'on' : 'off'}">${p.activa ? 'Activa' : 'Oculta'}</span></h3>
+                        <p>${esc(p.descripcion || '')}</p>
+                        <div class="precio">${esc(p.precio || '')}</div>
+                    </div>
+                    <div class="promo-tools">
+                        <button class="icon-btn" data-up="${p.id}" ${i === 0 ? 'disabled' : ''} aria-label="Subir" title="Subir">
+                            <svg viewBox="0 0 24 24"><path d="M12 7l6 6-1.4 1.4L12 9.8 7.4 14.4 6 13z"/></svg></button>
+                        <button class="icon-btn" data-down="${p.id}" ${i === promos.length - 1 ? 'disabled' : ''} aria-label="Bajar" title="Bajar">
+                            <svg viewBox="0 0 24 24"><path d="M12 17l-6-6 1.4-1.4L12 14.2l4.6-4.6L18 11z"/></svg></button>
+                        <button class="icon-btn" data-edit="${p.id}" aria-label="Editar" title="Editar">
+                            <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zM20.7 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75z"/></svg></button>
+                        <button class="icon-btn danger" data-del="${p.id}" aria-label="Borrar" title="Borrar">
+                            <svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6zM19 4h-3.5l-1-1h-5l-1 1H5v2h14z"/></svg></button>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        /* ---------- ACCIONES ---------- */
+        $('lista').addEventListener('click', async e => {
+            const t = e.target.closest('button[data-edit],button[data-del],button[data-up],button[data-down]');
+            if (!t) return;
+            if (t.dataset.edit)  abrirModal(t.dataset.edit);
+            if (t.dataset.del)   borrar(t.dataset.del);
+            if (t.dataset.up)    mover(t.dataset.up, -1);
+            if (t.dataset.down)  mover(t.dataset.down, 1);
+        });
+
+        $('lista').addEventListener('change', async e => {
+            const chk = e.target.closest('input[data-toggle]');
+            if (!chk) return;
+            try {
+                await updateDoc(doc(db, COLECCION, chk.dataset.toggle), { activa: chk.checked });
+                toast(chk.checked ? 'Promoción activada' : 'Promoción oculta');
+            } catch (err) { toast('No se pudo guardar', 'bad'); chk.checked = !chk.checked; }
+        });
+
+        async function mover(id, dir) {
+            const i = promos.findIndex(p => p.id === id);
+            const j = i + dir;
+            if (j < 0 || j >= promos.length) return;
+            const a = promos[i], b = promos[j];
+            try {
+                await Promise.all([
+                    updateDoc(doc(db, COLECCION, a.id), { orden: b.orden ?? j }),
+                    updateDoc(doc(db, COLECCION, b.id), { orden: a.orden ?? i })
+                ]);
+            } catch (err) { toast('No se pudo reordenar', 'bad'); }
+        }
+
+        async function borrar(id) {
+            const p = promos.find(x => x.id === id);
+            if (!confirm(`¿Borrar “${p?.nombre || 'esta promoción'}”? Esta acción no se puede deshacer.`)) return;
+            try { await deleteDoc(doc(db, COLECCION, id)); toast('Promoción borrada'); }
+            catch (err) { toast('No se pudo borrar', 'bad'); }
+        }
+
+        /* ---------- MODAL CREAR / EDITAR ---------- */
+        let editId = null;
+        function abrirModal(id = null) {
+            editId = id;
+            const p = id ? promos.find(x => x.id === id) : null;
+            $('modalTitulo').textContent = id ? 'Editar promoción' : 'Nueva promoción';
+            $('mNombre').value = p?.nombre || '';
+            $('mDesc').value   = p?.descripcion || '';
+            $('mPrecio').value = p?.precio || '';
+            $('modalMsg').textContent = '';
+            $('modalBg').classList.add('open');
+            $('mNombre').focus();
+        }
+        function cerrarModal() { $('modalBg').classList.remove('open'); editId = null; }
+
+        $('btnNueva').addEventListener('click', () => abrirModal());
+        $('btnCancelar').addEventListener('click', cerrarModal);
+        $('modalBg').addEventListener('click', e => { if (e.target === $('modalBg')) cerrarModal(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarModal(); });
+
+        $('btnGuardar').addEventListener('click', async () => {
+            const nombre = $('mNombre').value.trim();
+            const descripcion = $('mDesc').value.trim();
+            const precio = $('mPrecio').value.trim();
+            if (!nombre || !precio) { $('modalMsg').textContent = 'El nombre y el precio son obligatorios.'; return; }
+            $('btnGuardar').disabled = true;
+            try {
+                if (editId) {
+                    await updateDoc(doc(db, COLECCION, editId), { nombre, descripcion, precio });
+                    toast('Cambios guardados');
+                } else {
+                    const maxOrden = promos.reduce((m, p) => Math.max(m, p.orden ?? 0), 0);
+                    await addDoc(collection(db, COLECCION), {
+                        nombre, descripcion, precio,
+                        activa: true, orden: maxOrden + 1, creado: serverTimestamp()
+                    });
+                    toast('Promoción creada');
+                }
+                cerrarModal();
+            } catch (err) { $('modalMsg').textContent = 'No se pudo guardar. Intenta de nuevo.'; console.error(err); }
+            finally { $('btnGuardar').disabled = false; }
+        });
+    </script>
+</body>
+</html>
