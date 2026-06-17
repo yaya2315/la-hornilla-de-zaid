@@ -18,6 +18,23 @@
 
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="inicio.css">
+
+    <!-- Dos botones apilados en el hero -->
+    <style>
+        .hero-cta {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+        }
+        .hero-cta .btn-primary,
+        .hero-cta .btn-ghost { min-width: 250px; justify-content: center; }
+        /* El botón "fantasma" se ve mejor sobre el hero oscuro con un velo */
+        .hero-cta .btn-ghost {
+            background: rgba(10, 3, 0, 0.35);
+            backdrop-filter: blur(4px);
+        }
+    </style>
 </head>
 <body>
 
@@ -53,7 +70,8 @@
                 <h1 class="sr-only">La Hornilla de Zaid — Cocina mexicana hecha a la hornilla en Sonzacate</h1>
                 <span class="hero-eyebrow">Cocina mexicana · Hecho a la hornilla</span>
                 <div class="hero-cta">
-                    <a href="menu.html" class="btn-primary">Ver el menú <span class="arrow">→</span></a>
+                    <a href="menu.html" class="btn-primary">Menú Mexicano <span class="arrow">→</span></a>
+                    <a href="pupusas.html" class="btn-ghost">Menú de Pupusas <span class="arrow">→</span></a>
                 </div>
             </div>
     </main>
@@ -66,6 +84,7 @@
             <ul>
                 <li><a href="index.html" aria-current="page">Inicio</a></li>
                 <li><a href="menu.html">Menú</a></li>
+                <li><a href="pupusas.html">Pupusas</a></li>
                 <li><a href="ubicacion.html">Ubicación</a></li>
             </ul>
         </nav>
