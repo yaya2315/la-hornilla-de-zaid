@@ -360,6 +360,143 @@ a { color: inherit; }
 .reveal[data-delay="4"] { transition-delay: 0.32s; }
 .reveal[data-delay="5"] { transition-delay: 0.40s; }
 
+/* ===== BUSCADOR + FILTROS DE CARTA (menú y pupusas) ======= */
+.carta-toolbar {
+    position: sticky;
+    top: 70px;
+    z-index: 500;
+    background: rgba(10, 3, 0, 0.82);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+}
+.carta-toolbar-inner {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 14px clamp(16px, 5vw, 60px);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.carta-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.carta-search svg {
+    position: absolute;
+    left: 16px;
+    width: 18px; height: 18px;
+    fill: var(--muted);
+    pointer-events: none;
+}
+.carta-search input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--line);
+    border-radius: 30px;
+    padding: 12px 16px 12px 44px;
+    color: var(--cream);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.92rem;
+    transition: border-color 0.25s var(--ease), background 0.25s var(--ease);
+}
+.carta-search input::placeholder { color: var(--muted); }
+.carta-search input:focus { outline: none; border-color: var(--ember); background: rgba(255, 255, 255, 0.08); }
+.carta-search .clear-btn {
+    position: absolute;
+    right: 8px;
+    width: 28px; height: 28px;
+    display: grid; place-items: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--muted);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s var(--ease), color 0.2s var(--ease);
+}
+.carta-search .clear-btn svg { position: static; width: 13px; height: 13px; fill: currentColor; }
+.carta-search.has-text .clear-btn { opacity: 1; pointer-events: auto; }
+.carta-search .clear-btn:hover { color: var(--ember); }
+
+.carta-cats {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+}
+.carta-cats::-webkit-scrollbar { display: none; }
+.carta-cat-pill {
+    flex: 0 0 auto;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 0.76rem;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--text);
+    padding: 8px 16px;
+    border-radius: 30px;
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.03);
+    white-space: nowrap;
+    transition: color 0.25s var(--ease), background 0.25s var(--ease), border-color 0.25s var(--ease);
+}
+.carta-cat-pill:hover { color: var(--cream); border-color: var(--ember); }
+.carta-cat-pill.is-active {
+    color: #fff;
+    background: linear-gradient(135deg, var(--ember-soft), var(--ember-deep));
+    border-color: transparent;
+    box-shadow: 0 6px 18px var(--glow);
+}
+
+.carta-sin-resultados {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+}
+.carta-sin-resultados h3 { color: var(--cream); margin-bottom: 8px; font-size: 1.3rem; }
+.carta-sin-resultados a { color: var(--ember); text-decoration: underline; text-underline-offset: 3px; }
+
+/* Resalta el texto que coincide con la búsqueda */
+mark.carta-match {
+    background: rgba(255, 102, 0, 0.3);
+    color: inherit;
+    border-radius: 3px;
+    padding: 0 1px;
+}
+
+/* ===== BOTÓN COMPARTIR (header de página interna) ========= */
+.page-hero-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+.btn-share {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--line);
+    color: var(--text);
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    border-radius: 30px;
+    transition: border-color 0.25s var(--ease), color 0.25s var(--ease), background 0.25s var(--ease);
+}
+.btn-share:hover { border-color: var(--ember); color: var(--ember); }
+.btn-share svg { width: 16px; height: 16px; fill: currentColor; }
+
+@media (max-width: 860px) {
+    .carta-toolbar { top: 64px; }
+}
+
+/* ===== UTILIDAD ============================================ */
+.hidden { display: none !important; }
+
 /* ===== FOCO ACCESIBLE ===================================== */
 a:focus-visible,
 button:focus-visible {
