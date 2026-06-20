@@ -136,6 +136,69 @@
 
         .hidden{display:none!important}
 
+        /* ===== TABS PRINCIPALES ===== */
+        .top-tabs{display:flex;gap:8px;margin-bottom:28px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+        .top-tab{background:none;color:var(--muted);font-family:'Oswald',sans-serif;font-weight:700;
+            font-size:.82rem;letter-spacing:1.5px;text-transform:uppercase;padding:13px 18px;
+            border-bottom:2px solid transparent;transition:color .25s var(--ease),border-color .25s var(--ease)}
+        .top-tab:hover{color:var(--text)}
+        .top-tab.active{color:var(--ember);border-color:var(--ember)}
+
+        /* ===== SUB-TABS DE CATEGORÍA ===== */
+        .cat-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+        .cat-tab{background:rgba(255,255,255,.04);color:var(--text);font-size:.78rem;font-weight:600;
+            letter-spacing:.5px;padding:9px 16px;border-radius:30px;border:1px solid var(--line);
+            transition:background .2s var(--ease),border-color .2s var(--ease),color .2s var(--ease)}
+        .cat-tab:hover{border-color:var(--ember)}
+        .cat-tab.active{background:linear-gradient(135deg,var(--ember-soft),var(--ember-deep));color:#fff;border-color:transparent}
+        .cat-tab .count{opacity:.7;margin-left:4px}
+        .cat-tab-add{background:none;color:var(--ember);border:1px dashed var(--line);font-size:.78rem;
+            font-weight:600;padding:9px 16px;border-radius:30px}
+        .cat-tab-add:hover{border-color:var(--ember)}
+
+        /* ===== TARJETA DE PLATILLO (lista admin) ===== */
+        .plato{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+            padding:18px 20px;display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;
+            transition:border-color .3s var(--ease)}
+        .plato.inactivo{opacity:.55}
+        .plato:hover{border-color:rgba(255,102,0,.4)}
+        .plato-info h3{color:var(--cream);font-size:1.1rem;letter-spacing:.5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+        .plato-info .tag-nuevo{font-size:.65rem;background:var(--ember);color:#fff;padding:3px 9px;
+            border-radius:6px;letter-spacing:1px;text-transform:uppercase;font-weight:700}
+        .plato-info .nota{color:var(--muted);font-size:.78rem;font-weight:400}
+        .plato-info p.desc{color:var(--muted);font-size:.85rem;margin-top:4px;max-width:48ch}
+        .plato-variantes{margin-top:8px;display:flex;flex-direction:column;gap:3px}
+        .plato-variantes .vrow{display:flex;justify-content:space-between;gap:12px;font-size:.84rem;color:var(--text)}
+        .plato-variantes .vrow .precio{font-family:'Oswald';font-weight:700;color:var(--ember);white-space:nowrap}
+
+        .plato-tools{display:flex;align-items:center;gap:6px}
+
+        .empty-cat{text-align:center;padding:40px 20px;color:var(--muted);border:1px dashed var(--line);border-radius:var(--radius)}
+
+        /* ===== EDITOR DE VARIANTES (en el modal) ===== */
+        .var-list{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+        .var-row{display:grid;grid-template-columns:1fr 110px auto;gap:8px;align-items:center}
+        .var-row input{background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:10px;
+            padding:11px 13px;color:var(--cream);font-size:.92rem}
+        .var-row input:focus{outline:none;border-color:var(--ember)}
+        .var-del{width:38px;height:38px;flex-shrink:0;border-radius:10px;background:rgba(255,255,255,.05);
+            border:1px solid var(--line);color:var(--text);display:grid;place-items:center}
+        .var-del:hover{background:var(--bad);color:#fff}
+        .var-del svg{width:16px;height:16px;fill:currentColor}
+        .btn-add-var{margin-top:4px;background:none;border:1px dashed var(--line);color:var(--ember);
+            font-size:.82rem;font-weight:600;padding:10px;border-radius:10px;width:100%}
+        .btn-add-var:hover{border-color:var(--ember)}
+
+        .check-row{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+        .check-row input[type="checkbox"]{width:18px;height:18px;accent-color:var(--ember)}
+        .check-row label{font-size:.88rem;color:var(--text);cursor:pointer}
+
+        .field select{width:100%;background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:12px;
+            padding:14px 16px;color:var(--cream);font-size:1rem}
+        .field select:focus{outline:none;border-color:var(--ember)}
+        .field-row{display:flex;gap:12px}
+        .field-row .field{flex:1}
+
         @media(max-width:560px){
             .promo{grid-template-columns:auto 1fr;gap:14px}
             .promo-tools{grid-column:1 / -1;justify-content:flex-end}
@@ -171,23 +234,62 @@
         <div class="panel-top">
             <div>
                 <span class="eyebrow">Panel</span>
-                <h1>Promociones</h1>
+                <h1 id="panelTitulo">Promociones</h1>
             </div>
             <div class="panel-actions">
-                <button class="btn btn-primary" id="btnNueva">+ Nueva promoción</button>
+                <button class="btn btn-primary hidden" id="btnNueva">+ Nueva promoción</button>
                 <button class="btn btn-ghost" id="btnLogout">Cerrar sesión</button>
             </div>
         </div>
-        <p class="panel-sub">Cada promoción se muestra en el sitio solo si está encendida y solo en los días que elijas.</p>
 
-        <div id="listaWrap">
-            <p class="loading" id="loadingMsg">Cargando promociones...</p>
-            <div class="promo-list" id="lista"></div>
-            <div class="empty hidden" id="vacio">
-                <h3>Aún no hay promociones</h3>
-                <p>Crea la primera con el botón "Nueva promoción".</p>
+        <nav class="top-tabs">
+            <button class="top-tab active" data-tab="promos">Promociones</button>
+            <button class="top-tab" data-tab="menu">Menú principal</button>
+            <button class="top-tab" data-tab="pupusas">Pupusas</button>
+        </nav>
+
+        <!-- ===== VISTA: PROMOCIONES ===== -->
+        <section id="vistaPromos">
+            <p class="panel-sub">Cada promoción se muestra en el sitio solo si está encendida y solo en los días que elijas.</p>
+            <div id="listaWrap">
+                <p class="loading" id="loadingMsg">Cargando promociones...</p>
+                <div class="promo-list" id="lista"></div>
+                <div class="empty hidden" id="vacio">
+                    <h3>Aún no hay promociones</h3>
+                    <p>Crea la primera con el botón "Nueva promoción".</p>
+                </div>
             </div>
-        </div>
+        </section>
+
+        <!-- ===== VISTA: MENÚ PRINCIPAL ===== -->
+        <section id="vistaMenu" class="hidden">
+            <p class="panel-sub">Platillos del menú mexicano. Cada uno aparece solo si está activo.</p>
+            <div class="panel-actions" style="margin-bottom:18px">
+                <button class="btn btn-primary" id="btnNuevoPlatoMenu">+ Nuevo platillo</button>
+                <button class="btn btn-ghost" id="btnNuevaCatMenu">+ Nueva categoría</button>
+            </div>
+            <nav class="cat-tabs" id="catTabsMenu"></nav>
+            <p class="loading" id="loadingMenu">Cargando menú...</p>
+            <div class="promo-list" id="listaMenu"></div>
+            <div class="empty-cat hidden" id="vacioMenu">
+                <h3>Sin platillos en esta categoría todavía</h3>
+            </div>
+        </section>
+
+        <!-- ===== VISTA: PUPUSAS ===== -->
+        <section id="vistaPupusas" class="hidden">
+            <p class="panel-sub">Platillos del menú de pupusas. Cada uno aparece solo si está activo.</p>
+            <div class="panel-actions" style="margin-bottom:18px">
+                <button class="btn btn-primary" id="btnNuevoPlatoPupusas">+ Nuevo platillo</button>
+                <button class="btn btn-ghost" id="btnNuevaCatPupusas">+ Nueva categoría</button>
+            </div>
+            <nav class="cat-tabs" id="catTabsPupusas"></nav>
+            <p class="loading" id="loadingPupusas">Cargando menú...</p>
+            <div class="promo-list" id="listaPupusas"></div>
+            <div class="empty-cat hidden" id="vacioPupusas">
+                <h3>Sin platillos en esta categoría todavía</h3>
+            </div>
+        </section>
     </main>
 
     <!-- ========== MODAL ========== -->
@@ -233,9 +335,82 @@
 
     <div class="toast" id="toast"></div>
 
+    <!-- ========== MODAL: PLATILLO ========== -->
+    <div class="modal-bg" id="modalPlatoBg">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalPlatoTitulo">
+            <h2 id="modalPlatoTitulo">Nuevo platillo</h2>
+
+            <div class="field">
+                <label for="pNombre">Nombre del platillo</label>
+                <input type="text" id="pNombre" placeholder="Tacos">
+            </div>
+
+            <div class="field-row">
+                <div class="field">
+                    <label for="pCategoria">Categoría</label>
+                    <select id="pCategoria"></select>
+                </div>
+                <div class="field">
+                    <label for="pNota">Nota (opcional)</label>
+                    <input type="text" id="pNota" placeholder="Orden de 4">
+                </div>
+            </div>
+
+            <div class="check-row">
+                <input type="checkbox" id="pDestacado">
+                <label for="pDestacado">Mostrar como tarjeta destacada (ej. "Lo nuevo")</label>
+            </div>
+
+            <div id="bloqueDestacado" class="hidden">
+                <div class="field">
+                    <label for="pEtiqueta">Etiqueta</label>
+                    <input type="text" id="pEtiqueta" placeholder="Lo nuevo">
+                </div>
+                <div class="field">
+                    <label for="pDescripcion">Descripción</label>
+                    <textarea id="pDescripcion" placeholder="Base de papa asada con..."></textarea>
+                </div>
+                <div class="field">
+                    <label for="pPrecioUnico">Precio</label>
+                    <input type="text" id="pPrecioUnico" placeholder="$5.50">
+                </div>
+            </div>
+
+            <div id="bloqueVariantes">
+                <label style="display:block;font-size:.74rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:7px">
+                    Opciones y precios
+                </label>
+                <div class="var-list" id="varList"></div>
+                <button type="button" class="btn-add-var" id="btnAddVar">+ Agregar opción</button>
+            </div>
+
+            <p class="form-msg error" id="modalPlatoMsg"></p>
+            <div class="modal-foot">
+                <button class="btn btn-ghost" id="btnCancelarPlato">Cancelar</button>
+                <button class="btn btn-primary" id="btnGuardarPlato">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: CATEGORÍA ========== -->
+    <div class="modal-bg" id="modalCatBg">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalCatTitulo">
+            <h2 id="modalCatTitulo">Nueva categoría</h2>
+            <div class="field">
+                <label for="cNombre">Nombre de la categoría</label>
+                <input type="text" id="cNombre" placeholder="Tacos">
+            </div>
+            <p class="form-msg error" id="modalCatMsg"></p>
+            <div class="modal-foot">
+                <button class="btn btn-ghost" id="btnCancelarCat">Cancelar</button>
+                <button class="btn btn-primary" id="btnGuardarCat">Crear</button>
+            </div>
+        </div>
+    </div>
+
     <!-- ========== LÓGICA ========== -->
     <script type="module">
-        import { auth, db, COLECCION } from './firebase-config.js';
+        import { auth, db, COLECCION, COLECCION_MENU, COLECCION_PUPUSAS, COLECCION_CATEGORIAS } from './firebase-config.js';
         import {
             signInWithEmailAndPassword, signOut, onAuthStateChanged
         } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js';
@@ -304,6 +479,8 @@
         $('btnLogout').addEventListener('click', () => signOut(auth));
 
         let desuscribir = null;
+        let desuscribirMenu = null, desuscribirCatMenu = null;
+        let desuscribirPupusas = null, desuscribirCatPupusas = null;
         onAuthStateChanged(auth, user => {
             if (user) {
                 loginView.classList.add('hidden');
@@ -314,7 +491,31 @@
                 loginView.classList.remove('hidden');
                 $('pass').value = '';
                 if (desuscribir) { desuscribir(); desuscribir = null; }
+                if (desuscribirMenu) { desuscribirMenu(); desuscribirMenu = null; }
+                if (desuscribirCatMenu) { desuscribirCatMenu(); desuscribirCatMenu = null; }
+                if (desuscribirPupusas) { desuscribirPupusas(); desuscribirPupusas = null; }
+                if (desuscribirCatPupusas) { desuscribirCatPupusas(); desuscribirCatPupusas = null; }
             }
+        });
+
+        /* ---------- TABS PRINCIPALES ---------- */
+        const vistas = {
+            promos: { el: $('vistaPromos'), titulo: 'Promociones', nuevaBtn: true },
+            menu: { el: $('vistaMenu'), titulo: 'Menú principal', nuevaBtn: false },
+            pupusas: { el: $('vistaPupusas'), titulo: 'Pupusas', nuevaBtn: false }
+        };
+        let menuIniciado = false, pupusasIniciado = false;
+        document.querySelectorAll('.top-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.top-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                const key = tab.dataset.tab;
+                Object.entries(vistas).forEach(([k, v]) => v.el.classList.toggle('hidden', k !== key));
+                $('panelTitulo').textContent = vistas[key].titulo;
+                $('btnNueva').classList.toggle('hidden', key !== 'promos');
+                if (key === 'menu' && !menuIniciado && window.iniciarMenu) { menuIniciado = true; window.iniciarMenu('menu'); }
+                if (key === 'pupusas' && !pupusasIniciado && window.iniciarMenu) { pupusasIniciado = true; window.iniciarMenu('pupusas'); }
+            });
         });
 
         /* ---------- LISTA EN VIVO ---------- */
@@ -466,6 +667,338 @@
                 cerrarModal();
             } catch (err) { $('modalMsg').textContent = 'No se pudo guardar. Intenta de nuevo.'; console.error(err); }
             finally { $('btnGuardar').disabled = false; }
+        });
+    </script>
+
+    <!-- ========== LÓGICA: MENÚ Y PUPUSAS ========== -->
+    <script type="module">
+        import { db, COLECCION_MENU, COLECCION_PUPUSAS, COLECCION_CATEGORIAS } from './firebase-config.js';
+        import {
+            collection, query, where, orderBy, onSnapshot,
+            addDoc, updateDoc, deleteDoc, doc, serverTimestamp, writeBatch
+        } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
+
+        const $$ = id => document.getElementById(id);
+        function esc(s = '') { return String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
+        function toast(texto, tipo = 'ok') {
+            const t = $$('toast');
+            t.textContent = texto;
+            t.className = 'toast show ' + tipo;
+            clearTimeout(toast._timer);
+            toast._timer = setTimeout(() => t.className = 'toast', 2600);
+        }
+
+        /* Configuración por "menu": qué colección, qué elementos del DOM usar */
+        const CFG = {
+            menu: {
+                col: COLECCION_MENU,
+                clave: 'principal',
+                catTabs: $$('catTabsMenu'),
+                lista: $$('listaMenu'),
+                loading: $$('loadingMenu'),
+                vacio: $$('vacioMenu'),
+                btnNuevo: $$('btnNuevoPlatoMenu'),
+                btnNuevaCat: $$('btnNuevaCatMenu')
+            },
+            pupusas: {
+                col: COLECCION_PUPUSAS,
+                clave: 'pupusas',
+                catTabs: $$('catTabsPupusas'),
+                lista: $$('listaPupusas'),
+                loading: $$('loadingPupusas'),
+                vacio: $$('vacioPupusas'),
+                btnNuevo: $$('btnNuevoPlatoPupusas'),
+                btnNuevaCat: $$('btnNuevaCatPupusas')
+            }
+        };
+
+        const estado = {
+            menu:    { platos: [], categorias: [], catActiva: null },
+            pupusas: { platos: [], categorias: [], catActiva: null }
+        };
+
+        window.iniciarMenu = function iniciarMenu(tipo) {
+            const cfg = CFG[tipo];
+            const st = estado[tipo];
+
+            /* Categorías en vivo */
+            const qCat = query(collection(db, COLECCION_CATEGORIAS), where('menu', '==', cfg.clave), orderBy('orden', 'asc'));
+            onSnapshot(qCat, snap => {
+                st.categorias = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                if (!st.catActiva && st.categorias.length) st.catActiva = st.categorias[0].nombre;
+                renderCatTabs(tipo);
+                renderPlatos(tipo);
+                poblarSelectCategorias(tipo);
+            }, err => console.error(err));
+
+            /* Platillos en vivo */
+            const qPlatos = query(collection(db, cfg.col), orderBy('orden', 'asc'));
+            onSnapshot(qPlatos, snap => {
+                st.platos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                cfg.loading.classList.add('hidden');
+                renderCatTabs(tipo);
+                renderPlatos(tipo);
+            }, err => {
+                cfg.loading.textContent = 'No se pudo cargar el menú.';
+                console.error(err);
+            });
+
+            cfg.btnNuevo.addEventListener('click', () => abrirModalPlato(tipo));
+            cfg.btnNuevaCat.addEventListener('click', () => abrirModalCat(tipo));
+        };
+
+        function renderCatTabs(tipo) {
+            const cfg = CFG[tipo], st = estado[tipo];
+            if (!st.categorias.length) { cfg.catTabs.innerHTML = ''; return; }
+            cfg.catTabs.innerHTML = st.categorias.map(c => {
+                const n = st.platos.filter(p => p.categoria === c.nombre).length;
+                const activa = c.nombre === st.catActiva;
+                return `<button type="button" class="cat-tab ${activa ? 'active' : ''}" data-cat="${esc(c.nombre)}">
+                    ${esc(c.nombre)} <span class="count">${n}</span>
+                </button>`;
+            }).join('');
+            cfg.catTabs.querySelectorAll('.cat-tab').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    st.catActiva = btn.dataset.cat;
+                    renderCatTabs(tipo);
+                    renderPlatos(tipo);
+                });
+            });
+        }
+
+        function renderPlatos(tipo) {
+            const cfg = CFG[tipo], st = estado[tipo];
+            const items = st.platos.filter(p => p.categoria === st.catActiva);
+            cfg.vacio.classList.toggle('hidden', items.length > 0 || !st.catActiva);
+            cfg.lista.innerHTML = items.map((p, i) => {
+                const variantesHtml = p.destacado
+                    ? `<div class="plato-variantes"><div class="vrow"><span>${esc(p.descripcion || '')}</span><span class="precio">${esc(p.precioUnico || '')}</span></div></div>`
+                    : `<div class="plato-variantes">${(p.variantes || []).map(v =>
+                        `<div class="vrow"><span>${esc(v.texto)}</span><span class="precio">${esc(v.precio)}</span></div>`).join('')}</div>`;
+                return `
+                <article class="plato ${p.activo === false ? 'inactivo' : ''}" data-id="${p.id}">
+                    <label class="switch" title="${p.activo === false ? 'Inactivo' : 'Activo'}">
+                        <input type="checkbox" ${p.activo === false ? '' : 'checked'} data-toggle-plato="${p.id}" aria-label="Activar o desactivar">
+                        <span class="track"></span><span class="thumb"></span>
+                    </label>
+                    <div class="plato-info">
+                        <h3>${esc(p.nombre)} ${p.nota ? `<span class="nota">· ${esc(p.nota)}</span>` : ''} ${p.destacado ? `<span class="tag-nuevo">${esc(p.etiqueta || 'Destacado')}</span>` : ''}</h3>
+                        ${variantesHtml}
+                    </div>
+                    <div class="plato-tools">
+                        <button class="icon-btn" data-up-plato="${p.id}" ${i === 0 ? 'disabled' : ''} aria-label="Subir" title="Subir">
+                            <svg viewBox="0 0 24 24"><path d="M12 7l6 6-1.4 1.4L12 9.8 7.4 14.4 6 13z"/></svg></button>
+                        <button class="icon-btn" data-down-plato="${p.id}" ${i === items.length - 1 ? 'disabled' : ''} aria-label="Bajar" title="Bajar">
+                            <svg viewBox="0 0 24 24"><path d="M12 17l-6-6 1.4-1.4L12 14.2l4.6-4.6L18 11z"/></svg></button>
+                        <button class="icon-btn" data-edit-plato="${p.id}" data-tipo="${tipo}" aria-label="Editar" title="Editar">
+                            <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zM20.7 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75z"/></svg></button>
+                        <button class="icon-btn danger" data-del-plato="${p.id}" data-tipo="${tipo}" aria-label="Borrar" title="Borrar">
+                            <svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6zM19 4h-3.5l-1-1h-5l-1 1H5v2h14z"/></svg></button>
+                    </div>
+                </article>`;
+            }).join('');
+        }
+
+        /* ---------- ACCIONES SOBRE LA LISTA (toggle, mover, editar, borrar) ---------- */
+        ['menu', 'pupusas'].forEach(tipo => {
+            const cfg = CFG[tipo];
+
+            cfg.lista.addEventListener('change', async e => {
+                const chk = e.target.closest('input[data-toggle-plato]');
+                if (!chk) return;
+                try {
+                    await updateDoc(doc(db, cfg.col, chk.dataset.togglePlato), { activo: chk.checked });
+                    toast(chk.checked ? 'Platillo activado' : 'Platillo oculto');
+                } catch (err) { toast('No se pudo guardar', 'bad'); chk.checked = !chk.checked; }
+            });
+
+            cfg.lista.addEventListener('click', async e => {
+                const t = e.target.closest('button[data-edit-plato],button[data-del-plato],button[data-up-plato],button[data-down-plato]');
+                if (!t) return;
+                if (t.dataset.editPlato) abrirModalPlato(tipo, t.dataset.editPlato);
+                if (t.dataset.delPlato)  borrarPlato(tipo, t.dataset.delPlato);
+                if (t.dataset.upPlato)   moverPlato(tipo, t.dataset.upPlato, -1);
+                if (t.dataset.downPlato) moverPlato(tipo, t.dataset.downPlato, 1);
+            });
+        });
+
+        async function moverPlato(tipo, id, dir) {
+            const cfg = CFG[tipo], st = estado[tipo];
+            const items = st.platos.filter(p => p.categoria === st.catActiva);
+            const i = items.findIndex(p => p.id === id);
+            const j = i + dir;
+            if (j < 0 || j >= items.length) return;
+            const a = items[i], b = items[j];
+            try {
+                await Promise.all([
+                    updateDoc(doc(db, cfg.col, a.id), { orden: b.orden ?? j }),
+                    updateDoc(doc(db, cfg.col, b.id), { orden: a.orden ?? i })
+                ]);
+            } catch (err) { toast('No se pudo reordenar', 'bad'); }
+        }
+
+        async function borrarPlato(tipo, id) {
+            const cfg = CFG[tipo], st = estado[tipo];
+            const p = st.platos.find(x => x.id === id);
+            if (!confirm(`¿Borrar "${p?.nombre || 'este platillo'}"? Esta acción no se puede deshacer.`)) return;
+            try { await deleteDoc(doc(db, cfg.col, id)); toast('Platillo borrado'); }
+            catch (err) { toast('No se pudo borrar', 'bad'); }
+        }
+
+        /* ---------- SELECT DE CATEGORÍAS EN EL MODAL ---------- */
+        let tipoActualModal = 'menu';
+        function poblarSelectCategorias(tipo) {
+            if (tipo !== tipoActualModal) return;
+            const st = estado[tipo];
+            $$('pCategoria').innerHTML = st.categorias.map(c => `<option value="${esc(c.nombre)}">${esc(c.nombre)}</option>`).join('');
+        }
+
+        /* ---------- VARIANTES EN EL MODAL ---------- */
+        function filaVariante(texto = '', precio = '') {
+            const row = document.createElement('div');
+            row.className = 'var-row';
+            row.innerHTML = `
+                <input type="text" placeholder="Pastor · Pollo pastor · Suadero" class="var-texto" value="${esc(texto)}">
+                <input type="text" placeholder="$4.99" class="var-precio" value="${esc(precio)}">
+                <button type="button" class="var-del" aria-label="Quitar opción">
+                    <svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6zM19 4h-3.5l-1-1h-5l-1 1H5v2h14z"/></svg>
+                </button>`;
+            row.querySelector('.var-del').addEventListener('click', () => row.remove());
+            return row;
+        }
+        $$('btnAddVar').addEventListener('click', () => $$('varList').appendChild(filaVariante()));
+
+        $$('pDestacado').addEventListener('change', () => {
+            const on = $$('pDestacado').checked;
+            $$('bloqueDestacado').classList.toggle('hidden', !on);
+            $$('bloqueVariantes').classList.toggle('hidden', on);
+        });
+
+        /* ---------- MODAL PLATILLO: abrir / cerrar / guardar ---------- */
+        let editPlatoId = null;
+        function abrirModalPlato(tipo, id = null) {
+            tipoActualModal = tipo;
+            editPlatoId = id;
+            const st = estado[tipo];
+            const p = id ? st.platos.find(x => x.id === id) : null;
+
+            if (!st.categorias.length) {
+                toast('Primero crea una categoría', 'bad');
+                return;
+            }
+
+            $$('modalPlatoTitulo').textContent = id ? 'Editar platillo' : 'Nuevo platillo';
+            $$('pNombre').value = p?.nombre || '';
+            poblarSelectCategorias(tipo);
+            $$('pCategoria').value = p?.categoria || st.catActiva || st.categorias[0].nombre;
+            $$('pNota').value = p?.nota || '';
+
+            const destacado = !!p?.destacado;
+            $$('pDestacado').checked = destacado;
+            $$('bloqueDestacado').classList.toggle('hidden', !destacado);
+            $$('bloqueVariantes').classList.toggle('hidden', destacado);
+            $$('pEtiqueta').value = p?.etiqueta || 'Lo nuevo';
+            $$('pDescripcion').value = p?.descripcion || '';
+            $$('pPrecioUnico').value = p?.precioUnico || '';
+
+            $$('varList').innerHTML = '';
+            const variantes = (p?.variantes && p.variantes.length) ? p.variantes : [{ texto: '', precio: '' }];
+            variantes.forEach(v => $$('varList').appendChild(filaVariante(v.texto, v.precio)));
+
+            $$('modalPlatoMsg').textContent = '';
+            $$('modalPlatoBg').classList.add('open');
+            $$('pNombre').focus();
+        }
+        function cerrarModalPlato() { $$('modalPlatoBg').classList.remove('open'); editPlatoId = null; }
+
+        $$('btnCancelarPlato').addEventListener('click', cerrarModalPlato);
+        $$('modalPlatoBg').addEventListener('click', e => { if (e.target === $$('modalPlatoBg')) cerrarModalPlato(); });
+
+        $$('btnGuardarPlato').addEventListener('click', async () => {
+            const tipo = tipoActualModal;
+            const cfg = CFG[tipo], st = estado[tipo];
+            const nombre = $$('pNombre').value.trim();
+            const categoria = $$('pCategoria').value;
+            const nota = $$('pNota').value.trim();
+            const destacado = $$('pDestacado').checked;
+
+            if (!nombre) { $$('modalPlatoMsg').textContent = 'El nombre es obligatorio.'; return; }
+            if (!categoria) { $$('modalPlatoMsg').textContent = 'Elige una categoría.'; return; }
+
+            let datos = { nombre, categoria, nota, destacado };
+
+            if (destacado) {
+                const etiqueta = $$('pEtiqueta').value.trim() || 'Lo nuevo';
+                const descripcion = $$('pDescripcion').value.trim();
+                const precioUnico = $$('pPrecioUnico').value.trim();
+                if (!precioUnico) { $$('modalPlatoMsg').textContent = 'Pon el precio.'; return; }
+                datos = { ...datos, etiqueta, descripcion, precioUnico, variantes: [] };
+            } else {
+                const variantes = [...$$('varList').querySelectorAll('.var-row')].map(row => ({
+                    texto: row.querySelector('.var-texto').value.trim(),
+                    precio: row.querySelector('.var-precio').value.trim()
+                })).filter(v => v.texto && v.precio);
+                if (variantes.length === 0) { $$('modalPlatoMsg').textContent = 'Agrega al menos una opción con precio.'; return; }
+                datos = { ...datos, variantes, etiqueta: '', descripcion: '', precioUnico: '' };
+            }
+
+            $$('btnGuardarPlato').disabled = true;
+            try {
+                if (editPlatoId) {
+                    await updateDoc(doc(db, cfg.col, editPlatoId), datos);
+                    toast('Cambios guardados');
+                } else {
+                    const maxOrden = st.platos.reduce((m, p) => Math.max(m, p.orden ?? 0), 0);
+                    await addDoc(collection(db, cfg.col), {
+                        ...datos, activo: true, orden: maxOrden + 1, creado: serverTimestamp()
+                    });
+                    toast('Platillo creado');
+                }
+                cerrarModalPlato();
+            } catch (err) {
+                $$('modalPlatoMsg').textContent = 'No se pudo guardar. Intenta de nuevo.';
+                console.error(err);
+            } finally {
+                $$('btnGuardarPlato').disabled = false;
+            }
+        });
+
+        /* ---------- MODAL CATEGORÍA: abrir / cerrar / guardar ---------- */
+        function abrirModalCat(tipo) {
+            tipoActualModal = tipo;
+            $$('cNombre').value = '';
+            $$('modalCatMsg').textContent = '';
+            $$('modalCatBg').classList.add('open');
+            $$('cNombre').focus();
+        }
+        function cerrarModalCat() { $$('modalCatBg').classList.remove('open'); }
+        $$('btnCancelarCat').addEventListener('click', cerrarModalCat);
+        $$('modalCatBg').addEventListener('click', e => { if (e.target === $$('modalCatBg')) cerrarModalCat(); });
+
+        $$('btnGuardarCat').addEventListener('click', async () => {
+            const tipo = tipoActualModal;
+            const cfg = CFG[tipo], st = estado[tipo];
+            const nombre = $$('cNombre').value.trim();
+            if (!nombre) { $$('modalCatMsg').textContent = 'Escribe un nombre.'; return; }
+            if (st.categorias.some(c => c.nombre.toLowerCase() === nombre.toLowerCase())) {
+                $$('modalCatMsg').textContent = 'Ya existe una categoría con ese nombre.';
+                return;
+            }
+            $$('btnGuardarCat').disabled = true;
+            try {
+                const maxOrden = st.categorias.reduce((m, c) => Math.max(m, c.orden ?? 0), 0);
+                await addDoc(collection(db, COLECCION_CATEGORIAS), {
+                    menu: cfg.clave, nombre, orden: maxOrden + 1
+                });
+                st.catActiva = nombre;
+                toast('Categoría creada');
+                cerrarModalCat();
+            } catch (err) {
+                $$('modalCatMsg').textContent = 'No se pudo crear. Intenta de nuevo.';
+                console.error(err);
+            } finally {
+                $$('btnGuardarCat').disabled = false;
+            }
         });
     </script>
 </body>
