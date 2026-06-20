@@ -55,87 +55,44 @@
                 Martes a Sábado · 10:30 a.m. – 2:00 p.m. y 5:00 p.m. – 9:30 p.m.<br>
                 Domingo · 5:00 p.m. – 9:30 p.m.
             </p>
+            <div class="page-hero-actions">
+                <button type="button" class="btn-share" id="btnCompartirMenu">
+                    <svg viewBox="0 0 24 24"><path d="M18 16.1c-.8 0-1.5.3-2 .9l-7.1-4.1c.1-.3.1-.6.1-.9s0-.6-.1-.9L15.9 7c.5.5 1.2.8 2.1.8 1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3c0 .3 0 .6.1.9L7.9 9.9C7.4 9.3 6.7 9 5.9 9c-1.7 0-3 1.3-3 3s1.3 3 3 3c.8 0 1.5-.3 2-.9l7.2 4.2c-.1.3-.1.5-.1.8 0 1.6 1.3 3 3 3s3-1.4 3-3-1.3-3-3-3z"/></svg>
+                    Compartir menú
+                </button>
+            </div>
         </section>
 
         <!-- ===== ⭐ PROMOCIONES DEL DÍA (las llena promos.js) ===== -->
         <div id="combosActivos" class="combos-wrap" aria-label="Promociones del día"></div>
 
-        <!-- ===== PLATILLOS ===== -->
+        <!-- ===== BUSCADOR + CATEGORÍAS ===== -->
+        <nav class="carta-toolbar" id="cartaToolbar">
+            <div class="carta-toolbar-inner">
+                <div class="carta-search" id="cartaSearchWrap">
+                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.8l-.3-.3a6.5 6.5 0 1 0-.7.7l.3.3v.8l5 5L20.5 19zM10 14a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/></svg>
+                    <input type="text" id="cartaBuscar" placeholder="Buscar en el menú... (ej. pastor, birria)" aria-label="Buscar platillo">
+                    <button type="button" class="clear-btn" id="cartaClear" aria-label="Limpiar búsqueda">
+                        <svg viewBox="0 0 24 24"><path d="M18.3 5.7L12 12l6.3 6.3-1.4 1.4L10.6 13.4 4.3 19.7 2.9 18.3 9.2 12 2.9 5.7 4.3 4.3l6.3 6.3 6.3-6.3z"/></svg>
+                    </button>
+                </div>
+                <div class="carta-cats" id="cartaCats"></div>
+            </div>
+        </nav>
+
+        <!-- ===== PLATILLOS (cargados desde Firebase) ===== -->
         <section class="menu-section" id="platillos">
             <div class="section-header reveal">
                 <span class="eyebrow">Lo mejor de la casa</span>
                 <h2>Platillos</h2>
             </div>
 
-            <div class="platillos-grid">
-
-                <article class="platillo-card reveal" data-delay="1">
-                    <div class="platillo-head">
-                        <h3>Tacos</h3>
-                        <span class="platillo-nota">Orden de 4</span>
-                    </div>
-                    <div class="platillo-rows">
-                        <div class="row"><span>Pastor · Pollo pastor · Suadero</span><span class="precio">$4.99</span></div>
-                        <div class="row"><span>Cochinita pibil · Birria</span><span class="precio">$5.99</span></div>
-                    </div>
-                </article>
-
-                <article class="platillo-card reveal" data-delay="2">
-                    <div class="platillo-head"><h3>Burrito</h3></div>
-                    <div class="platillo-rows">
-                        <div class="row"><span>Pastor · Pollo pastor · Suadero</span><span class="precio">$4.99</span></div>
-                        <div class="row"><span>Cochinita pibil · Birria</span><span class="precio">$5.99</span></div>
-                    </div>
-                </article>
-
-                <article class="platillo-card reveal" data-delay="1">
-                    <div class="platillo-head"><h3>Tortas</h3></div>
-                    <div class="platillo-rows">
-                        <div class="row"><span>Pastor · Pollo pastor · Suadero</span><span class="precio">$4.99</span></div>
-                        <div class="row"><span>Cochinita pibil · Birria</span><span class="precio">$5.99</span></div>
-                    </div>
-                </article>
-
-                <article class="platillo-card reveal" data-delay="2">
-                    <div class="platillo-head"><h3>Nachos</h3></div>
-                    <div class="platillo-rows">
-                        <div class="row"><span>Pastor · Pollo pastor · Suadero</span><span class="precio">$4.50</span></div>
-                        <div class="row"><span>Cochinita pibil · Birria</span><span class="precio">$5.50</span></div>
-                    </div>
-                </article>
-
-                <article class="platillo-card reveal" data-delay="1">
-                    <div class="platillo-head">
-                        <h3>Quesadillas</h3>
-                        <span class="platillo-nota">Orden de 3</span>
-                    </div>
-                    <div class="platillo-rows">
-                        <div class="row"><span>Pastor · Pollo pastor · Suadero</span><span class="precio">$4.99</span></div>
-                        <div class="row"><span>Cochinita pibil · Birria</span><span class="precio">$5.99</span></div>
-                    </div>
-                </article>
-
-                <article class="platillo-card reveal" data-delay="2">
-                    <div class="platillo-head">
-                        <h3>Sopa de Tortilla</h3>
-                        <span class="platillo-nota">Carne a elección</span>
-                    </div>
-                    <div class="platillo-rows">
-                        <div class="row"><span>Media (16 oz)</span><span class="precio">$3.00</span></div>
-                        <div class="row"><span>Entera (32 oz)</span><span class="precio">$5.00</span></div>
-                    </div>
-                </article>
-
-                <!-- LO NUEVO: Papa Asada -->
-                <article class="platillo-card nuevo-card reveal">
-                    <span class="nuevo-tag">Lo nuevo</span>
-                    <div>
-                        <h3>Papa Asada</h3>
-                        <p>Base de papa asada con mezcla de queso gratinado y cheddar, crema, tu carne a elección, pico de gallo y un toque de salsa de aguacate.</p>
-                    </div>
-                    <span class="precio">$5.50</span>
-                </article>
-
+            <div id="cartaApp" data-tipo="menu">
+                <div class="platillos-grid" id="cartaGrid"></div>
+                <div class="carta-sin-resultados hidden" id="cartaSinResultados">
+                    <h3>No encontramos nada con <span class="termino"></span></h3>
+                    <p>Prueba con otra palabra o <a href="https://wa.me/50370991660" target="_blank" rel="noopener">pregúntanos por WhatsApp</a>.</p>
+                </div>
             </div>
 
             <!-- Extras -->
@@ -152,7 +109,7 @@
             <p class="propina reveal">Propina: 5% sobre el consumo en el local</p>
         </section>
 
-        <!-- ===== PUPUSAS ===== -->
+        <!-- ===== PUPUSAS (vista rápida, el menú completo está en pupusas.html) ===== -->
         <section class="menu-section dark" id="pupusas">
             <div class="inner">
                 <div class="section-header reveal">
@@ -288,8 +245,10 @@
     </aside>
 
     <!-- Scripts: el primero hace funcionar el menú y las animaciones;
-         el segundo (módulo) muestra el combo desde Firebase. -->
+         el segundo (módulo) muestra el combo desde Firebase;
+         el tercero (módulo) carga los platillos, buscador y compartir. -->
     <script src="script.js"></script>
     <script type="module" src="promos.js"></script>
+    <script type="module" src="cartas.js"></script>
 </body>
 </html>
