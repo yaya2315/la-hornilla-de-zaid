@@ -22,3 +22,12 @@ export const db   = getFirestore(app);
 
 /* Nombre de la colección donde se guardan las promociones. */
 export const COLECCION = 'promociones';
+
+/* Colecciones del menú virtual.
+   Cada platillo vive en una de estas dos colecciones, con un campo
+   "categoria" (texto, ej. "Tacos") que agrupa los platillos en el
+   admin y en el sitio. El orden de las categorías se guarda aparte
+   en COLECCION_CATEGORIAS, distinguidas por el campo "menu". */
+export const COLECCION_MENU = 'menuPrincipal';
+export const COLECCION_PUPUSAS = 'menuPupusas';
+export const COLECCION_CATEGORIAS = 'menuCategorias';
