@@ -17,7 +17,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="menu.css">
     <link rel="stylesheet" href="pupusas.css">
 </head>
 <body>
@@ -41,29 +40,31 @@
             <p class="horario">
                 Lunes a Sábado · 6:30 a.m. – 10:30 a.m.<br>
             </p>
-            <div class="page-hero-actions">
-                <button type="button" class="btn-share" id="btnCompartirMenu">
-                    <svg viewBox="0 0 24 24"><path d="M18 16.1c-.8 0-1.5.3-2 .9l-7.1-4.1c.1-.3.1-.6.1-.9s0-.6-.1-.9L15.9 7c.5.5 1.2.8 2.1.8 1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3c0 .3 0 .6.1.9L7.9 9.9C7.4 9.3 6.7 9 5.9 9c-1.7 0-3 1.3-3 3s1.3 3 3 3c.8 0 1.5-.3 2-.9l7.2 4.2c-.1.3-.1.5-.1.8 0 1.6 1.3 3 3 3s3-1.4 3-3-1.3-3-3-3z"/></svg>
-                    Compartir menú
-                </button>
-            </div>
         </section>
 
-        <!-- ===== BUSCADOR + CATEGORÍAS ===== -->
-        <nav class="carta-toolbar" id="cartaToolbar">
-            <div class="carta-toolbar-inner">
-                <div class="carta-search" id="cartaSearchWrap">
-                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.8l-.3-.3a6.5 6.5 0 1 0-.7.7l.3.3v.8l5 5L20.5 19zM10 14a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/></svg>
-                    <input type="text" id="cartaBuscar" placeholder="Buscar pupusa o bebida..." aria-label="Buscar platillo">
-                    <button type="button" class="clear-btn" id="cartaClear" aria-label="Limpiar búsqueda">
-                        <svg viewBox="0 0 24 24"><path d="M18.3 5.7L12 12l6.3 6.3-1.4 1.4L10.6 13.4 4.3 19.7 2.9 18.3 9.2 12 2.9 5.7 4.3 4.3l6.3 6.3 6.3-6.3z"/></svg>
-                    </button>
-                </div>
-                <div class="carta-cats" id="cartaCats"></div>
+        <!-- ===== SUB-NAV (acceso rápido a cada bloque) ===== -->
+        <nav class="menu-subnav" aria-label="Secciones del menú de pupusas">
+            <div class="menu-subnav-inner">
+                <a href="#especialidades" class="subnav-pill is-active">Especialidades</a>
+                <a href="#tradicionales" class="subnav-pill">Tradicionales</a>
+                <a href="#toque-mexicano" class="subnav-pill">Toque mexicano</a>
+                <a href="#bebidas-pupusas" class="subnav-pill">Bebidas</a>
             </div>
         </nav>
 
-        <!-- ===== PUPUSAS (cargadas desde Firebase) ===== -->
+        <!-- ===== BUSCADOR ===== -->
+        <div class="pupusa-search-wrap">
+            <div class="pupusa-search">
+                <svg viewBox="0 0 24 24"><path d="M15.5 14h-.8l-.3-.3a6.5 6.5 0 1 0-.7.7l.3.3v.8l5 5L20.5 19zM10 14a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/></svg>
+                <input type="text" id="pupusaBuscar" placeholder="Buscar pupusa o bebida..." aria-label="Buscar en el menú de pupusas">
+                <button type="button" class="clear-btn" id="pupusaClear" aria-label="Limpiar búsqueda">
+                    <svg viewBox="0 0 24 24"><path d="M18.3 5.7L12 12l6.3 6.3-1.4 1.4L10.6 13.4 4.3 19.7 2.9 18.3 9.2 12 2.9 5.7 4.3 4.3l6.3 6.3 6.3-6.3z"/></svg>
+                </button>
+            </div>
+            <p class="pupusa-sin-resultados hidden" id="pupusaSinResultados">No encontramos nada con "<span></span>".</p>
+        </div>
+
+        <!-- ===== PUPUSAS ===== -->
         <section class="menu-section" id="pupusas-section">
             <div class="section-header reveal">
                 <span class="eyebrow">Hechas a mano · a la hornilla</span>
@@ -71,12 +72,67 @@
                 <p>Recién hechas, con tu masa y relleno favoritos.</p>
             </div>
 
-            <div id="cartaApp" data-tipo="pupusas">
-                <div class="platillos-grid" id="cartaGrid"></div>
-                <div class="carta-sin-resultados hidden" id="cartaSinResultados">
-                    <h3>No encontramos nada con <span class="termino"></span></h3>
-                    <p>Prueba con otra palabra o <a href="https://wa.me/50370991660" target="_blank" rel="noopener">pregúntanos por WhatsApp</a>.</p>
-                </div>
+            <div class="pupusas-layout">
+
+                <!-- Especialidades -->
+                <article class="cat-card reveal" id="especialidades" data-delay="1">
+                    <header class="cat-head">
+                        <span class="cat-pill is-red">Especialidades</span>
+                        <span class="cat-precio-fijo">$1.00 c/u</span>
+                    </header>
+                    <ul class="cat-rows">
+                        <li class="cat-row"><span class="cat-name">Ayote</span><span class="precio">$1.00</span></li>
+                        <li class="cat-row"><span class="cat-name">Mora</span><span class="precio">$1.00</span></li>
+                        <li class="cat-row"><span class="cat-name">Queso</span><span class="precio">$1.00</span></li>
+                        <li class="cat-row"><span class="cat-name">Queso con loroco</span><span class="precio">$1.00</span></li>
+                        <li class="cat-row"><span class="cat-name">Ajo</span><span class="precio">$1.00</span></li>
+                        <li class="cat-row"><span class="cat-name">Pollo</span><span class="precio">$1.00</span></li>
+                        <li class="cat-row"><span class="cat-name">Chicharrón con queso</span><span class="precio">$1.00</span></li>
+                    </ul>
+                </article>
+
+                <!-- Tradicionales -->
+                <article class="cat-card reveal" id="tradicionales" data-delay="2">
+                    <header class="cat-head">
+                        <span class="cat-pill is-gold">Tradicionales</span>
+                        <span class="cat-precio-fijo">$0.35 c/u</span>
+                    </header>
+                    <ul class="cat-rows">
+                        <li class="cat-row"><span class="cat-name">Frijol con queso</span><span class="precio">$0.35</span></li>
+                        <li class="cat-row"><span class="cat-name">Revueltas</span><span class="precio">$0.35</span></li>
+                    </ul>
+                    <p class="cat-nota">Las clásicas de siempre, a precio de barrio.</p>
+                </article>
+
+                <!-- Con un toque mexicano -->
+                <article class="toque-card reveal" id="toque-mexicano" data-delay="1">
+                    <header class="cat-head">
+                        <span class="cat-pill is-green">Con un toque mexicano</span>
+                    </header>
+                    <ul class="toque-rows">
+                        <li class="toque-row">
+                            <div class="toque-info">
+                                <h3>Birria con queso</h3>
+                                <p>Acompañada de su caldo, cilantro y cebolla.</p>
+                            </div>
+                            <span class="precio">$1.50</span>
+                        </li>
+                        <li class="toque-row">
+                            <div class="toque-info">
+                                <h3>Pollo pastor con queso y piña</h3>
+                                <p>Acompañada de cilantro y cebolla.</p>
+                            </div>
+                            <span class="precio">$1.50</span>
+                        </li>
+                        <li class="toque-row">
+                            <div class="toque-info">
+                                <h3>Pastor con queso y piña</h3>
+                            </div>
+                            <span class="precio">$1.50</span>
+                        </li>
+                    </ul>
+                </article>
+
             </div>
         </section>
 
@@ -173,8 +229,10 @@
     </aside>
 
     <!-- Scripts: el primero hace funcionar el menú lateral y las animaciones;
-         el segundo (módulo) carga las pupusas, el buscador y compartir. -->
+         el segundo resalta la pestaña activa del sub-menú al hacer scroll;
+         el tercero filtra las pupusas/bebidas según lo que se busca. -->
     <script src="script.js"></script>
-    <script type="module" src="cartas.js"></script>
+    <script src="pupusas.js"></script>
+    <script src="pupusa-buscar.js"></script>
 </body>
 </html>
