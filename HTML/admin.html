@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel · La Hornilla de Zaid</title>
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#120600">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root{
+            --ember:#ff6600; --ember-deep:#d44e00; --ember-soft:#ff8533;
+            --glow:rgba(255,102,0,.35); --line:rgba(255,102,0,.18);
+            --char-900:#0a0300; --char-800:#120600; --char-700:#1a0a02;
+            --card:rgba(40,18,5,.95); --card-soft:rgba(122,63,29,.4);
+            --cream:#f3e9dd; --text:#e3d6c8; --muted:#9d8b7c;
+            --ok:#3ddc84; --bad:#ff5c5c;
+            --radius:16px; --radius-lg:22px;
+            --ease:cubic-bezier(.22,1,.36,1); --maxw:920px;
+        }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{
+            font-family:'Inter',system-ui,sans-serif;
+            background:
+                radial-gradient(80% 60% at 50% 0%, rgba(255,102,0,.10), transparent 60%),
+                var(--char-700);
+            color:var(--text); line-height:1.6; min-height:100vh;
+            -webkit-font-smoothing:antialiased;
+        }
+        h1,h2,h3{font-family:'Oswald',sans-serif;font-weight:700;line-height:1.05;text-transform:uppercase;letter-spacing:1px}
+        .eyebrow{font-size:.72rem;letter-spacing:3px;text-transform:uppercase;color:var(--ember);font-weight:600}
+        button{font-family:inherit;cursor:pointer;border:none}
+
+        .btn{display:inline-flex;align-items:center;gap:8px;font-family:'Oswald',sans-serif;font-weight:700;
+            text-transform:uppercase;letter-spacing:1.5px;font-size:.85rem;padding:13px 24px;border-radius:12px;
+            transition:transform .25s var(--ease),box-shadow .25s var(--ease),background .25s var(--ease),color .25s var(--ease)}
+        .btn-primary{background:linear-gradient(135deg,var(--ember-soft),var(--ember-deep));color:#fff;box-shadow:0 10px 30px var(--glow)}
+        .btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 40px var(--glow)}
+        .btn-ghost{border:1.5px solid var(--line);color:var(--text);background:transparent}
+        .btn-ghost:hover{border-color:var(--ember);color:var(--ember)}
+        .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+        /* ===== LOGIN ===== */
+        .login-wrap{min-height:100vh;display:grid;place-items:center;padding:24px}
+        .login-card{width:min(400px,100%);background:var(--card);border:1px solid var(--line);
+            border-radius:var(--radius-lg);padding:clamp(28px,5vw,42px);box-shadow:0 24px 60px rgba(0,0,0,.5)}
+        .login-card .brand{text-align:center;margin-bottom:28px}
+        .login-card .brand h1{color:#fff;font-size:1.7rem}
+        .login-card .brand span{color:var(--muted);font-size:.8rem;letter-spacing:2px;text-transform:uppercase}
+        .field{margin-bottom:16px}
+        .field label{display:block;font-size:.74rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+        .field input{width:100%;background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:12px;
+            padding:14px 16px;color:var(--cream);font-size:1rem;transition:border-color .25s var(--ease)}
+        .field input:focus{outline:none;border-color:var(--ember)}
+        .login-card .btn{width:100%;justify-content:center;margin-top:6px}
+        .form-msg{min-height:20px;margin-top:14px;font-size:.85rem;text-align:center}
+        .form-msg.error{color:var(--bad)}
+
+        /* ===== PANEL ===== */
+        .panel{max-width:var(--maxw);margin:0 auto;padding:clamp(20px,4vw,40px)}
+        .panel-top{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;margin-bottom:8px}
+        .panel-top h1{color:#fff;font-size:clamp(1.6rem,5vw,2.2rem)}
+        .panel-sub{color:var(--muted);font-size:.9rem;margin-bottom:30px}
+        .panel-actions{display:flex;gap:10px;flex-wrap:wrap}
+
+        .promo-list{display:flex;flex-direction:column;gap:14px}
+        .promo{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+            padding:20px 22px;display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;
+            transition:border-color .3s var(--ease)}
+        .promo.inactiva{opacity:.6}
+        .promo:hover{border-color:rgba(255,102,0,.4)}
+
+        .switch{position:relative;width:52px;height:30px;flex-shrink:0}
+        .switch input{position:absolute;opacity:0;width:100%;height:100%;cursor:pointer;margin:0;z-index:2}
+        .switch .track{position:absolute;inset:0;background:rgba(255,255,255,.12);border-radius:30px;transition:background .25s var(--ease)}
+        .switch .thumb{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .25s var(--ease)}
+        .switch input:checked ~ .track{background:linear-gradient(135deg,var(--ember-soft),var(--ember-deep))}
+        .switch input:checked ~ .thumb{transform:translateX(22px)}
+        .switch input:focus-visible ~ .track{outline:2px solid var(--ember-soft);outline-offset:2px}
+
+        .promo-info h3{color:var(--cream);font-size:1.2rem;letter-spacing:.5px}
+        .promo-info .estado{font-size:.68rem;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;margin-left:10px}
+        .estado.on{color:var(--ok)} .estado.off{color:var(--muted)}
+        .promo-info p{color:var(--muted);font-size:.88rem;margin-top:4px}
+        .promo-info .precio{font-family:'Oswald';font-weight:700;color:var(--ember);font-size:1.15rem;margin-top:6px}
+        .promo-info .promo-dias{color:var(--muted);font-size:.76rem;letter-spacing:.5px;text-transform:uppercase;margin-top:8px}
+        .promo-info .promo-dias b{color:var(--text);font-weight:600}
+
+        .promo-tools{display:flex;align-items:center;gap:6px}
+        .icon-btn{width:38px;height:38px;display:grid;place-items:center;border-radius:10px;background:rgba(255,255,255,.05);
+            border:1px solid var(--line);color:var(--text);transition:background .25s var(--ease),color .25s var(--ease)}
+        .icon-btn:hover{background:var(--ember);color:#fff}
+        .icon-btn.danger:hover{background:var(--bad)}
+        .icon-btn:disabled{opacity:.3;cursor:not-allowed}
+        .icon-btn svg{width:18px;height:18px;fill:currentColor}
+
+        .empty{text-align:center;padding:60px 20px;color:var(--muted);border:1px dashed var(--line);border-radius:var(--radius)}
+        .empty h3{color:var(--cream);margin-bottom:8px}
+        .loading{text-align:center;color:var(--muted);padding:50px}
+
+        /* ===== MODAL ===== */
+        .modal-bg{position:fixed;inset:0;background:rgba(5,2,0,.72);backdrop-filter:blur(4px);
+            display:none;place-items:center;padding:24px;z-index:100;overflow-y:auto}
+        .modal-bg.open{display:grid}
+        .modal{width:min(480px,100%);background:var(--char-800);border:1px solid var(--line);
+            border-radius:var(--radius-lg);padding:clamp(24px,4vw,34px);box-shadow:0 30px 70px rgba(0,0,0,.6);margin:auto}
+        .modal h2{color:#fff;font-size:1.4rem;margin-bottom:22px}
+        .modal textarea{width:100%;background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:12px;
+            padding:14px 16px;color:var(--cream);font-size:1rem;font-family:inherit;resize:vertical;min-height:78px}
+        .modal textarea:focus{outline:none;border-color:var(--ember)}
+        .modal-foot{display:flex;gap:10px;justify-content:flex-end;margin-top:24px}
+
+        /* ===== CHIPS DE DÍAS ===== */
+        .dias-row{display:flex;flex-wrap:wrap;gap:8px}
+        .dia-chip{padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.05);
+            border:1px solid var(--line);color:var(--text);font-size:.82rem;font-weight:600;
+            letter-spacing:.5px;transition:background .2s var(--ease),color .2s var(--ease),border-color .2s var(--ease)}
+        .dia-chip:hover{border-color:var(--ember)}
+        .dia-chip.on{background:linear-gradient(135deg,var(--ember-soft),var(--ember-deep));color:#fff;border-color:transparent}
+        .dias-atajos{display:flex;gap:14px;margin-top:10px}
+        .dias-atajos button{background:none;color:var(--muted);font-size:.74rem;letter-spacing:.5px;
+            text-decoration:underline;text-underline-offset:3px}
+        .dias-atajos button:hover{color:var(--ember)}
+
+        /* ===== TOAST ===== */
+        .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
+            background:var(--char-900);border:1px solid var(--line);color:var(--cream);padding:13px 22px;
+            border-radius:30px;font-size:.9rem;box-shadow:0 12px 36px rgba(0,0,0,.5);opacity:0;pointer-events:none;
+            transition:opacity .3s var(--ease),transform .3s var(--ease);z-index:200}
+        .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+        .toast.ok{border-color:rgba(61,220,132,.5)} .toast.bad{border-color:rgba(255,92,92,.5)}
+
+        .hidden{display:none!important}
+
+        /* ===== TABS PRINCIPALES ===== */
+        .top-tabs{display:flex;gap:8px;margin-bottom:28px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+        .top-tab{background:none;color:var(--muted);font-family:'Oswald',sans-serif;font-weight:700;
+            font-size:.82rem;letter-spacing:1.5px;text-transform:uppercase;padding:13px 18px;
+            border-bottom:2px solid transparent;transition:color .25s var(--ease),border-color .25s var(--ease)}
+        .top-tab:hover{color:var(--text)}
+        .top-tab.active{color:var(--ember);border-color:var(--ember)}
+
+        /* ===== SUB-TABS DE CATEGORÍA ===== */
+        .cat-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+        .cat-tab{background:rgba(255,255,255,.04);color:var(--text);font-size:.78rem;font-weight:600;
+            letter-spacing:.5px;padding:9px 16px;border-radius:30px;border:1px solid var(--line);
+            transition:background .2s var(--ease),border-color .2s var(--ease),color .2s var(--ease)}
+        .cat-tab:hover{border-color:var(--ember)}
+        .cat-tab.active{background:linear-gradient(135deg,var(--ember-soft),var(--ember-deep));color:#fff;border-color:transparent}
+        .cat-tab .count{opacity:.7;margin-left:4px}
+        .cat-tab-add{background:none;color:var(--ember);border:1px dashed var(--line);font-size:.78rem;
+            font-weight:600;padding:9px 16px;border-radius:30px}
+        .cat-tab-add:hover{border-color:var(--ember)}
+
+        /* ===== TARJETA DE PLATILLO (lista admin) ===== */
+        .plato{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+            padding:18px 20px;display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;
+            transition:border-color .3s var(--ease)}
+        .plato.inactivo{opacity:.55}
+        .plato:hover{border-color:rgba(255,102,0,.4)}
+        .plato-info h3{color:var(--cream);font-size:1.1rem;letter-spacing:.5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+        .plato-info .tag-nuevo{font-size:.65rem;background:var(--ember);color:#fff;padding:3px 9px;
+            border-radius:6px;letter-spacing:1px;text-transform:uppercase;font-weight:700}
+        .plato-info .nota{color:var(--muted);font-size:.78rem;font-weight:400}
+        .plato-info p.desc{color:var(--muted);font-size:.85rem;margin-top:4px;max-width:48ch}
+        .plato-variantes{margin-top:8px;display:flex;flex-direction:column;gap:3px}
+        .plato-variantes .vrow{display:flex;justify-content:space-between;gap:12px;font-size:.84rem;color:var(--text)}
+        .plato-variantes .vrow .precio{font-family:'Oswald';font-weight:700;color:var(--ember);white-space:nowrap}
+
+        .plato-tools{display:flex;align-items:center;gap:6px}
+
+        .empty-cat{text-align:center;padding:40px 20px;color:var(--muted);border:1px dashed var(--line);border-radius:var(--radius)}
+
+        /* ===== EDITOR DE VARIANTES (en el modal) ===== */
+        .var-list{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+        .var-row{display:grid;grid-template-columns:1fr 110px auto;gap:8px;align-items:center}
+        .var-row input{background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:10px;
+            padding:11px 13px;color:var(--cream);font-size:.92rem}
+        .var-row input:focus{outline:none;border-color:var(--ember)}
+        .var-del{width:38px;height:38px;flex-shrink:0;border-radius:10px;background:rgba(255,255,255,.05);
+            border:1px solid var(--line);color:var(--text);display:grid;place-items:center}
+        .var-del:hover{background:var(--bad);color:#fff}
+        .var-del svg{width:16px;height:16px;fill:currentColor}
+        .btn-add-var{margin-top:4px;background:none;border:1px dashed var(--line);color:var(--ember);
+            font-size:.82rem;font-weight:600;padding:10px;border-radius:10px;width:100%}
+        .btn-add-var:hover{border-color:var(--ember)}
+
+        .check-row{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+        .check-row input[type="checkbox"]{width:18px;height:18px;accent-color:var(--ember)}
+        .check-row label{font-size:.88rem;color:var(--text);cursor:pointer}
+        .campo-ayuda{font-size:.76rem;color:var(--muted);margin:-10px 0 16px;line-height:1.4}
+        .promo-tag{display:inline-flex;align-items:center;gap:5px;font-size:.68rem;letter-spacing:.5px;
+            text-transform:uppercase;font-weight:600;color:var(--ember-soft);background:rgba(255,102,0,.12);
+            border:1px solid rgba(255,102,0,.3);border-radius:20px;padding:3px 10px;margin-top:8px}
+
+        .field select{width:100%;background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:12px;
+            padding:14px 16px;color:var(--cream);font-size:1rem}
+        .field select:focus{outline:none;border-color:var(--ember)}
+        .field-row{display:flex;gap:12px}
+        .field-row .field{flex:1}
+
+        @media(max-width:560px){
+            .promo{grid-template-columns:auto 1fr;gap:14px}
+            .promo-tools{grid-column:1 / -1;justify-content:flex-end}
+        }
+        @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+    </style>
+</head>
+<body>
+
+    <!-- ========== LOGIN ========== -->
+    <section class="login-wrap" id="loginView">
+        <div class="login-card">
+            <div class="brand">
+                <span class="eyebrow">Panel privado</span>
+                <h1>La Hornilla de Zaid</h1>
+                <span>Gestión de promociones</span>
+            </div>
+            <div class="field">
+                <label for="email">Correo</label>
+                <input type="email" id="email" autocomplete="username" placeholder="tucorreo@ejemplo.com">
+            </div>
+            <div class="field">
+                <label for="pass">Contraseña</label>
+                <input type="password" id="pass" autocomplete="current-password" placeholder="********">
+            </div>
+            <button class="btn btn-primary" id="btnLogin">Entrar</button>
+            <p class="form-msg" id="loginMsg"></p>
+        </div>
+    </section>
+
+    <!-- ========== PANEL ========== -->
+    <main class="panel hidden" id="panelView">
+        <div class="panel-top">
+            <div>
+                <span class="eyebrow">Panel</span>
+                <h1 id="panelTitulo">Promociones</h1>
+            </div>
+            <div class="panel-actions">
+                <button class="btn btn-primary hidden" id="btnNueva">+ Nueva promoción</button>
+                <button class="btn btn-ghost" id="btnLogout">Cerrar sesión</button>
+            </div>
+        </div>
+
+        <nav class="top-tabs">
+            <button class="top-tab active" data-tab="promos">Promociones</button>
+            <button class="top-tab" data-tab="menu">Menú principal</button>
+            <button class="top-tab" data-tab="pupusas">Pupusas</button>
+            <button class="top-tab" data-tab="bebidas">Bebidas</button>
+            <button class="top-tab" data-tab="extras">Extras</button>
+        </nav>
+
+        <!-- ===== VISTA: PROMOCIONES ===== -->
+        <section id="vistaPromos">
+            <p class="panel-sub">Cada promoción se muestra en el sitio solo si está encendida y solo en los días que elijas.</p>
+            <div id="listaWrap">
+                <p class="loading" id="loadingMsg">Cargando promociones...</p>
+                <div class="promo-list" id="lista"></div>
+                <div class="empty hidden" id="vacio">
+                    <h3>Aún no hay promociones</h3>
+                    <p>Crea la primera con el botón "Nueva promoción".</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== VISTA: MENÚ PRINCIPAL ===== -->
+        <section id="vistaMenu" class="hidden">
+            <p class="panel-sub">Platillos del menú mexicano. Cada uno aparece solo si está activo.</p>
+            <div class="panel-actions" style="margin-bottom:18px">
+                <button class="btn btn-primary" id="btnNuevoPlatoMenu">+ Nuevo platillo</button>
+                <button class="btn btn-ghost" id="btnNuevaCatMenu">+ Nueva categoría</button>
+                <button class="btn btn-ghost" id="btnEditarCatMenu">✎ Editar categoría</button>
+            </div>
+            <nav class="cat-tabs" id="catTabsMenu"></nav>
+            <p class="loading" id="loadingMenu">Cargando menú...</p>
+            <div class="promo-list" id="listaMenu"></div>
+            <div class="empty-cat hidden" id="vacioMenu">
+                <h3>Sin platillos en esta categoría todavía</h3>
+            </div>
+        </section>
+
+        <!-- ===== VISTA: PUPUSAS ===== -->
+        <section id="vistaPupusas" class="hidden">
+            <p class="panel-sub">Platillos del menú de pupusas. Cada uno aparece solo si está activo.</p>
+            <div class="panel-actions" style="margin-bottom:18px">
+                <button class="btn btn-primary" id="btnNuevoPlatoPupusas">+ Nuevo platillo</button>
+                <button class="btn btn-ghost" id="btnNuevaCatPupusas">+ Nueva categoría</button>
+                <button class="btn btn-ghost" id="btnEditarCatPupusas">✎ Editar categoría</button>
+            </div>
+            <nav class="cat-tabs" id="catTabsPupusas"></nav>
+            <p class="loading" id="loadingPupusas">Cargando menú...</p>
+            <div class="promo-list" id="listaPupusas"></div>
+            <div class="empty-cat hidden" id="vacioPupusas">
+                <h3>Sin platillos en esta categoría todavía</h3>
+            </div>
+        </section>
+
+        <!-- ===== VISTA: BEBIDAS ===== -->
+        <section id="vistaBebidas" class="hidden">
+            <p class="panel-sub">Estas bebidas aparecen en el menú mexicano, en pupusas y en Pedir en línea — un solo lugar para las tres.</p>
+            <div class="panel-actions" style="margin-bottom:18px">
+                <button class="btn btn-primary" id="btnNuevaBebida">+ Nueva bebida</button>
+            </div>
+            <p class="loading" id="loadingBebidas">Cargando bebidas...</p>
+            <div class="promo-list" id="listaBebidas"></div>
+            <div class="empty hidden" id="vacioBebidas">
+                <h3>Aún no hay bebidas</h3>
+                <p>Agrega la primera con el botón "Nueva bebida".</p>
+            </div>
+        </section>
+
+        <!-- ===== VISTA: EXTRAS ===== -->
+        <section id="vistaExtras" class="hidden">
+            <p class="panel-sub">Los extras aparecen en la caja "Extras" del menú mexicano.</p>
+            <div class="panel-actions" style="margin-bottom:18px">
+                <button class="btn btn-primary" id="btnNuevoExtra">+ Nuevo extra</button>
+            </div>
+            <p class="loading" id="loadingExtras">Cargando extras...</p>
+            <div class="promo-list" id="listaExtras"></div>
+            <div class="empty hidden" id="vacioExtras">
+                <h3>Aún no hay extras</h3>
+                <p>Agrega el primero con el botón "Nuevo extra".</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- ========== MODAL ========== -->
+    <div class="modal-bg" id="modalBg">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitulo">
+            <h2 id="modalTitulo">Nueva promoción</h2>
+            <div class="field">
+                <label for="mNombre">Nombre</label>
+                <input type="text" id="mNombre" placeholder="Combo Mega Quesadilla">
+            </div>
+            <div class="field">
+                <label for="mDesc">Descripción</label>
+                <textarea id="mDesc" placeholder="1/2 Sopa de tortilla + Mega Quesadilla + Bebida."></textarea>
+            </div>
+            <div class="field">
+                <label for="mPrecio">Precio</label>
+                <input type="text" id="mPrecio" placeholder="$5.50">
+            </div>
+            <div class="check-row">
+                <input type="checkbox" id="mPideCarne">
+                <label for="mPideCarne">Este combo lleva carne a elegir (el cliente la elige al pedirlo)</label>
+            </div>
+            <p class="campo-ayuda" id="ayudaPideCarne">Solo aparece como selector en la página de Pedido — no se muestra en el menú.</p>
+            <div class="field">
+                <label>Días que se muestra</label>
+                <div class="dias-row" id="diasRow">
+                    <button type="button" class="dia-chip" data-dia="1">Lun</button>
+                    <button type="button" class="dia-chip" data-dia="2">Mar</button>
+                    <button type="button" class="dia-chip" data-dia="3">Mié</button>
+                    <button type="button" class="dia-chip" data-dia="4">Jue</button>
+                    <button type="button" class="dia-chip" data-dia="5">Vie</button>
+                    <button type="button" class="dia-chip" data-dia="6">Sáb</button>
+                    <button type="button" class="dia-chip" data-dia="0">Dom</button>
+                </div>
+                <div class="dias-atajos">
+                    <button type="button" data-preset="2,3,4,5">Martes a viernes</button>
+                    <button type="button" data-preset="6,0">Fin de semana</button>
+                    <button type="button" data-preset="1,2,3,4,5,6,0">Todos</button>
+                </div>
+            </div>
+            <p class="form-msg error" id="modalMsg"></p>
+            <div class="modal-foot">
+                <button class="btn btn-ghost" id="btnCancelar">Cancelar</button>
+                <button class="btn btn-primary" id="btnGuardar">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <!-- ========== MODAL: PLATILLO ========== -->
+    <div class="modal-bg" id="modalPlatoBg">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalPlatoTitulo">
+            <h2 id="modalPlatoTitulo">Nuevo platillo</h2>
+
+            <div class="field">
+                <label for="pNombre">Nombre del platillo</label>
+                <input type="text" id="pNombre" placeholder="Tacos">
+            </div>
+
+            <div class="field-row">
+                <div class="field">
+                    <label for="pCategoria">Categoría</label>
+                    <select id="pCategoria"></select>
+                </div>
+                <div class="field">
+                    <label for="pNota">Nota (opcional)</label>
+                    <input type="text" id="pNota" placeholder="Orden de 4">
+                </div>
+            </div>
+
+            <div class="check-row">
+                <input type="checkbox" id="pDestacado">
+                <label for="pDestacado">Mostrar como tarjeta destacada (ej. "Lo nuevo")</label>
+            </div>
+
+            <div id="bloqueDestacado" class="hidden">
+                <div class="field">
+                    <label for="pEtiqueta">Etiqueta</label>
+                    <input type="text" id="pEtiqueta" placeholder="Lo nuevo">
+                </div>
+                <div class="field">
+                    <label for="pDescripcion">Descripción</label>
+                    <textarea id="pDescripcion" placeholder="Base de papa asada con..."></textarea>
+                </div>
+                <div class="field">
+                    <label for="pPrecioUnico">Precio</label>
+                    <input type="text" id="pPrecioUnico" placeholder="$5.50">
+                </div>
+            </div>
+
+            <div id="bloqueVariantes">
+                <label style="display:block;font-size:.74rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:7px">
+                    Opciones y precios
+                </label>
+                <div class="var-list" id="varList"></div>
+                <button type="button" class="btn-add-var" id="btnAddVar">+ Agregar opción</button>
+            </div>
+
+            <p class="form-msg error" id="modalPlatoMsg"></p>
+            <div class="modal-foot">
+                <button class="btn btn-ghost" id="btnCancelarPlato">Cancelar</button>
+                <button class="btn btn-primary" id="btnGuardarPlato">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: CATEGORÍA ========== -->
+    <div class="modal-bg" id="modalCatBg">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalCatTitulo">
+            <h2 id="modalCatTitulo">Nueva categoría</h2>
+            <div class="field">
+                <label for="cNombre">Nombre de la categoría</label>
+                <input type="text" id="cNombre" placeholder="Tacos">
+            </div>
+            <div class="field hidden" id="campoCatNota">
+                <label for="cNota">Nota (opcional, se muestra debajo de la lista)</label>
+                <textarea id="cNota" placeholder="Las clásicas de siempre, a precio de barrio."></textarea>
+            </div>
+            <div class="check-row hidden" id="campoCatEstilo">
+                <input type="checkbox" id="cEstiloToque">
+                <label for="cEstiloToque">Tarjeta destacada (título + descripción, como "Con un toque mexicano")</label>
+            </div>
+            <p class="form-msg error" id="modalCatMsg"></p>
+            <div class="modal-foot">
+                <button class="btn btn-ghost hidden" id="btnBorrarCat" style="color:var(--bad);margin-right:auto">Borrar categoría</button>
+                <button class="btn btn-ghost" id="btnCancelarCat">Cancelar</button>
+                <button class="btn btn-primary" id="btnGuardarCat">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: BEBIDA ========== -->
+    <div class="modal-bg" id="modalBebidaBg">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalBebidaTitulo">
+            <h2 id="modalBebidaTitulo">Nueva bebida</h2>
+            <div class="field">
+                <label for="bNombre">Nombre</label>
+                <input type="text" id="bNombre" placeholder="Café con leche">
+            </div>
+            <div class="field-row">
+                <div class="field">
+                    <label for="bPrecio">Precio</label>
+                    <input type="text" id="bPrecio" placeholder="$0.75">
+                </div>
+                <div class="field">
+                    <label for="bGrupo">Tipo</label>
+                    <select id="bGrupo">
+                        <option value="fria">Fría</option>
+                        <option value="caliente">Caliente</option>
+                    </select>
+                </div>
+            </div>
+            <p class="form-msg error" id="modalBebidaMsg"></p>
+            <div class="modal-foot">
+                <button class="btn btn-ghost hidden" id="btnBorrarBebida" style="color:var(--bad);margin-right:auto">Borrar</button>
+                <button class="btn btn-ghost" id="btnCancelarBebida">Cancelar</button>
+                <button class="btn btn-primary" id="btnGuardarBebida">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: EXTRA ========== -->
+    <div class="modal-bg" id="modalExtraBg">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalExtraTitulo">
+            <h2 id="modalExtraTitulo">Nuevo extra</h2>
+            <div class="field">
+                <label for="eNombre">Nombre</label>
+                <input type="text" id="eNombre" placeholder="Aguacate">
+            </div>
+            <div class="field">
+                <label for="ePrecio">Precio</label>
+                <input type="text" id="ePrecio" placeholder="$0.75">
+            </div>
+            <p class="form-msg error" id="modalExtraMsg"></p>
+            <div class="modal-foot">
+                <button class="btn btn-ghost hidden" id="btnBorrarExtra" style="color:var(--bad);margin-right:auto">Borrar</button>
+                <button class="btn btn-ghost" id="btnCancelarExtra">Cancelar</button>
+                <button class="btn btn-primary" id="btnGuardarExtra">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== LÓGICA ========== -->
+    <script type="module">
+        import { auth, db, COLECCION, COLECCION_MENU, COLECCION_PUPUSAS, COLECCION_CATEGORIAS } from '../JS/firebase-config.js';
+        import {
+            signInWithEmailAndPassword, signOut, onAuthStateChanged
+        } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js';
+        import {
+            collection, onSnapshot,
+            addDoc, updateDoc, deleteDoc, doc, serverTimestamp
+        } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
+
+        const $ = id => document.getElementById(id);
+        const loginView = $('loginView'), panelView = $('panelView');
+
+        /* ---------- DÍAS ---------- */
+        const ORDEN_SEM = [1, 2, 3, 4, 5, 6, 0];
+        const COR = { 0:'Dom', 1:'Lun', 2:'Mar', 3:'Mié', 4:'Jue', 5:'Vie', 6:'Sáb' };
+        function fmtDias(dias) {
+            if (!Array.isArray(dias) || dias.length === 0) return '—';
+            if (dias.length >= 7) return 'Todos los días';
+            const arr = [...dias].sort((a,b) => ORDEN_SEM.indexOf(a) - ORDEN_SEM.indexOf(b));
+            const idx = arr.map(d => ORDEN_SEM.indexOf(d));
+            const contiguo = idx.every((v,i) => i === 0 || v === idx[i-1] + 1);
+            if (contiguo && arr.length >= 3) return `${COR[arr[0]]} a ${COR[arr[arr.length-1]]}`;
+            return arr.map(d => COR[d]).join(' · ');
+        }
+
+        /* ---------- TOAST ---------- */
+        let toastTimer;
+        function toast(texto, tipo = 'ok') {
+            const t = $('toast');
+            t.textContent = texto;
+            t.className = 'toast show ' + tipo;
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => t.className = 'toast', 2600);
+        }
+
+        /* ---------- AUTENTICACIÓN ---------- */
+        const erroresAuth = {
+            'auth/invalid-email': 'El correo no es válido.',
+            'auth/user-not-found': 'No existe una cuenta con ese correo.',
+            'auth/wrong-password': 'Contraseña incorrecta.',
+            'auth/invalid-credential': 'Correo o contraseña incorrectos.',
+            'auth/too-many-requests': 'Demasiados intentos. Espera un momento.',
+            'auth/network-request-failed': 'Sin conexión. Revisa tu internet.'
+        };
+
+        $('btnLogin').addEventListener('click', login);
+        $('pass').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+        $('email').addEventListener('keydown', e => { if (e.key === 'Enter') $('pass').focus(); });
+
+        async function login() {
+            const email = $('email').value.trim();
+            const pass = $('pass').value;
+            const msg = $('loginMsg');
+            msg.textContent = '';
+            if (!email || !pass) { msg.textContent = 'Escribe tu correo y contraseña.'; msg.className = 'form-msg error'; return; }
+            $('btnLogin').disabled = true;
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+            } catch (err) {
+                msg.textContent = erroresAuth[err.code] || 'No se pudo iniciar sesión.';
+                msg.className = 'form-msg error';
+            } finally {
+                $('btnLogin').disabled = false;
+            }
+        }
+
+        $('btnLogout').addEventListener('click', () => signOut(auth));
+
+        let desuscribir = null;
+        let desuscribirMenu = null, desuscribirCatMenu = null;
+        let desuscribirPupusas = null, desuscribirCatPupusas = null;
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                loginView.classList.add('hidden');
+                panelView.classList.remove('hidden');
+                escuchar();
+            } else {
+                panelView.classList.add('hidden');
+                loginView.classList.remove('hidden');
+                $('pass').value = '';
+                if (desuscribir) { desuscribir(); desuscribir = null; }
+                if (desuscribirMenu) { desuscribirMenu(); desuscribirMenu = null; }
+                if (desuscribirCatMenu) { desuscribirCatMenu(); desuscribirCatMenu = null; }
+                if (desuscribirPupusas) { desuscribirPupusas(); desuscribirPupusas = null; }
+                if (desuscribirCatPupusas) { desuscribirCatPupusas(); desuscribirCatPupusas = null; }
+            }
+        });
+
+        /* ---------- TABS PRINCIPALES ---------- */
+        const vistas = {
+            promos: { el: $('vistaPromos'), titulo: 'Promociones', nuevaBtn: true },
+            menu: { el: $('vistaMenu'), titulo: 'Menú principal', nuevaBtn: false },
+            pupusas: { el: $('vistaPupusas'), titulo: 'Pupusas', nuevaBtn: false },
+            bebidas: { el: $('vistaBebidas'), titulo: 'Bebidas', nuevaBtn: false },
+            extras: { el: $('vistaExtras'), titulo: 'Extras', nuevaBtn: false }
+        };
+        let menuIniciado = false, pupusasIniciado = false, bebidasIniciado = false, extrasIniciado = false;
+        document.querySelectorAll('.top-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.top-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                const key = tab.dataset.tab;
+                Object.entries(vistas).forEach(([k, v]) => v.el.classList.toggle('hidden', k !== key));
+                $('panelTitulo').textContent = vistas[key].titulo;
+                $('btnNueva').classList.toggle('hidden', key !== 'promos');
+                if (key === 'menu' && !menuIniciado && window.iniciarMenu) { menuIniciado = true; window.iniciarMenu('menu'); }
+                if (key === 'pupusas' && !pupusasIniciado && window.iniciarMenu) { pupusasIniciado = true; window.iniciarMenu('pupusas'); }
+                if (key === 'bebidas' && !bebidasIniciado && window.iniciarBebidas) { bebidasIniciado = true; window.iniciarBebidas(); }
+                if (key === 'extras' && !extrasIniciado && window.iniciarExtras) { extrasIniciado = true; window.iniciarExtras(); }
+            });
+        });
+
+        /* ---------- LISTA EN VIVO ---------- */
+        let promos = [];
+        function escuchar() {
+            /* Sin orderBy: una promoción sin campo "orden" (agregada a
+               mano en Firebase) quedaría invisible si ordenamos en el
+               servidor. Se escucha la colección completa y se ordena aquí. */
+            desuscribir = onSnapshot(collection(db, COLECCION), snap => {
+                promos = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                    .sort((a, b) => (a.orden ?? Infinity) - (b.orden ?? Infinity));
+                $('loadingMsg').classList.add('hidden');
+                render();
+            }, err => {
+                $('loadingMsg').textContent = 'No se pudieron cargar las promociones.';
+                console.error(err);
+            });
+        }
+
+        function esc(s = '') { return String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
+
+        function render() {
+            const cont = $('lista');
+            $('vacio').classList.toggle('hidden', promos.length > 0);
+            cont.innerHTML = promos.map((p, i) => `
+                <article class="promo ${p.activa ? '' : 'inactiva'}">
+                    <label class="switch" title="${p.activa ? 'Activa' : 'Inactiva'}">
+                        <input type="checkbox" ${p.activa ? 'checked' : ''} data-toggle="${p.id}" aria-label="Activar o desactivar">
+                        <span class="track"></span><span class="thumb"></span>
+                    </label>
+                    <div class="promo-info">
+                        <h3>${esc(p.nombre)}<span class="estado ${p.activa ? 'on' : 'off'}">${p.activa ? 'Activa' : 'Oculta'}</span></h3>
+                        <p>${esc(p.descripcion || '')}</p>
+                        <div class="precio">${esc(p.precio || '')}</div>
+                        <div class="promo-dias">Días: <b>${esc(fmtDias(p.dias))}</b></div>
+                        ${p.pideCarne ? '<span class="promo-tag">🍖 Pide carne al ordenar</span>' : ''}
+                    </div>
+                    <div class="promo-tools">
+                        <button class="icon-btn" data-up="${p.id}" ${i === 0 ? 'disabled' : ''} aria-label="Subir" title="Subir">
+                            <svg viewBox="0 0 24 24"><path d="M12 7l6 6-1.4 1.4L12 9.8 7.4 14.4 6 13z"/></svg></button>
+                        <button class="icon-btn" data-down="${p.id}" ${i === promos.length - 1 ? 'disabled' : ''} aria-label="Bajar" title="Bajar">
+                            <svg viewBox="0 0 24 24"><path d="M12 17l-6-6 1.4-1.4L12 14.2l4.6-4.6L18 11z"/></svg></button>
+                        <button class="icon-btn" data-edit="${p.id}" aria-label="Editar" title="Editar">
+                            <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zM20.7 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75z"/></svg></button>
+                        <button class="icon-btn danger" data-del="${p.id}" aria-label="Borrar" title="Borrar">
+                            <svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6zM19 4h-3.5l-1-1h-5l-1 1H5v2h14z"/></svg></button>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        /* ---------- ACCIONES LISTA ---------- */
+        $('lista').addEventListener('click', async e => {
+            const t = e.target.closest('button[data-edit],button[data-del],button[data-up],button[data-down]');
+            if (!t) return;
+            if (t.dataset.edit)  abrirModal(t.dataset.edit);
+            if (t.dataset.del)   borrar(t.dataset.del);
+            if (t.dataset.up)    mover(t.dataset.up, -1);
+            if (t.dataset.down)  mover(t.dataset.down, 1);
+        });
+
+        $('lista').addEventListener('change', async e => {
+            const chk = e.target.closest('input[data-toggle]');
+            if (!chk) return;
+            try {
+                await updateDoc(doc(db, COLECCION, chk.dataset.toggle), { activa: chk.checked });
+                toast(chk.checked ? 'Promoción activada' : 'Promoción oculta');
+            } catch (err) { toast('No se pudo guardar', 'bad'); chk.checked = !chk.checked; }
+        });
+
+        async function mover(id, dir) {
+            const i = promos.findIndex(p => p.id === id);
+            const j = i + dir;
+            if (j < 0 || j >= promos.length) return;
+            const a = promos[i], b = promos[j];
+            try {
+                await Promise.all([
+                    updateDoc(doc(db, COLECCION, a.id), { orden: b.orden ?? j }),
+                    updateDoc(doc(db, COLECCION, b.id), { orden: a.orden ?? i })
+                ]);
+            } catch (err) { toast('No se pudo reordenar', 'bad'); }
+        }
+
+        async function borrar(id) {
+            const p = promos.find(x => x.id === id);
+            if (!confirm(`¿Borrar "${p?.nombre || 'esta promoción'}"? Esta acción no se puede deshacer.`)) return;
+            try { await deleteDoc(doc(db, COLECCION, id)); toast('Promoción borrada'); }
+            catch (err) { toast('No se pudo borrar', 'bad'); }
+        }
+
+        /* ---------- CHIPS DE DÍAS ---------- */
+        $('diasRow').addEventListener('click', e => {
+            const chip = e.target.closest('.dia-chip');
+            if (chip) chip.classList.toggle('on');
+        });
+        document.querySelector('.dias-atajos').addEventListener('click', e => {
+            const b = e.target.closest('button[data-preset]');
+            if (!b) return;
+            const set = new Set(b.dataset.preset.split(',').map(Number));
+            $('diasRow').querySelectorAll('.dia-chip').forEach(c =>
+                c.classList.toggle('on', set.has(Number(c.dataset.dia))));
+        });
+        function setDiasChips(dias = []) {
+            const set = new Set(dias.map(Number));
+            $('diasRow').querySelectorAll('.dia-chip').forEach(c =>
+                c.classList.toggle('on', set.has(Number(c.dataset.dia))));
+        }
+        function getDiasChips() {
+            return [...$('diasRow').querySelectorAll('.dia-chip.on')].map(c => Number(c.dataset.dia));
+        }
+
+        /* ---------- MODAL CREAR / EDITAR ---------- */
+        let editId = null;
+        function abrirModal(id = null) {
+            editId = id;
+            const p = id ? promos.find(x => x.id === id) : null;
+            $('modalTitulo').textContent = id ? 'Editar promoción' : 'Nueva promoción';
+            $('mNombre').value = p?.nombre || '';
+            $('mDesc').value   = p?.descripcion || '';
+            $('mPrecio').value = p?.precio || '';
+            $('mPideCarne').checked = !!p?.pideCarne;
+            setDiasChips(p?.dias || [2, 3, 4, 5]);   // por defecto: martes a viernes
+            $('modalMsg').textContent = '';
+            $('modalBg').classList.add('open');
+            $('mNombre').focus();
+        }
+        function cerrarModal() { $('modalBg').classList.remove('open'); editId = null; }
+
+        $('btnNueva').addEventListener('click', () => abrirModal());
+        $('btnCancelar').addEventListener('click', cerrarModal);
+        $('modalBg').addEventListener('click', e => { if (e.target === $('modalBg')) cerrarModal(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarModal(); });
+
+        $('btnGuardar').addEventListener('click', async () => {
+            const nombre = $('mNombre').value.trim();
+            const descripcion = $('mDesc').value.trim();
+            const precio = $('mPrecio').value.trim();
+            const dias = getDiasChips();
+            const pideCarne = $('mPideCarne').checked;
+            if (!nombre || !precio) { $('modalMsg').textContent = 'El nombre y el precio son obligatorios.'; return; }
+            if (dias.length === 0) { $('modalMsg').textContent = 'Elige al menos un día.'; return; }
+            $('btnGuardar').disabled = true;
+            try {
+                if (editId) {
+                    await updateDoc(doc(db, COLECCION, editId), { nombre, descripcion, precio, dias, pideCarne });
+                    toast('Cambios guardados');
+                } else {
+                    const maxOrden = promos.reduce((m, p) => Math.max(m, p.orden ?? 0), 0);
+                    await addDoc(collection(db, COLECCION), {
+                        nombre, descripcion, precio, dias, pideCarne,
+                        activa: true, orden: maxOrden + 1, creado: serverTimestamp()
+                    });
+                    toast('Promoción creada');
+                }
+                cerrarModal();
+            } catch (err) { $('modalMsg').textContent = 'No se pudo guardar. Intenta de nuevo.'; console.error(err); }
+            finally { $('btnGuardar').disabled = false; }
+        });
+    </script>
+
+    <!-- ========== LÓGICA: MENÚ Y PUPUSAS ========== -->
+    <script type="module">
+        import { db, COLECCION_MENU, COLECCION_PUPUSAS, COLECCION_CATEGORIAS } from '../JS/firebase-config.js';
+        import {
+            collection, onSnapshot,
+            addDoc, updateDoc, deleteDoc, doc, serverTimestamp, writeBatch
+        } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
+
+        const $$ = id => document.getElementById(id);
+        function esc(s = '') { return String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
+        function toast(texto, tipo = 'ok') {
+            const t = $$('toast');
+            t.textContent = texto;
+            t.className = 'toast show ' + tipo;
+            clearTimeout(toast._timer);
+            toast._timer = setTimeout(() => t.className = 'toast', 2600);
+        }
+
+        /* Configuración por "menu": qué colección, qué elementos del DOM usar */
+        const CFG = {
+            menu: {
+                col: COLECCION_MENU,
+                clave: 'principal',
+                catTabs: $$('catTabsMenu'),
+                lista: $$('listaMenu'),
+                loading: $$('loadingMenu'),
+                vacio: $$('vacioMenu'),
+                btnNuevo: $$('btnNuevoPlatoMenu'),
+                btnNuevaCat: $$('btnNuevaCatMenu'),
+                btnEditarCat: $$('btnEditarCatMenu')
+            },
+            pupusas: {
+                col: COLECCION_PUPUSAS,
+                clave: 'pupusas',
+                catTabs: $$('catTabsPupusas'),
+                lista: $$('listaPupusas'),
+                loading: $$('loadingPupusas'),
+                vacio: $$('vacioPupusas'),
+                btnNuevo: $$('btnNuevoPlatoPupusas'),
+                btnNuevaCat: $$('btnNuevaCatPupusas'),
+                btnEditarCat: $$('btnEditarCatPupusas')
+            }
+        };
+
+        const estado = {
+            menu:    { platos: [], categorias: [], catActiva: null },
+            pupusas: { platos: [], categorias: [], catActiva: null }
+        };
+
+        window.iniciarMenu = function iniciarMenu(tipo) {
+            const cfg = CFG[tipo];
+            const st = estado[tipo];
+            const ordenar = lista => lista.sort((a, b) => (a.orden ?? Infinity) - (b.orden ?? Infinity));
+
+            /* Categorías en vivo. Sin where()/orderBy() del lado del
+               servidor: un documento sin el campo "orden", o creado a
+               mano en la consola de Firebase, quedaría invisible si
+               Firestore filtrara/ordenara ahí. Se filtra y ordena aquí. */
+            onSnapshot(collection(db, COLECCION_CATEGORIAS), snap => {
+                st.categorias = ordenar(
+                    snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(c => c.menu === cfg.clave)
+                );
+                if (!st.catActiva && st.categorias.length) st.catActiva = st.categorias[0].nombre;
+                renderCatTabs(tipo);
+                renderPlatos(tipo);
+                poblarSelectCategorias(tipo);
+            }, err => console.error(err));
+
+            /* Platillos en vivo */
+            onSnapshot(collection(db, cfg.col), snap => {
+                st.platos = ordenar(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+                cfg.loading.classList.add('hidden');
+                renderCatTabs(tipo);
+                renderPlatos(tipo);
+            }, err => {
+                cfg.loading.textContent = 'No se pudo cargar el menú.';
+                console.error(err);
+            });
+
+            cfg.btnNuevo.addEventListener('click', () => abrirModalPlato(tipo));
+            cfg.btnNuevaCat.addEventListener('click', () => abrirModalCat(tipo));
+            cfg.btnEditarCat.addEventListener('click', () => {
+                if (!st.catActiva) { toast('Primero crea o elige una categoría', 'bad'); return; }
+                const cat = st.categorias.find(c => c.nombre === st.catActiva);
+                if (cat) abrirModalCat(tipo, cat);
+            });
+        };
+
+        function renderCatTabs(tipo) {
+            const cfg = CFG[tipo], st = estado[tipo];
+            if (!st.categorias.length) { cfg.catTabs.innerHTML = ''; return; }
+            cfg.catTabs.innerHTML = st.categorias.map(c => {
+                const n = st.platos.filter(p => p.categoria === c.nombre).length;
+                const activa = c.nombre === st.catActiva;
+                return `<button type="button" class="cat-tab ${activa ? 'active' : ''}" data-cat="${esc(c.nombre)}">
+                    ${esc(c.nombre)} <span class="count">${n}</span>
+                </button>`;
+            }).join('');
+            cfg.catTabs.querySelectorAll('.cat-tab').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    st.catActiva = btn.dataset.cat;
+                    renderCatTabs(tipo);
+                    renderPlatos(tipo);
+                });
+            });
+        }
+
+        function renderPlatos(tipo) {
+            const cfg = CFG[tipo], st = estado[tipo];
+            const items = st.platos.filter(p => p.categoria === st.catActiva);
+            cfg.vacio.classList.toggle('hidden', items.length > 0 || !st.catActiva);
+            cfg.lista.innerHTML = items.map((p, i) => {
+                const variantesHtml = p.destacado
+                    ? `<div class="plato-variantes"><div class="vrow"><span>${esc(p.descripcion || '')}</span><span class="precio">${esc(p.precioUnico || '')}</span></div></div>`
+                    : `<div class="plato-variantes">${(p.variantes || []).map(v =>
+                        `<div class="vrow"><span>${esc(v.texto)}</span><span class="precio">${esc(v.precio)}</span></div>`).join('')}</div>`;
+                return `
+                <article class="plato ${p.activo === false ? 'inactivo' : ''}" data-id="${p.id}">
+                    <label class="switch" title="${p.activo === false ? 'Inactivo' : 'Activo'}">
+                        <input type="checkbox" ${p.activo === false ? '' : 'checked'} data-toggle-plato="${p.id}" aria-label="Activar o desactivar">
+                        <span class="track"></span><span class="thumb"></span>
+                    </label>
+                    <div class="plato-info">
+                        <h3>${esc(p.nombre)} ${p.nota ? `<span class="nota">· ${esc(p.nota)}</span>` : ''} ${p.destacado ? `<span class="tag-nuevo">${esc(p.etiqueta || 'Destacado')}</span>` : ''}</h3>
+                        ${variantesHtml}
+                    </div>
+                    <div class="plato-tools">
+                        <button class="icon-btn" data-up-plato="${p.id}" ${i === 0 ? 'disabled' : ''} aria-label="Subir" title="Subir">
+                            <svg viewBox="0 0 24 24"><path d="M12 7l6 6-1.4 1.4L12 9.8 7.4 14.4 6 13z"/></svg></button>
+                        <button class="icon-btn" data-down-plato="${p.id}" ${i === items.length - 1 ? 'disabled' : ''} aria-label="Bajar" title="Bajar">
+                            <svg viewBox="0 0 24 24"><path d="M12 17l-6-6 1.4-1.4L12 14.2l4.6-4.6L18 11z"/></svg></button>
+                        <button class="icon-btn" data-edit-plato="${p.id}" data-tipo="${tipo}" aria-label="Editar" title="Editar">
+                            <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zM20.7 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75z"/></svg></button>
+                        <button class="icon-btn danger" data-del-plato="${p.id}" data-tipo="${tipo}" aria-label="Borrar" title="Borrar">
+                            <svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6zM19 4h-3.5l-1-1h-5l-1 1H5v2h14z"/></svg></button>
+                    </div>
+                </article>`;
+            }).join('');
+        }
+
+        /* ---------- ACCIONES SOBRE LA LISTA (toggle, mover, editar, borrar) ---------- */
+        ['menu', 'pupusas'].forEach(tipo => {
+            const cfg = CFG[tipo];
+
+            cfg.lista.addEventListener('change', async e => {
+                const chk = e.target.closest('input[data-toggle-plato]');
+                if (!chk) return;
+                try {
+                    await updateDoc(doc(db, cfg.col, chk.dataset.togglePlato), { activo: chk.checked });
+                    toast(chk.checked ? 'Platillo activado' : 'Platillo oculto');
+                } catch (err) { toast('No se pudo guardar', 'bad'); chk.checked = !chk.checked; }
+            });
+
+            cfg.lista.addEventListener('click', async e => {
+                const t = e.target.closest('button[data-edit-plato],button[data-del-plato],button[data-up-plato],button[data-down-plato]');
+                if (!t) return;
+                if (t.dataset.editPlato) abrirModalPlato(tipo, t.dataset.editPlato);
+                if (t.dataset.delPlato)  borrarPlato(tipo, t.dataset.delPlato);
+                if (t.dataset.upPlato)   moverPlato(tipo, t.dataset.upPlato, -1);
+                if (t.dataset.downPlato) moverPlato(tipo, t.dataset.downPlato, 1);
+            });
+        });
+
+        async function moverPlato(tipo, id, dir) {
+            const cfg = CFG[tipo], st = estado[tipo];
+            const items = st.platos.filter(p => p.categoria === st.catActiva);
+            const i = items.findIndex(p => p.id === id);
+            const j = i + dir;
+            if (j < 0 || j >= items.length) return;
+            const a = items[i], b = items[j];
+            try {
+                await Promise.all([
+                    updateDoc(doc(db, cfg.col, a.id), { orden: b.orden ?? j }),
+                    updateDoc(doc(db, cfg.col, b.id), { orden: a.orden ?? i })
+                ]);
+            } catch (err) { toast('No se pudo reordenar', 'bad'); }
+        }
+
+        async function borrarPlato(tipo, id) {
+            const cfg = CFG[tipo], st = estado[tipo];
+            const p = st.platos.find(x => x.id === id);
+            if (!confirm(`¿Borrar "${p?.nombre || 'este platillo'}"? Esta acción no se puede deshacer.`)) return;
+            try { await deleteDoc(doc(db, cfg.col, id)); toast('Platillo borrado'); }
+            catch (err) { toast('No se pudo borrar', 'bad'); }
+        }
+
+        /* ---------- SELECT DE CATEGORÍAS EN EL MODAL ---------- */
+        let tipoActualModal = 'menu';
+        function poblarSelectCategorias(tipo) {
+            if (tipo !== tipoActualModal) return;
+            const st = estado[tipo];
+            $$('pCategoria').innerHTML = st.categorias.map(c => `<option value="${esc(c.nombre)}">${esc(c.nombre)}</option>`).join('');
+        }
+
+        /* ---------- VARIANTES EN EL MODAL ---------- */
+        function filaVariante(texto = '', precio = '') {
+            const row = document.createElement('div');
+            row.className = 'var-row';
+            row.innerHTML = `
+                <input type="text" placeholder="Pastor · Pollo pastor · Suadero" class="var-texto" value="${esc(texto)}">
+                <input type="text" placeholder="$4.99" class="var-precio" value="${esc(precio)}">
+                <button type="button" class="var-del" aria-label="Quitar opción">
+                    <svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6zM19 4h-3.5l-1-1h-5l-1 1H5v2h14z"/></svg>
+                </button>`;
+            row.querySelector('.var-del').addEventListener('click', () => row.remove());
+            return row;
+        }
+        $$('btnAddVar').addEventListener('click', () => $$('varList').appendChild(filaVariante()));
+
+        $$('pDestacado').addEventListener('change', () => {
+            const on = $$('pDestacado').checked;
+            $$('bloqueDestacado').classList.toggle('hidden', !on);
+            $$('bloqueVariantes').classList.toggle('hidden', on);
+        });
+
+        /* ---------- MODAL PLATILLO: abrir / cerrar / guardar ---------- */
+        let editPlatoId = null;
+        function abrirModalPlato(tipo, id = null) {
+            tipoActualModal = tipo;
+            editPlatoId = id;
+            const st = estado[tipo];
+            const p = id ? st.platos.find(x => x.id === id) : null;
+
+            if (!st.categorias.length) {
+                toast('Primero crea una categoría', 'bad');
+                return;
+            }
+
+            $$('modalPlatoTitulo').textContent = id ? 'Editar platillo' : 'Nuevo platillo';
+            $$('pNombre').value = p?.nombre || '';
+            poblarSelectCategorias(tipo);
+            $$('pCategoria').value = p?.categoria || st.catActiva || st.categorias[0].nombre;
+            $$('pNota').value = p?.nota || '';
+
+            const destacado = !!p?.destacado;
+            $$('pDestacado').checked = destacado;
+            $$('bloqueDestacado').classList.toggle('hidden', !destacado);
+            $$('bloqueVariantes').classList.toggle('hidden', destacado);
+            $$('pEtiqueta').value = p?.etiqueta || 'Lo nuevo';
+            $$('pDescripcion').value = p?.descripcion || '';
+            $$('pPrecioUnico').value = p?.precioUnico || '';
+
+            $$('varList').innerHTML = '';
+            const variantes = (p?.variantes && p.variantes.length) ? p.variantes : [{ texto: '', precio: '' }];
+            variantes.forEach(v => $$('varList').appendChild(filaVariante(v.texto, v.precio)));
+
+            $$('modalPlatoMsg').textContent = '';
+            $$('modalPlatoBg').classList.add('open');
+            $$('pNombre').focus();
+        }
+        function cerrarModalPlato() { $$('modalPlatoBg').classList.remove('open'); editPlatoId = null; }
+
+        $$('btnCancelarPlato').addEventListener('click', cerrarModalPlato);
+        $$('modalPlatoBg').addEventListener('click', e => { if (e.target === $$('modalPlatoBg')) cerrarModalPlato(); });
+
+        $$('btnGuardarPlato').addEventListener('click', async () => {
+            const tipo = tipoActualModal;
+            const cfg = CFG[tipo], st = estado[tipo];
+            const nombre = $$('pNombre').value.trim();
+            const categoria = $$('pCategoria').value;
+            const nota = $$('pNota').value.trim();
+            const destacado = $$('pDestacado').checked;
+
+            if (!nombre) { $$('modalPlatoMsg').textContent = 'El nombre es obligatorio.'; return; }
+            if (!categoria) { $$('modalPlatoMsg').textContent = 'Elige una categoría.'; return; }
+
+            let datos = { nombre, categoria, nota, destacado };
+
+            if (destacado) {
+                const etiqueta = $$('pEtiqueta').value.trim() || 'Lo nuevo';
+                const descripcion = $$('pDescripcion').value.trim();
+                const precioUnico = $$('pPrecioUnico').value.trim();
+                if (!precioUnico) { $$('modalPlatoMsg').textContent = 'Pon el precio.'; return; }
+                datos = { ...datos, etiqueta, descripcion, precioUnico, variantes: [] };
+            } else {
+                const variantes = [...$$('varList').querySelectorAll('.var-row')].map(row => ({
+                    texto: row.querySelector('.var-texto').value.trim(),
+                    precio: row.querySelector('.var-precio').value.trim()
+                })).filter(v => v.texto && v.precio);
+                if (variantes.length === 0) { $$('modalPlatoMsg').textContent = 'Agrega al menos una opción con precio.'; return; }
+                datos = { ...datos, variantes, etiqueta: '', descripcion: '', precioUnico: '' };
+            }
+
+            $$('btnGuardarPlato').disabled = true;
+            try {
+                if (editPlatoId) {
+                    await updateDoc(doc(db, cfg.col, editPlatoId), datos);
+                    toast('Cambios guardados');
+                } else {
+                    const maxOrden = st.platos.reduce((m, p) => Math.max(m, p.orden ?? 0), 0);
+                    await addDoc(collection(db, cfg.col), {
+                        ...datos, activo: true, orden: maxOrden + 1, creado: serverTimestamp()
+                    });
+                    toast('Platillo creado');
+                }
+                cerrarModalPlato();
+            } catch (err) {
+                $$('modalPlatoMsg').textContent = 'No se pudo guardar. Intenta de nuevo.';
+                console.error(err);
+            } finally {
+                $$('btnGuardarPlato').disabled = false;
+            }
+        });
+
+        /* ---------- MODAL CATEGORÍA: abrir / cerrar / guardar / borrar ---------- */
+        let editCatId = null, editCatNombreOriginal = null;
+        function abrirModalCat(tipo, cat = null) {
+            tipoActualModal = tipo;
+            editCatId = cat?.id || null;
+            editCatNombreOriginal = cat?.nombre || null;
+
+            $$('modalCatTitulo').textContent = cat ? 'Editar categoría' : 'Nueva categoría';
+            $$('cNombre').value = cat?.nombre || '';
+
+            const esPupusas = tipo === 'pupusas';
+            $$('campoCatNota').classList.toggle('hidden', !esPupusas);
+            $$('campoCatEstilo').classList.toggle('hidden', !esPupusas);
+            $$('cNota').value = cat?.nota || '';
+            $$('cEstiloToque').checked = cat?.estilo === 'toque';
+
+            $$('btnBorrarCat').classList.toggle('hidden', !cat);
+            $$('modalCatMsg').textContent = '';
+            $$('modalCatBg').classList.add('open');
+            $$('cNombre').focus();
+        }
+        function cerrarModalCat() { $$('modalCatBg').classList.remove('open'); editCatId = null; editCatNombreOriginal = null; }
+        $$('btnCancelarCat').addEventListener('click', cerrarModalCat);
+        $$('modalCatBg').addEventListener('click', e => { if (e.target === $$('modalCatBg')) cerrarModalCat(); });
+
+        $$('btnGuardarCat').addEventListener('click', async () => {
+            const tipo = tipoActualModal;
+            const cfg = CFG[tipo], st = estado[tipo];
+            const nombre = $$('cNombre').value.trim();
+            if (!nombre) { $$('modalCatMsg').textContent = 'Escribe un nombre.'; return; }
+            const duplicada = st.categorias.some(c =>
+                c.nombre.toLowerCase() === nombre.toLowerCase() && c.id !== editCatId);
+            if (duplicada) {
+                $$('modalCatMsg').textContent = 'Ya existe una categoría con ese nombre.';
+                return;
+            }
+
+            const datos = { nombre };
+            if (tipo === 'pupusas') {
+                datos.nota = $$('cNota').value.trim();
+                datos.estilo = $$('cEstiloToque').checked ? 'toque' : 'lista';
+            }
+
+            $$('btnGuardarCat').disabled = true;
+            try {
+                if (editCatId) {
+                    await updateDoc(doc(db, COLECCION_CATEGORIAS, editCatId), datos);
+                    /* Si se renombró, hay que mover todos los platillos que
+                       apuntaban al nombre viejo, o se quedarían huérfanos. */
+                    if (editCatNombreOriginal && editCatNombreOriginal !== nombre) {
+                        const afectados = st.platos.filter(p => p.categoria === editCatNombreOriginal);
+                        if (afectados.length) {
+                            const batch = writeBatch(db);
+                            afectados.forEach(p => batch.update(doc(db, cfg.col, p.id), { categoria: nombre }));
+                            await batch.commit();
+                        }
+                    }
+                    st.catActiva = nombre;
+                    toast('Categoría actualizada');
+                } else {
+                    const maxOrden = st.categorias.reduce((m, c) => Math.max(m, c.orden ?? 0), 0);
+                    await addDoc(collection(db, COLECCION_CATEGORIAS), {
+                        menu: cfg.clave, ...datos, orden: maxOrden + 1
+                    });
+                    st.catActiva = nombre;
+                    toast('Categoría creada');
+                }
+                cerrarModalCat();
+            } catch (err) {
+                $$('modalCatMsg').textContent = 'No se pudo guardar. Intenta de nuevo.';
+                console.error(err);
+            } finally {
+                $$('btnGuardarCat').disabled = false;
+            }
+        });
+
+        $$('btnBorrarCat').addEventListener('click', async () => {
+            if (!editCatId) return;
+            const tipo = tipoActualModal;
+            const cfg = CFG[tipo], st = estado[tipo];
+            const enUso = st.platos.filter(p => p.categoria === editCatNombreOriginal).length;
+            if (enUso > 0) {
+                $$('modalCatMsg').textContent = `Esta categoría tiene ${enUso} platillo(s). Muévelos o bórralos primero.`;
+                return;
+            }
+            if (!confirm(`¿Borrar la categoría "${editCatNombreOriginal}"? Esta acción no se puede deshacer.`)) return;
+            try {
+                await deleteDoc(doc(db, COLECCION_CATEGORIAS, editCatId));
+                if (st.catActiva === editCatNombreOriginal) st.catActiva = null;
+                toast('Categoría borrada');
+                cerrarModalCat();
+            } catch (err) {
+                $$('modalCatMsg').textContent = 'No se pudo borrar. Intenta de nuevo.';
+                console.error(err);
+            }
+        });
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') { cerrarModalPlato(); cerrarModalCat(); }
+        });
+    </script>
+
+    <!-- ========== LÓGICA: BEBIDAS Y EXTRAS ========== -->
+    <script type="module">
+        import { db, COLECCION_BEBIDAS, COLECCION_EXTRAS } from '../JS/firebase-config.js';
+        import {
+            collection, onSnapshot,
+            addDoc, updateDoc, deleteDoc, doc, serverTimestamp
+        } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
+
+        const $3 = id => document.getElementById(id);
+        function esc(s = '') { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+        function toast(texto, tipo = 'ok') {
+            const t = $3('toast');
+            t.textContent = texto;
+            t.className = 'toast show ' + tipo;
+            clearTimeout(toast._timer);
+            toast._timer = setTimeout(() => t.className = 'toast', 2600);
+        }
+        const ICONOS = {
+            subir: `<svg viewBox="0 0 24 24"><path d="M12 7l6 6-1.4 1.4L12 9.8 7.4 14.4 6 13z"/></svg>`,
+            bajar: `<svg viewBox="0 0 24 24"><path d="M12 17l-6-6 1.4-1.4L12 14.2l4.6-4.6L18 11z"/></svg>`,
+            editar: `<svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zM20.7 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75z"/></svg>`,
+            borrar: `<svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6zM19 4h-3.5l-1-1h-5l-1 1H5v2h14z"/></svg>`
+        };
+
+        /* ==================== BEBIDAS ==================== */
+        let bebidas = [];
+        const GRUPO_LABEL = { fria: 'Fría', caliente: 'Caliente' };
+
+        window.iniciarBebidas = function iniciarBebidas() {
+            onSnapshot(collection(db, COLECCION_BEBIDAS), snap => {
+                bebidas = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                    .sort((a, b) => (a.orden ?? Infinity) - (b.orden ?? Infinity));
+                $3('loadingBebidas').classList.add('hidden');
+                renderBebidas();
+            }, err => {
+                $3('loadingBebidas').textContent = 'No se pudieron cargar las bebidas.';
+                console.error(err);
+            });
+        };
+
+        function renderBebidas() {
+            const cont = $3('listaBebidas');
+            $3('vacioBebidas').classList.toggle('hidden', bebidas.length > 0);
+            cont.innerHTML = bebidas.map((b, i) => `
+                <article class="promo ${b.activo === false ? 'inactiva' : ''}">
+                    <label class="switch" title="${b.activo === false ? 'Inactiva' : 'Activa'}">
+                        <input type="checkbox" ${b.activo === false ? '' : 'checked'} data-toggle-bebida="${b.id}" aria-label="Activar o desactivar">
+                        <span class="track"></span><span class="thumb"></span>
+                    </label>
+                    <div class="promo-info">
+                        <h3>${esc(b.nombre)}<span class="estado ${b.activo === false ? 'off' : 'on'}">${b.activo === false ? 'Oculta' : 'Activa'}</span></h3>
+                        <div class="precio">${esc(b.precio || '')}</div>
+                        <div class="promo-dias">Tipo: <b>${esc(GRUPO_LABEL[b.grupo] || 'Fría')}</b></div>
+                    </div>
+                    <div class="promo-tools">
+                        <button class="icon-btn" data-up="${b.id}" ${i === 0 ? 'disabled' : ''} aria-label="Subir" title="Subir">${ICONOS.subir}</button>
+                        <button class="icon-btn" data-down="${b.id}" ${i === bebidas.length - 1 ? 'disabled' : ''} aria-label="Bajar" title="Bajar">${ICONOS.bajar}</button>
+                        <button class="icon-btn" data-edit="${b.id}" aria-label="Editar" title="Editar">${ICONOS.editar}</button>
+                        <button class="icon-btn danger" data-del="${b.id}" aria-label="Borrar" title="Borrar">${ICONOS.borrar}</button>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        $3('listaBebidas').addEventListener('click', e => {
+            const t = e.target.closest('button[data-edit],button[data-del],button[data-up],button[data-down]');
+            if (!t) return;
+            if (t.dataset.edit) abrirModalBebida(t.dataset.edit);
+            if (t.dataset.del)  borrarBebida(t.dataset.del);
+            if (t.dataset.up)   moverBebida(t.dataset.up, -1);
+            if (t.dataset.down) moverBebida(t.dataset.down, 1);
+        });
+        $3('listaBebidas').addEventListener('change', async e => {
+            const chk = e.target.closest('input[data-toggle-bebida]');
+            if (!chk) return;
+            try {
+                await updateDoc(doc(db, COLECCION_BEBIDAS, chk.dataset.toggleBebida), { activo: chk.checked });
+                toast(chk.checked ? 'Bebida activada' : 'Bebida oculta');
+            } catch (err) { toast('No se pudo guardar', 'bad'); chk.checked = !chk.checked; }
+        });
+
+        async function moverBebida(id, dir) {
+            const i = bebidas.findIndex(b => b.id === id);
+            const j = i + dir;
+            if (j < 0 || j >= bebidas.length) return;
+            const a = bebidas[i], b = bebidas[j];
+            try {
+                await Promise.all([
+                    updateDoc(doc(db, COLECCION_BEBIDAS, a.id), { orden: b.orden ?? j }),
+                    updateDoc(doc(db, COLECCION_BEBIDAS, b.id), { orden: a.orden ?? i })
+                ]);
+            } catch (err) { toast('No se pudo reordenar', 'bad'); }
+        }
+        async function borrarBebida(id) {
+            const b = bebidas.find(x => x.id === id);
+            if (!confirm(`¿Borrar "${b?.nombre || 'esta bebida'}"? Esta acción no se puede deshacer.`)) return;
+            try { await deleteDoc(doc(db, COLECCION_BEBIDAS, id)); toast('Bebida borrada'); }
+            catch (err) { toast('No se pudo borrar', 'bad'); }
+        }
+
+        let editBebidaId = null;
+        function abrirModalBebida(id = null) {
+            editBebidaId = id;
+            const b = id ? bebidas.find(x => x.id === id) : null;
+            $3('modalBebidaTitulo').textContent = id ? 'Editar bebida' : 'Nueva bebida';
+            $3('bNombre').value = b?.nombre || '';
+            $3('bPrecio').value = b?.precio || '';
+            $3('bGrupo').value = b?.grupo || 'fria';
+            $3('btnBorrarBebida').classList.toggle('hidden', !id);
+            $3('modalBebidaMsg').textContent = '';
+            $3('modalBebidaBg').classList.add('open');
+            $3('bNombre').focus();
+        }
+        function cerrarModalBebida() { $3('modalBebidaBg').classList.remove('open'); editBebidaId = null; }
+
+        $3('btnNuevaBebida').addEventListener('click', () => abrirModalBebida());
+        $3('btnCancelarBebida').addEventListener('click', cerrarModalBebida);
+        $3('modalBebidaBg').addEventListener('click', e => { if (e.target === $3('modalBebidaBg')) cerrarModalBebida(); });
+        $3('btnBorrarBebida').addEventListener('click', async () => {
+            if (!editBebidaId) return;
+            const id = editBebidaId;
+            cerrarModalBebida();
+            await borrarBebida(id);
+        });
+
+        $3('btnGuardarBebida').addEventListener('click', async () => {
+            const nombre = $3('bNombre').value.trim();
+            const precio = $3('bPrecio').value.trim();
+            const grupo = $3('bGrupo').value;
+            if (!nombre || !precio) { $3('modalBebidaMsg').textContent = 'El nombre y el precio son obligatorios.'; return; }
+            $3('btnGuardarBebida').disabled = true;
+            try {
+                if (editBebidaId) {
+                    await updateDoc(doc(db, COLECCION_BEBIDAS, editBebidaId), { nombre, precio, grupo });
+                    toast('Cambios guardados');
+                } else {
+                    const maxOrden = bebidas.reduce((m, b) => Math.max(m, b.orden ?? 0), 0);
+                    await addDoc(collection(db, COLECCION_BEBIDAS), {
+                        nombre, precio, grupo, activo: true, orden: maxOrden + 1, creado: serverTimestamp()
+                    });
+                    toast('Bebida creada');
+                }
+                cerrarModalBebida();
+            } catch (err) {
+                $3('modalBebidaMsg').textContent = 'No se pudo guardar. Intenta de nuevo.';
+                console.error(err);
+            } finally {
+                $3('btnGuardarBebida').disabled = false;
+            }
+        });
+
+        /* ==================== EXTRAS ==================== */
+        let extras = [];
+
+        window.iniciarExtras = function iniciarExtras() {
+            onSnapshot(collection(db, COLECCION_EXTRAS), snap => {
+                extras = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                    .sort((a, b) => (a.orden ?? Infinity) - (b.orden ?? Infinity));
+                $3('loadingExtras').classList.add('hidden');
+                renderExtras();
+            }, err => {
+                $3('loadingExtras').textContent = 'No se pudieron cargar los extras.';
+                console.error(err);
+            });
+        };
+
+        function renderExtras() {
+            const cont = $3('listaExtras');
+            $3('vacioExtras').classList.toggle('hidden', extras.length > 0);
+            cont.innerHTML = extras.map((e, i) => `
+                <article class="promo ${e.activo === false ? 'inactiva' : ''}">
+                    <label class="switch" title="${e.activo === false ? 'Inactivo' : 'Activo'}">
+                        <input type="checkbox" ${e.activo === false ? '' : 'checked'} data-toggle-extra="${e.id}" aria-label="Activar o desactivar">
+                        <span class="track"></span><span class="thumb"></span>
+                    </label>
+                    <div class="promo-info">
+                        <h3>${esc(e.nombre)}<span class="estado ${e.activo === false ? 'off' : 'on'}">${e.activo === false ? 'Oculto' : 'Activo'}</span></h3>
+                        <div class="precio">${esc(e.precio || '')}</div>
+                    </div>
+                    <div class="promo-tools">
+                        <button class="icon-btn" data-up="${e.id}" ${i === 0 ? 'disabled' : ''} aria-label="Subir" title="Subir">${ICONOS.subir}</button>
+                        <button class="icon-btn" data-down="${e.id}" ${i === extras.length - 1 ? 'disabled' : ''} aria-label="Bajar" title="Bajar">${ICONOS.bajar}</button>
+                        <button class="icon-btn" data-edit="${e.id}" aria-label="Editar" title="Editar">${ICONOS.editar}</button>
+                        <button class="icon-btn danger" data-del="${e.id}" aria-label="Borrar" title="Borrar">${ICONOS.borrar}</button>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        $3('listaExtras').addEventListener('click', e => {
+            const t = e.target.closest('button[data-edit],button[data-del],button[data-up],button[data-down]');
+            if (!t) return;
+            if (t.dataset.edit) abrirModalExtra(t.dataset.edit);
+            if (t.dataset.del)  borrarExtra(t.dataset.del);
+            if (t.dataset.up)   moverExtra(t.dataset.up, -1);
+            if (t.dataset.down) moverExtra(t.dataset.down, 1);
+        });
+        $3('listaExtras').addEventListener('change', async e => {
+            const chk = e.target.closest('input[data-toggle-extra]');
+            if (!chk) return;
+            try {
+                await updateDoc(doc(db, COLECCION_EXTRAS, chk.dataset.toggleExtra), { activo: chk.checked });
+                toast(chk.checked ? 'Extra activado' : 'Extra oculto');
+            } catch (err) { toast('No se pudo guardar', 'bad'); chk.checked = !chk.checked; }
+        });
+
+        async function moverExtra(id, dir) {
+            const i = extras.findIndex(x => x.id === id);
+            const j = i + dir;
+            if (j < 0 || j >= extras.length) return;
+            const a = extras[i], b = extras[j];
+            try {
+                await Promise.all([
+                    updateDoc(doc(db, COLECCION_EXTRAS, a.id), { orden: b.orden ?? j }),
+                    updateDoc(doc(db, COLECCION_EXTRAS, b.id), { orden: a.orden ?? i })
+                ]);
+            } catch (err) { toast('No se pudo reordenar', 'bad'); }
+        }
+        async function borrarExtra(id) {
+            const e = extras.find(x => x.id === id);
+            if (!confirm(`¿Borrar "${e?.nombre || 'este extra'}"? Esta acción no se puede deshacer.`)) return;
+            try { await deleteDoc(doc(db, COLECCION_EXTRAS, id)); toast('Extra borrado'); }
+            catch (err) { toast('No se pudo borrar', 'bad'); }
+        }
+
+        let editExtraId = null;
+        function abrirModalExtra(id = null) {
+            editExtraId = id;
+            const e = id ? extras.find(x => x.id === id) : null;
+            $3('modalExtraTitulo').textContent = id ? 'Editar extra' : 'Nuevo extra';
+            $3('eNombre').value = e?.nombre || '';
+            $3('ePrecio').value = e?.precio || '';
+            $3('btnBorrarExtra').classList.toggle('hidden', !id);
+            $3('modalExtraMsg').textContent = '';
+            $3('modalExtraBg').classList.add('open');
+            $3('eNombre').focus();
+        }
+        function cerrarModalExtra() { $3('modalExtraBg').classList.remove('open'); editExtraId = null; }
+
+        $3('btnNuevoExtra').addEventListener('click', () => abrirModalExtra());
+        $3('btnCancelarExtra').addEventListener('click', cerrarModalExtra);
+        $3('modalExtraBg').addEventListener('click', e => { if (e.target === $3('modalExtraBg')) cerrarModalExtra(); });
+        $3('btnBorrarExtra').addEventListener('click', async () => {
+            if (!editExtraId) return;
+            const id = editExtraId;
+            cerrarModalExtra();
+            await borrarExtra(id);
+        });
+
+        $3('btnGuardarExtra').addEventListener('click', async () => {
+            const nombre = $3('eNombre').value.trim();
+            const precio = $3('ePrecio').value.trim();
+            if (!nombre || !precio) { $3('modalExtraMsg').textContent = 'El nombre y el precio son obligatorios.'; return; }
+            $3('btnGuardarExtra').disabled = true;
+            try {
+                if (editExtraId) {
+                    await updateDoc(doc(db, COLECCION_EXTRAS, editExtraId), { nombre, precio });
+                    toast('Cambios guardados');
+                } else {
+                    const maxOrden = extras.reduce((m, e) => Math.max(m, e.orden ?? 0), 0);
+                    await addDoc(collection(db, COLECCION_EXTRAS), {
+                        nombre, precio, activo: true, orden: maxOrden + 1, creado: serverTimestamp()
+                    });
+                    toast('Extra creado');
+                }
+                cerrarModalExtra();
+            } catch (err) {
+                $3('modalExtraMsg').textContent = 'No se pudo guardar. Intenta de nuevo.';
+                console.error(err);
+            } finally {
+                $3('btnGuardarExtra').disabled = false;
+            }
+        });
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') { cerrarModalBebida(); cerrarModalExtra(); }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú de Pupusas — La Hornilla de Zaid</title>
+    <meta name="description" content="Menú de pupusas hechas a mano: especialidades, tradicionales y pupusas con un toque mexicano (birria, pastor, pollo pastor). Incluye menú de bebidas. Plaza Nova, Sonzacate.">
+    <meta name="theme-color" content="#120600">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Menú de Pupusas — La Hornilla de Zaid">
+    <meta property="og:description" content="Pupusas hechas a mano con un toque mexicano. Especialidades, tradicionales y bebidas.">
+    <meta property="og:type" content="restaurant.menu">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="../CSS/style.css">
+    <link rel="stylesheet" href="../CSS/pupusas.css">
+</head>
+<body>
+
+    <!-- ===== PANTALLA DE CARGA — Fueguito ===== -->
+    <div class="pageload" id="pageload" role="status" aria-live="polite" aria-label="Cargando La Hornilla de Zaid">
+        <div class="pageload-flame">
+            <svg class="flame-svg flame-base" viewBox="0 0 24 28" aria-hidden="true" focusable="false">
+                <path d="M12 1C12 1 5 9 5 17C5 22 8.1 26 12 26C15.9 26 19 22 19 17C19 13.7 17 11 15 9C15.6 11.7 14.6 13.6 13 14.6C13.8 12 13 9.4 11 7.6C10.6 10 9.4 11.8 9.4 14C9.4 11 10.4 7.8 12 4.6C12 3.4 12 2.1 12 1Z"/>
+            </svg>
+            <svg class="flame-svg flame-glow" viewBox="0 0 24 28" aria-hidden="true" focusable="false">
+                <defs>
+                    <linearGradient id="flameGrad" x1="0" y1="1" x2="0" y2="0">
+                        <stop offset="0%" stop-color="#ffcf7a"/>
+                        <stop offset="45%" stop-color="#ff6600"/>
+                        <stop offset="100%" stop-color="#d44e00"/>
+                    </linearGradient>
+                </defs>
+                <path fill="url(#flameGrad)" d="M12 1C12 1 5 9 5 17C5 22 8.1 26 12 26C15.9 26 19 22 19 17C19 13.7 17 11 15 9C15.6 11.7 14.6 13.6 13 14.6C13.8 12 13 9.4 11 7.6C10.6 10 9.4 11.8 9.4 14C9.4 11 10.4 7.8 12 4.6C12 3.4 12 2.1 12 1Z"/>
+            </svg>
+            <span class="pageload-embers" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+        </div>
+        <p class="pageload-word">La Hornilla de Zaid</p>
+    </div>
+
+    <!-- ===== HEADER ===== -->
+    <header class="main-header">
+        <a class="logo-box" href="../index.html" aria-label="Inicio">
+            <img src="../Imagenes/IMG-20260215-WA0049.jpg.png" alt="La Hornilla de Zaid" class="main-logo">
+        </a>
+        <button class="menu-toggle" id="menuBtn" aria-label="Abrir menú" aria-controls="sidebar" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
+    </header>
+
+    <main class="page-main">
+
+        <!-- ===== HERO ===== -->
+        <section class="page-hero">
+            <span class="eyebrow">La Hornilla de Zaid</span>
+            <h1>Menú de Pupusas</h1>
+            <p class="horario">
+                Lunes a Sábado · 6:30 a.m. – 10:30 a.m.<br>
+            </p>
+            <div class="page-hero-actions">
+                <a href="pedido.html" class="btn-pedir">Pedir en línea <span class="arrow">→</span></a>
+            </div>
+        </section>
+
+        <!-- ===== SUB-NAV (acceso rápido a cada bloque; lo llena pupusas-contenido.js) ===== -->
+        <nav class="menu-subnav" aria-label="Secciones del menú de pupusas">
+            <div class="menu-subnav-inner" id="pupusaSubnav"></div>
+        </nav>
+
+        <!-- ===== BUSCADOR ===== -->
+        <div class="pupusa-search-wrap">
+            <div class="pupusa-search" id="pupusaSearchWrap">
+                <svg viewBox="0 0 24 24"><path d="M15.5 14h-.8l-.3-.3a6.5 6.5 0 1 0-.7.7l.3.3v.8l5 5L20.5 19zM10 14a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/></svg>
+                <input type="text" id="pupusaBuscar" placeholder="Buscar pupusa o bebida..." aria-label="Buscar en el menú de pupusas">
+                <button type="button" class="clear-btn" id="pupusaClear" aria-label="Limpiar búsqueda">
+                    <svg viewBox="0 0 24 24"><path d="M18.3 5.7L12 12l6.3 6.3-1.4 1.4L10.6 13.4 4.3 19.7 2.9 18.3 9.2 12 2.9 5.7 4.3 4.3l6.3 6.3 6.3-6.3z"/></svg>
+                </button>
+            </div>
+            <p class="pupusa-sin-resultados hidden" id="pupusaSinResultados">No encontramos nada con "<span></span>".</p>
+        </div>
+
+        <!-- ===== PUPUSAS ===== -->
+        <section class="menu-section" id="pupusas-section">
+            <div class="section-header reveal">
+                <span class="eyebrow">Hechas a mano · a la hornilla</span>
+                <h2>Pupusas</h2>
+                <p>Recién hechas, con tu masa y relleno favoritos.</p>
+            </div>
+
+            <p class="pupusas-cargando" id="pupusasCargando">Cargando el menú…</p>
+            <div class="pupusas-layout" id="pupusasLayout"></div>
+        </section>
+
+        <!-- ===== BEBIDAS ===== -->
+        <section class="menu-section dark" id="bebidas-pupusas">
+            <div class="inner">
+                <div class="section-header reveal">
+                    <span class="eyebrow">Para acompañar</span>
+                    <h2>Bebidas</h2>
+                </div>
+
+                <div class="bebidas-lista" id="bebidasPupusasLista"></div>
+
+                <div class="bebidas-cta reveal" data-delay="1">
+                    <a class="btn-primary" href="https://wa.me/50370991660" target="_blank" rel="noopener">
+                        Ordena por WhatsApp <span class="arrow">→</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="main-footer">
+        <div class="footer-content">
+            <img src="../Imagenes/IMG-20260215-WA0049.jpg.png" alt="La Hornilla de Zaid" class="footer-logo-img">
+            <nav class="footer-links">
+                <a href="../index.html">Inicio</a>
+                <a href="menu.html">Menú mexicano</a>
+                <a href="pupusas.html">Menú de pupusas</a>
+                <a href="pedido.html">Pedir</a>
+                <a href="ubicacion.html">Ubicación</a>
+            </nav>
+            <div class="footer-social social-row">
+                <a class="social-link" href="https://wa.me/50370991660" target="_blank" rel="noopener" aria-label="WhatsApp">
+                    <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.4A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-2.9.8.8-2.8-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-5.8c-.3-.2-1.7-.8-2-.9-.3-.1-.5-.2-.7.2-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5 0-.2-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3z"/></svg>
+                </a>
+                <a class="social-link" href="https://www.instagram.com/la_hornilla_de_zaid" target="_blank" rel="noopener" aria-label="Instagram">
+                    <svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.9.1 1.2.1 1.8.2 2.2.4.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.2.4.3 1 .4 2.2.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c-.1 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1 .3-2.2.4-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2-.1-1.8-.2-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.4-.3-1-.4-2.2-.1-1.3-.1-1.7-.1-4.9s0-3.6.1-4.9c.1-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.3 2.2-.4C8.4 2.2 8.8 2.2 12 2.2zm0 1.8c-3.1 0-3.5 0-4.7.1-1.1.1-1.7.2-2.1.4-.5.2-.9.4-1.3.8-.4.4-.6.8-.8 1.3-.2.4-.3 1-.4 2.1C2.6 9.5 2.6 9.9 2.6 12s0 3.5.1 4.7c.1 1.1.2 1.7.4 2.1.2.5.4.9.8 1.3.4.4.8.6 1.3.8.4.2 1 .3 2.1.4 1.2.1 1.6.1 4.7.1s3.5 0 4.7-.1c1.1-.1 1.7-.2 2.1-.4.5-.2.9-.4 1.3-.8.4-.4.6-.8.8-1.3.2-.4.3-1 .4-2.1.1-1.2.1-1.6.1-4.7s0-3.5-.1-4.7c-.1-1.1-.2-1.7-.4-2.1-.2-.5-.4-.9-.8-1.3-.4-.4-.8-.6-1.3-.8-.4-.2-1-.3-2.1-.4C15.5 4 15.1 4 12 4zm0 3.1a4.9 4.9 0 1 1 0 9.8 4.9 4.9 0 0 1 0-9.8zm0 8.1a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4zM17.1 5.8a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2z"/></svg>
+                </a>
+                <a class="social-link" href="https://www.facebook.com/profile.php?id=100090295385638&locale=es_LA" target="_blank" rel="noopener" aria-label="Facebook">
+                    <svg viewBox="0 0 24 24"><path d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.3-1.5 1.6-1.5h1.7V3.6c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.1v2.3H7.6V13h2.8v8h3.1z"/></svg>
+                </a>
+                <a class="social-link" href="https://www.tiktok.com/@lahornilladezaid" target="_blank" rel="noopener" aria-label="TikTok">
+                    <svg viewBox="0 0 24 24"><path d="M16.5 3c.3 2 1.5 3.6 3.5 3.9v2.7c-1.3.1-2.5-.3-3.5-1v5.9c0 3.3-2.5 5.6-5.6 5.6-2.9 0-5.3-2.2-5.3-5.1 0-3.1 2.6-5.3 5.8-4.9v2.8c-.4-.1-.8-.2-1.2-.2-1.3 0-2.4 1-2.4 2.4 0 1.4 1.1 2.4 2.5 2.4 1.5 0 2.7-1.1 2.7-2.8V3h3.5z"/></svg>
+                </a>
+            </div>
+            <p class="footer-copy">© 2026 La Hornilla de Zaid. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- ===== BACKDROP + SIDEBAR ===== -->
+    <div class="backdrop" id="backdrop"></div>
+
+    <aside class="sidebar" id="sidebar" aria-label="Menú de navegación">
+        <nav class="nav-menu">
+            <ul>
+                <li><a href="../index.html">Inicio</a></li>
+                <li><a href="menu.html">Menú</a></li>
+                <li><a href="pupusas.html" aria-current="page">Pupusas</a></li>
+                <li><a href="pedido.html" class="is-cta">Pedir</a></li>
+                <li><a href="ubicacion.html">Ubicación</a></li>
+            </ul>
+        </nav>
+
+        <div class="sidebar-contact">
+            <p class="eyebrow">Síguenos y contáctanos</p>
+            <div class="social-row">
+                <a class="social-link" href="https://wa.me/50370991660" target="_blank" rel="noopener" aria-label="WhatsApp">
+                    <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.4A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-2.9.8.8-2.8-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-5.8c-.3-.2-1.7-.8-2-.9-.3-.1-.5-.2-.7.2-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5 0-.2-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3z"/></svg>
+                </a>
+                <a class="social-link" href="https://www.instagram.com/la_hornilla_de_zaid" target="_blank" rel="noopener" aria-label="Instagram">
+                    <svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.9.1 1.2.1 1.8.2 2.2.4.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.2.4.3 1 .4 2.2.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c-.1 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1 .3-2.2.4-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2-.1-1.8-.2-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.4-.3-1-.4-2.2-.1-1.3-.1-1.7-.1-4.9s0-3.6.1-4.9c.1-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.3 2.2-.4C8.4 2.2 8.8 2.2 12 2.2zm0 1.8c-3.1 0-3.5 0-4.7.1-1.1.1-1.7.2-2.1.4-.5.2-.9.4-1.3.8-.4.4-.6.8-.8 1.3-.2.4-.3 1-.4 2.1C2.6 9.5 2.6 9.9 2.6 12s0 3.5.1 4.7c.1 1.1.2 1.7.4 2.1.2.5.4.9.8 1.3.4.4.8.6 1.3.8.4.2 1 .3 2.1.4 1.2.1 1.6.1 4.7.1s3.5 0 4.7-.1c1.1-.1 1.7-.2 2.1-.4.5-.2.9-.4 1.3-.8.4-.4.6-.8.8-1.3.2-.4.3-1 .4-2.1.1-1.2.1-1.6.1-4.7s0-3.5-.1-4.7c-.1-1.1-.2-1.7-.4-2.1-.2-.5-.4-.9-.8-1.3-.4-.4-.8-.6-1.3-.8-.4-.2-1-.3-2.1-.4C15.5 4 15.1 4 12 4zm0 3.1a4.9 4.9 0 1 1 0 9.8 4.9 4.9 0 0 1 0-9.8zm0 8.1a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4zM17.1 5.8a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2z"/></svg>
+                </a>
+                <a class="social-link" href="https://www.facebook.com/profile.php?id=100090295385638&locale=es_LA" target="_blank" rel="noopener" aria-label="Facebook">
+                    <svg viewBox="0 0 24 24"><path d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.3-1.5 1.6-1.5h1.7V3.6c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.1v2.3H7.6V13h2.8v8h3.1z"/></svg>
+                </a>
+                <a class="social-link" href="https://www.tiktok.com/@lahornilladezaid" target="_blank" rel="noopener" aria-label="TikTok">
+                    <svg viewBox="0 0 24 24"><path d="M16.5 3c.3 2 1.5 3.6 3.5 3.9v2.7c-1.3.1-2.5-.3-3.5-1v5.9c0 3.3-2.5 5.6-5.6 5.6-2.9 0-5.3-2.2-5.3-5.1 0-3.1 2.6-5.3 5.8-4.9v2.8c-.4-.1-.8-.2-1.2-.2-1.3 0-2.4 1-2.4 2.4 0 1.4 1.1 2.4 2.5 2.4 1.5 0 2.7-1.1 2.7-2.8V3h3.5z"/></svg>
+                </a>
+            </div>
+            <div class="sidebar-direct">
+                <span class="lbl">WhatsApp</span>
+                <a href="https://wa.me/50370991660" target="_blank" rel="noopener">7099-1660</a>
+                <span class="lbl">Correo</span>
+                <a href="mailto:hornillaz.14@gmail.com">hornillaz.14@gmail.com</a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Scripts: el primero hace funcionar el menú lateral y las animaciones;
+         el segundo (módulo) trae categorías, pupusas y bebidas desde
+         Firebase, arma el sub-menú, el buscador y resalta la pestaña
+         activa al hacer scroll. -->
+    <script src="../JS/loader.js"></script>
+    <script src="../JS/script.js"></script>
+    <script type="module" src="../JS/pupusas-contenido.js"></script>
+</body>
+</html>

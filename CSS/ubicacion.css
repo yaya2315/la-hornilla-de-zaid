@@ -1,0 +1,64 @@
+/* =====================================================================
+   UBICACIÓN — Mapa, dirección, horarios y contacto
+   ===================================================================== */
+
+.ubicacion-section {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: clamp(56px, 8vw, 90px) clamp(20px, 5vw, 60px);
+}
+
+.ubicacion-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: clamp(28px, 5vw, 56px);
+    align-items: stretch;
+}
+
+/* --- Panel de información --- */
+.info-panel { display: flex; flex-direction: column; gap: 18px; }
+.info-item {
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    transition: border-color 0.3s var(--ease), transform 0.3s var(--ease);
+}
+.info-item:hover { border-color: var(--ember); transform: translateY(-3px); }
+.info-icon {
+    flex-shrink: 0;
+    width: 48px; height: 48px;
+    display: grid; place-items: center;
+    border-radius: 12px;
+    background: rgba(255,102,0,0.12);
+    color: var(--ember);
+}
+.info-icon svg { width: 24px; height: 24px; fill: currentColor; }
+.info-item h4 {
+    color: var(--ember);
+    font-size: 1.05rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 5px;
+}
+.info-item p { color: var(--text); font-size: 0.95rem; line-height: 1.55; }
+
+.info-cta { margin-top: 6px; }
+
+/* --- Mapa --- */
+.map-wrap {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--line);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+    min-height: 420px;
+}
+.map-wrap iframe { width: 100%; height: 100%; min-height: 420px; border: 0; display: block; }
+
+@media (max-width: 860px) {
+    .ubicacion-grid { grid-template-columns: 1fr; }
+    .map-wrap, .map-wrap iframe { min-height: 320px; }
+}
