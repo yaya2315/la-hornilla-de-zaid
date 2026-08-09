@@ -1,11 +1,17 @@
 /* =====================================================================
    PEDIDOS.JS — Fuente única para leer y escribir la colección "pedidos"
    ---------------------------------------------------------------------
-   La usan tanto mesero.js (tomar/editar comandas) como cocina.js
-   (escuchar en tiempo real y cambiar el estado del ticket). Así los
-   dos hablan con Firestore exactamente de la misma forma y con los
-   mismos nombres de campo — el mismo criterio que ya usan bebidas.js
-   y extras.js para no desincronizar nada entre pantallas.
+   La usan mesero.js (tomar/editar comandas), cocina.js (escuchar en
+   tiempo real y cambiar el estado del ticket) e historial.js (consulta
+   de todo lo vendido). Así todas hablan con Firestore exactamente de
+   la misma forma y con los mismos nombres de campo.
+
+   NUEVO — tipo de pedido:
+   Cada pedido ahora lleva un campo "tipo": 'local' | 'llevar' | 'domicilio'.
+   • local:     mesa = número de mesa (1–6)
+   • llevar:    mesa = nombre del cliente (se reusa el mismo campo para
+                no romper nada de lo que ya lee cocina.js), cliente = igual
+   • domicilio: igual que llevar, más el campo "direccion"
    ===================================================================== */
 
 import { db, COLECCION_PEDIDOS } from './firebase-config.js';
@@ -27,10 +33,16 @@ export function calcularTotal(items = []) {
     return items.reduce((acc, it) => acc + (Number(it.precio) || 0) * (Number(it.cantidad) || 0), 0);
 }
 
-/* ── Crear un pedido nuevo ──────────────────────────────────────── */
-export async function crearPedido(mesa, items) {
+/* ── Crear un pedido nuevo ──────────────────────────────────────────
+   origen = { tipo, mesa, cliente, direccion } — solo "tipo" y "mesa"
+   son obligatorios; cliente/direccion aplican a llevar/domicilio. */
+export async function crearPedido(origen, items) {
+    const { tipo = 'local', mesa = '', cliente = '', direccion = '' } = origen || {};
     const ref = await addDoc(collection(db, COLECCION_PEDIDOS), {
-        mesa: String(mesa),
+        tipo,
+        mesa: String(mesa || ''),
+        cliente: cliente || '',
+        direccion: direccion || '',
         estado: 'pendiente',
         items,
         total: calcularTotal(items),
@@ -59,15 +71,16 @@ export async function cambiarEstado(pedidoId, estado) {
 }
 
 /* ── Buscar el pedido ACTIVO más reciente de una mesa (para editar) ──
-   "Activo" = pendiente, preparando o listo. Uno entregado o cancelado
-   nunca se vuelve a cargar aquí; ya es historial. */
+   Solo aplica a pedidos "local" (mesa numerada). "Activo" = pendiente,
+   preparando o listo. Uno entregado o cancelado nunca se vuelve a
+   cargar aquí; ya es historial. */
 export async function buscarPedidoActivoPorMesa(mesa) {
     const snap = await getDocs(
         query(collection(db, COLECCION_PEDIDOS), where('mesa', '==', String(mesa)))
     );
     const activos = snap.docs
         .map(d => ({ id: d.id, ...d.data() }))
-        .filter(p => ESTADOS_ACTIVOS.includes(p.estado))
+        .filter(p => (p.tipo || 'local') === 'local' && ESTADOS_ACTIVOS.includes(p.estado))
         .sort((a, b) => (b.creadoEn?.toMillis?.() ?? 0) - (a.creadoEn?.toMillis?.() ?? 0));
     return activos[0] || null;
 }
@@ -93,7 +106,7 @@ export function escucharPedidosActivos(callback) {
     }, err => console.error('[pedidos] Error escuchando pedidos activos:', err));
 }
 
-/* ── Tiempo real: TODO lo del día (para el panel de historial) ────── */
+/* ── Tiempo real: TODO lo del día (para el panel de historial de cocina.html) */
 export function escucharHistorialHoy(callback) {
     const inicio = new Date();
     inicio.setHours(0, 0, 0, 0);
@@ -104,4 +117,19 @@ export function escucharHistorialHoy(callback) {
     return onSnapshot(q, snap => {
         callback(snap.docs.map(d => ({ id: d.id, ...d.data() })));
     }, err => console.error('[pedidos] Error escuchando historial:', err));
+}
+
+/* ── Tiempo real: historial completo con rango de fechas opcional ──
+   (para historial.html). Sin desde/hasta, trae TODO lo que exista.
+   El filtro es siempre sobre "creadoEn", así no hace falta un índice
+   compuesto nuevo (rango + orderBy sobre el MISMO campo no lo pide). */
+export function escucharHistorial(callback, { desde, hasta } = {}) {
+    const partes = [collection(db, COLECCION_PEDIDOS)];
+    if (desde) partes.push(where('creadoEn', '>=', Timestamp.fromDate(desde)));
+    if (hasta) partes.push(where('creadoEn', '<', Timestamp.fromDate(hasta)));
+    partes.push(orderBy('creadoEn', 'desc'));
+    const q = query(...partes);
+    return onSnapshot(q, snap => {
+        callback(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    }, err => console.error('[pedidos] Error escuchando historial completo:', err));
 }
