@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de compras — La Hornilla de Zaid</title>
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#120600">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="../CSS/style.css">
+    <link rel="stylesheet" href="../CSS/historial.css">
+</head>
+<body class="kds-body hist-body">
+
+    <!-- ========== LOGIN (misma cuenta que usas en el panel) ========== -->
+    <section class="login-wrap" id="loginView">
+        <div class="login-card">
+            <div class="brand">
+                <span class="eyebrow">Acceso privado</span>
+                <h1>La Hornilla de Zaid</h1>
+                <span>Historial de compras</span>
+            </div>
+            <div class="field">
+                <label for="email">Correo</label>
+                <input type="email" id="email" autocomplete="username" placeholder="tucorreo@ejemplo.com">
+            </div>
+            <div class="field">
+                <label for="pass">Contraseña</label>
+                <input type="password" id="pass" autocomplete="current-password" placeholder="********">
+            </div>
+            <button class="btn btn-primary" id="btnLogin">Entrar</button>
+            <p class="form-msg" id="loginMsg"></p>
+        </div>
+    </section>
+
+    <!-- ========== HISTORIAL ========== -->
+    <div class="hist-wrap hidden" id="histView">
+
+        <header class="hist-header">
+            <div class="hist-header-top">
+                <span class="kds-title"><span class="ember-dot"></span>Historial de compras</span>
+                <div class="hist-header-acciones">
+                    <a href="cocina.html" class="cocina-btn">Ver cocina →</a>
+                    <button type="button" id="btnLogout" class="cocina-btn">Cerrar sesión</button>
+                </div>
+            </div>
+
+            <div class="hist-filtros">
+                <label class="hist-campo">
+                    <span>Desde</span>
+                    <input type="date" id="fDesde">
+                </label>
+                <label class="hist-campo">
+                    <span>Hasta</span>
+                    <input type="date" id="fHasta">
+                </label>
+                <label class="hist-campo">
+                    <span>Tipo</span>
+                    <select id="fTipo">
+                        <option value="">Todos</option>
+                        <option value="local">Comer aquí</option>
+                        <option value="llevar">Para llevar</option>
+                        <option value="domicilio">Domicilio</option>
+                    </select>
+                </label>
+                <label class="hist-campo">
+                    <span>Estado</span>
+                    <select id="fEstado">
+                        <option value="">Todos</option>
+                        <option value="entregado">Entregado</option>
+                        <option value="cancelado">Cancelado</option>
+                        <option value="pendiente">Pendiente</option>
+                        <option value="preparando">Preparando</option>
+                        <option value="listo">Listo</option>
+                    </select>
+                </label>
+                <label class="hist-campo hist-campo--busqueda">
+                    <span>Buscar</span>
+                    <input type="text" id="fBuscar" placeholder="Mesa o nombre del cliente…">
+                </label>
+                <button type="button" id="btnExportar" class="btn-nueva-mesa hist-btn-exportar">Exportar CSV</button>
+            </div>
+        </header>
+
+        <main class="hist-main">
+            <section class="hist-resumen" id="histResumen" aria-label="Resumen del periodo"></section>
+
+            <p id="histEstado" class="menu-estado">Cargando historial…</p>
+            <p id="histVacio" class="menu-vacio hidden">No hay pedidos con esos filtros.</p>
+
+            <div class="hist-tabla-wrap">
+                <table class="hist-tabla" id="histTabla">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                            <th>Origen</th>
+                            <th>Platillos</th>
+                            <th>Total</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="histTablaBody"></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="../JS/historial.js"></script>
+</body>
+</html>
