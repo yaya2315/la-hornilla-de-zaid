@@ -10,11 +10,14 @@
      Firestore para el historial del día.
    ===================================================================== */
 
-import { db, COLECCION_PEDIDOS, activarReconexionAutomatica } from './firebase-config.js';
-import { enableIndexedDbPersistence } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
+import { activarReconexionAutomatica } from './firebase-config.js';
 import { escucharPedidosActivos, escucharHistorialHoy, cambiarEstado, money } from './pedidos.js';
 
-try { enableIndexedDbPersistence(db); } catch { /* ya activa en otra pestaña, o navegador sin soporte */ }
+/* La persistencia offline (IndexedDB, multi-pestaña) ya se activa una
+   sola vez al crear "db" en firebase-config.js — no hace falta
+   llamar aquí a enableIndexedDbPersistence. Así se evita el warning
+   de deprecación y el error "failed to obtain exclusive access" que
+   salía al tener dos pestañas de cocina.html abiertas a la vez. */
 
 /* Evita que el tablero se quede "pegado" si esta pantalla se deja
    encendida todo el turno (ver detalle en firebase-config.js). */
