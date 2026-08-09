@@ -10,11 +10,15 @@
      Firestore para el historial del día.
    ===================================================================== */
 
-import { db, COLECCION_PEDIDOS } from './firebase-config.js';
+import { db, COLECCION_PEDIDOS, activarReconexionAutomatica } from './firebase-config.js';
 import { enableIndexedDbPersistence } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
 import { escucharPedidosActivos, escucharHistorialHoy, cambiarEstado, money } from './pedidos.js';
 
 try { enableIndexedDbPersistence(db); } catch { /* ya activa en otra pestaña, o navegador sin soporte */ }
+
+/* Evita que el tablero se quede "pegado" si esta pantalla se deja
+   encendida todo el turno (ver detalle en firebase-config.js). */
+activarReconexionAutomatica();
 
 const COLUMNAS = {
     pendiente:  { titulo: 'Pendiente',      siguiente: 'preparando', accion: 'Comenzar preparación' },
@@ -68,6 +72,15 @@ function minutosDesde(ts) {
 }
 
 /* ===== RENDER DEL TABLERO ============================================ */
+/* Encabezado del ticket: mesa numerada, o para llevar/domicilio con el
+   nombre del cliente. El campo "mesa" se reusa como identificador en
+   los tres casos para no romper nada de lo que ya lee esta pantalla. */
+function encabezadoTicket(p) {
+    if (p.tipo === 'llevar') return `🥡 Para llevar${p.cliente ? ' · ' + esc(p.cliente) : ''}`;
+    if (p.tipo === 'domicilio') return `🛵 Domicilio${p.cliente ? ' · ' + esc(p.cliente) : ''}`;
+    return `Mesa ${esc(p.mesa)}`;
+}
+
 function renderTicket(p) {
     const col = COLUMNAS[p.estado];
     const mins = minutosDesde(p.creadoEn);
@@ -75,9 +88,10 @@ function renderTicket(p) {
     return `
     <article class="ticket estado-${p.estado} ${idsRecienLlegados.has(p.id) ? 'is-nuevo' : ''} ${urgente ? 'es-urgente' : ''}" data-id="${p.id}">
         <header class="ticket-head">
-            <span class="ticket-mesa">Mesa ${esc(p.mesa)}</span>
+            <span class="ticket-mesa">${encabezadoTicket(p)}</span>
             <span class="ticket-tiempo" data-id="${p.id}">${formatoHora(p.creadoEn)} · hace <b>${mins}</b> min</span>
         </header>
+        ${p.tipo === 'domicilio' && p.direccion ? `<p class="ticket-direccion">📍 ${esc(p.direccion)}</p>` : ''}
         <ul class="ticket-items">
             ${(p.items || []).map(it => `
                 <li>
