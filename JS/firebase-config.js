@@ -1,15 +1,28 @@
 /* =====================================================================
    FIREBASE — CONFIGURACIÓN
    =====================================================================
-   Este archivo reemplaza al firebase-config.js que ya tienes en tu
-   proyecto. Es idéntico, solo se agregó UNA línea nueva al final:
-   COLECCION_PEDIDOS. Si prefieres no reemplazar el archivo, basta con
-   que agregues esa línea a tu firebase-config.js actual.
+   Igual que tu archivo actual, con DOS cosas nuevas al final:
+
+   1. COLECCION_PEDIDOS — ya la tenías.
+   2. activarReconexionAutomatica() — arregla el problema de "tengo que
+      refrescar la página para que se actualice". Firestore mantiene un
+      canal de datos en tiempo real abierto todo el tiempo, pero en una
+      pantalla que se queda encendida horas (cocina, mesero) ese canal
+      se puede "quedar dormido" si la pestaña pasa un rato en segundo
+      plano, la tablet se bloquea, o el wifi falla un instante — y el
+      navegador no siempre se da cuenta solo de que debe reconectar.
+      Esta función fuerza una reconexión cada vez que:
+        • vuelves a la pestaña / pantalla (visibilitychange, focus)
+        • el dispositivo recupera internet (evento 'online')
+        • cada 5 minutos, como respaldo silencioso, por si ninguno de
+          los eventos anteriores se disparó
    ===================================================================== */
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js';
 import { getAuth }       from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js';
-import { getFirestore }  from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
+import {
+    getFirestore, enableNetwork, disableNetwork
+} from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
 
 const firebaseConfig = {
     apiKey:            "AIzaSyC6Dl3tFN7AqEnSDwd7wVmL0pmx_PN0WYg",
@@ -43,7 +56,36 @@ export const COLECCION_CATEGORIAS = 'menuCategorias';
 export const COLECCION_BEBIDAS = 'menuBebidas';
 export const COLECCION_EXTRAS = 'menuExtras';
 
-/* NUEVO — Pedidos activos de mesero.html / cocina.html (sistema KDS).
-   Cada documento es una comanda: mesa, estado, items, total y
-   marcas de tiempo de creación/actualización. */
+/* Pedidos activos de mesero.html / cocina.html (sistema KDS).
+   Cada documento es una comanda: tipo, mesa/cliente, estado, items,
+   total y marcas de tiempo de creación/actualización. */
 export const COLECCION_PEDIDOS = 'pedidos';
+
+/* ===== RECONEXIÓN AUTOMÁTICA ========================================= */
+let _reconectando = false;
+let _activada = false;
+
+export function activarReconexionAutomatica() {
+    if (_activada) return;   // evita registrar los listeners más de una vez
+    _activada = true;
+
+    const reconectar = async () => {
+        if (_reconectando) return;
+        _reconectando = true;
+        try {
+            await disableNetwork(db);
+            await enableNetwork(db);
+        } catch (err) {
+            console.warn('[firebase] No se pudo forzar la reconexión:', err);
+        } finally {
+            _reconectando = false;
+        }
+    };
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') reconectar();
+    });
+    window.addEventListener('online', reconectar);
+    window.addEventListener('focus', reconectar);
+    setInterval(reconectar, 5 * 60 * 1000);
+}
