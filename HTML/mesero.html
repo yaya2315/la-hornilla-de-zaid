@@ -21,7 +21,10 @@
             <span class="kds-title"><span class="ember-dot"></span>Toma de pedidos</span>
             <a href="cocina.html" class="cocina-btn">Ver cocina →</a>
         </div>
-        <nav id="mesasWrap" class="mesas-wrap" aria-label="Selección de mesa"></nav>
+
+        <div id="tipoPedidoWrap" class="tipo-pedido-wrap" role="tablist" aria-label="Tipo de pedido"></div>
+        <div id="origenPedidoWrap"></div>
+
         <p id="comandaBanner" class="comanda-banner" role="status" aria-live="polite">Selecciona una mesa para comenzar</p>
     </header>
 
@@ -50,6 +53,11 @@
         </aside>
     </main>
 
+    <div id="kdsToasts" class="kds-toasts" role="status" aria-live="polite"></div>
+
+    <script type="module" src="../JS/mesero.js"></script>
+</body>
+</html>
     <div id="kdsToasts" class="kds-toasts" role="status" aria-live="polite"></div>
 
     <script type="module" src="../JS/mesero.js"></script>
