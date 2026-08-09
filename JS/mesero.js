@@ -5,16 +5,21 @@
      las mismas colecciones que ya administras desde tu panel — nada
      está escrito a mano aquí. Si agregas o editas algo en el admin,
      aparece solo, sin recargar la página.
-   • Al tocar una mesa (1–6), la app busca si ya tiene un pedido activo
-     (pendiente / preparando / listo). Si existe, lo carga para editarlo;
-     si no, arma uno nuevo.
+   • NUEVO — Tipo de pedido: Comer aquí / Para llevar / Domicilio.
+     - Comer aquí: se elige una mesa (1–6), igual que antes; si esa
+       mesa ya tiene un pedido activo, se carga para editarlo.
+     - Para llevar / Domicilio: no hay mesa — se escribe el nombre del
+       cliente (y la dirección, si es domicilio). Siempre arma un
+       pedido nuevo, no busca uno existente para editar.
    • El pedido se guarda en Firestore con persistencia offline: si el
      wifi falla un instante, no se pierde nada — se sincroniza solo.
+   • activarReconexionAutomatica() evita que esta pantalla se quede
+     "pegada" si se deja abierta todo el turno.
    ===================================================================== */
 
 import {
     db, COLECCION_MENU, COLECCION_PUPUSAS, COLECCION_CATEGORIAS,
-    COLECCION_BEBIDAS, COLECCION_EXTRAS
+    COLECCION_BEBIDAS, COLECCION_EXTRAS, activarReconexionAutomatica
 } from './firebase-config.js';
 import { collection, onSnapshot, enableIndexedDbPersistence }
     from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
@@ -28,6 +33,11 @@ import {
 try { enableIndexedDbPersistence(db); } catch { /* ya activa en otra pestaña, o navegador sin soporte */ }
 
 const MESAS = [1, 2, 3, 4, 5, 6];
+const TIPOS_PEDIDO = [
+    { id: 'local',     icono: '🍽️', label: 'Comer aquí' },
+    { id: 'llevar',    icono: '🥡', label: 'Para llevar' },
+    { id: 'domicilio', icono: '🛵', label: 'Domicilio' }
+];
 
 /* ===== ESTADO EN MEMORIA ============================================ */
 const menu = { categorias: [], principal: [], pupusas: [], bebidas: [], extras: [] };
@@ -36,15 +46,17 @@ let grupoActivo = 'todo';
 let termino = '';
 let fichaAbierta = null;    // id de la ficha con el panel de opciones abierto
 
-let mesaActual = null;
-let pedidoIdActual = null;  // null = pedido nuevo para esa mesa
+let tipoActual = 'local';   // 'local' | 'llevar' | 'domicilio'
+let mesaActual = null;      // solo aplica a tipo 'local'
+let clienteActual = '';     // aplica a 'llevar' / 'domicilio'
+let direccionActual = '';   // aplica solo a 'domicilio'
+let pedidoIdActual = null;  // null = pedido nuevo
 let itemsCarrito = [];      // { platillo, cantidad, notas, precio }
 
 /* ===== UTILIDADES ==================================================== */
 function esc(s = '') {
     return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 }
-function uid() { return Math.random().toString(36).slice(2, 10); }
 
 function toast(msg, tipo = 'ok') {
     const cont = document.getElementById('kdsToasts');
@@ -58,6 +70,11 @@ function toast(msg, tipo = 'ok') {
         el.classList.remove('is-visible');
         setTimeout(() => el.remove(), 300);
     }, 2600);
+}
+
+/* ¿Hay suficiente información para poder enviar el pedido? */
+function origenListo() {
+    return tipoActual === 'local' ? !!mesaActual : clienteActual.trim().length > 0;
 }
 
 /* ===== NORMALIZAR EL MENÚ A "FICHAS" ================================ */
@@ -257,6 +274,76 @@ function renderMenu() {
     });
 }
 
+/* ===== TIPO DE PEDIDO ================================================ */
+function renderTipoPedido() {
+    const wrap = document.getElementById('tipoPedidoWrap');
+    if (!wrap) return;
+    wrap.innerHTML = TIPOS_PEDIDO.map(t => `
+        <button type="button" class="tipo-pill ${tipoActual === t.id ? 'is-active' : ''}" data-tipo="${t.id}" role="tab" aria-selected="${tipoActual === t.id}">
+            <span aria-hidden="true">${t.icono}</span> ${t.label}
+        </button>`).join('');
+    wrap.querySelectorAll('.tipo-pill').forEach(btn => {
+        btn.addEventListener('click', () => cambiarTipoPedido(btn.dataset.tipo));
+    });
+}
+
+function bannerInicial() {
+    if (tipoActual === 'local') return 'Selecciona una mesa para comenzar';
+    if (tipoActual === 'llevar') return 'Escribe el nombre del cliente para el pedido para llevar';
+    return 'Escribe el nombre y la dirección para el domicilio';
+}
+
+function actualizarBotonNuevo() {
+    const btn = document.getElementById('btnNuevaMesa');
+    if (btn) btn.textContent = tipoActual === 'local' ? 'Cambiar de mesa' : 'Nuevo pedido';
+}
+
+function cambiarTipoPedido(t) {
+    if (t === tipoActual) return;
+    if (itemsCarrito.length && !confirm('Cambiar el tipo de pedido descarta lo que llevas sin enviar en la comanda. ¿Continuar?')) return;
+    tipoActual = t;
+    mesaActual = null;
+    pedidoIdActual = null;
+    itemsCarrito = [];
+    clienteActual = '';
+    direccionActual = '';
+    renderTipoPedido();
+    renderOrigen();
+    renderCarrito();
+    actualizarBotonNuevo();
+    document.getElementById('comandaBanner').textContent = bannerInicial();
+}
+
+function renderOrigen() {
+    const wrap = document.getElementById('origenPedidoWrap');
+    if (!wrap) return;
+
+    if (tipoActual === 'local') {
+        wrap.innerHTML = `<nav id="mesasWrap" class="mesas-wrap" aria-label="Selección de mesa"></nav>`;
+        renderMesas();
+        return;
+    }
+
+    wrap.innerHTML = `
+        <div class="cliente-form">
+            <label class="ficha-lbl">Nombre del cliente
+                <input type="text" id="clienteInput" class="ficha-notas" placeholder="Ej. Juan Pérez" maxlength="60" value="${esc(clienteActual)}">
+            </label>
+            ${tipoActual === 'domicilio' ? `
+            <label class="ficha-lbl">Dirección de entrega
+                <input type="text" id="direccionInput" class="ficha-notas" placeholder="Ej. Col. Escalón, casa #12" maxlength="140" value="${esc(direccionActual)}">
+            </label>` : ''}
+        </div>`;
+
+    document.getElementById('clienteInput')?.addEventListener('input', e => {
+        clienteActual = e.target.value;
+        renderCarrito();
+    });
+    document.getElementById('direccionInput')?.addEventListener('input', e => {
+        direccionActual = e.target.value;
+    });
+}
+
 /* ===== MESAS ========================================================= */
 function renderMesas() {
     const wrap = document.getElementById('mesasWrap');
@@ -326,7 +413,7 @@ function renderCarrito() {
     if (totalEl) totalEl.textContent = money(total);
 
     if (btnEnviar) {
-        btnEnviar.disabled = !mesaActual || !itemsCarrito.length;
+        btnEnviar.disabled = !origenListo() || !itemsCarrito.length;
         btnEnviar.textContent = pedidoIdActual ? 'Guardar cambios' : 'Enviar pedido a cocina';
     }
 
@@ -346,20 +433,26 @@ function renderCarrito() {
 }
 
 async function enviarPedido() {
-    if (!mesaActual || !itemsCarrito.length) return;
+    if (!origenListo() || !itemsCarrito.length) return;
     const btn = document.getElementById('btnEnviarPedido');
     btn.disabled = true;
     btn.textContent = 'Enviando…';
+
+    const nombreOrigen = tipoActual === 'local' ? `mesa ${mesaActual}` : clienteActual.trim();
+    const origen = tipoActual === 'local'
+        ? { tipo: 'local', mesa: mesaActual }
+        : { tipo: tipoActual, mesa: clienteActual.trim(), cliente: clienteActual.trim(), direccion: direccionActual.trim() };
+
     try {
         if (pedidoIdActual) {
             await actualizarItemsPedido(pedidoIdActual, itemsCarrito);
-            toast(`Cambios guardados — mesa ${mesaActual}`);
+            toast(`Cambios guardados — ${nombreOrigen}`);
         } else {
-            pedidoIdActual = await crearPedido(mesaActual, itemsCarrito);
-            toast(`Pedido enviado a cocina — mesa ${mesaActual}`);
+            pedidoIdActual = await crearPedido(origen, itemsCarrito);
+            toast(`Pedido enviado a cocina — ${nombreOrigen}`);
         }
         document.getElementById('comandaBanner').innerHTML =
-            `Editando el pedido <strong>activo</strong> de la mesa ${mesaActual} · estado: <strong>pendiente</strong>`;
+            `Editando el pedido <strong>activo</strong> de ${esc(nombreOrigen)} · estado: <strong>pendiente</strong>`;
     } catch (err) {
         console.error('[mesero] Error al guardar el pedido:', err);
         toast('No se pudo guardar. Revisa tu conexión — se reintentará solo.', 'error');
@@ -370,10 +463,15 @@ async function enviarPedido() {
 
 /* ===== INICIALIZACIÓN ================================================ */
 document.addEventListener('DOMContentLoaded', () => {
-    renderMesas();
+    activarReconexionAutomatica();
+
+    renderTipoPedido();
+    renderOrigen();
     renderPills();
     renderCarrito();
     suscribirMenu();
+    actualizarBotonNuevo();
+    document.getElementById('comandaBanner').textContent = bannerInicial();
 
     const buscar = document.getElementById('menuBuscar');
     if (buscar) {
@@ -388,7 +486,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btnNuevaMesa')?.addEventListener('click', () => {
         if (itemsCarrito.length && !confirm('Se perderán los ítems no enviados. ¿Continuar?')) return;
         mesaActual = null; pedidoIdActual = null; itemsCarrito = [];
-        renderMesas(); renderCarrito();
-        document.getElementById('comandaBanner').textContent = 'Selecciona una mesa para comenzar';
+        clienteActual = ''; direccionActual = '';
+        renderOrigen(); renderCarrito();
+        document.getElementById('comandaBanner').textContent = bannerInicial();
     });
 });
