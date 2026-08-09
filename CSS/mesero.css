@@ -85,6 +85,70 @@
 }
 .comanda-banner strong { color: var(--ember); }
 
+/* ===== TIPO DE PEDIDO (Comer aquí / Para llevar / Domicilio) ========= */
+.tipo-pedido-wrap {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+}
+.tipo-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--text);
+    padding: 10px 18px;
+    border-radius: 30px;
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.03);
+    cursor: pointer;
+    transition: color 0.25s var(--ease), background 0.25s var(--ease), border-color 0.25s var(--ease), transform 0.25s var(--ease);
+}
+.tipo-pill:hover { border-color: var(--ember); color: var(--cream); }
+.tipo-pill.is-active {
+    color: #fff;
+    background: linear-gradient(135deg, var(--ember-soft), var(--ember-deep));
+    border-color: transparent;
+    box-shadow: 0 8px 22px var(--glow);
+    transform: translateY(-1px);
+}
+
+/* ===== FORMULARIO DE CLIENTE (para llevar / domicilio) =============== */
+.cliente-form {
+    display: grid;
+    gap: 12px;
+    margin-top: 14px;
+    max-width: 480px;
+}
+@media (min-width: 560px) {
+    .cliente-form { grid-template-columns: 1fr 1fr; }
+}
+.cliente-form .ficha-lbl {
+    font-size: 0.68rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: grid;
+    gap: 6px;
+}
+.cliente-form .ficha-notas {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 11px 14px;
+    color: var(--cream);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    width: 100%;
+    transition: border-color 0.25s var(--ease), background 0.25s var(--ease);
+}
+.cliente-form .ficha-notas:focus { outline: none; border-color: var(--ember); background: rgba(255, 255, 255, 0.08); }
+
 /* ===== LAYOUT PRINCIPAL =============================================== */
 .kds-layout {
     max-width: 1400px;
