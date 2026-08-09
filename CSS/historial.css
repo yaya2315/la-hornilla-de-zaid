@@ -1,0 +1,196 @@
+/* =====================================================================
+   HISTORIAL.CSS — Historial de compras
+   ---------------------------------------------------------------------
+   Reutiliza los tokens de style.css (--ember, --char-*, --cream, etc.)
+   y agrega solo los colores de estado que le hacían falta al sistema
+   (entregado / cancelado), en la misma línea de cocina.css.
+   ===================================================================== */
+
+:root {
+    --ok:  #6fae55;
+    --bad: #e2452b;
+}
+
+.hist-body { background: var(--char-700); min-height: 100vh; }
+.hidden { display: none !important; }
+
+/* ===== LOGIN (mismo patrón visual que el panel de administración) ==== */
+.login-wrap { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+.login-card {
+    width: min(400px, 100%);
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: clamp(28px, 5vw, 42px);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+}
+.login-card .brand { text-align: center; margin-bottom: 28px; }
+.login-card .brand h1 { color: #fff; font-size: 1.7rem; }
+.login-card .brand span { color: var(--muted); font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; }
+.field { margin-bottom: 16px; }
+.field label { display: block; font-size: 0.74rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; }
+.field input {
+    width: 100%; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--line); border-radius: 12px;
+    padding: 14px 16px; color: var(--cream); font-size: 1rem; transition: border-color 0.25s var(--ease);
+}
+.field input:focus { outline: none; border-color: var(--ember); }
+.form-msg { min-height: 20px; margin-top: 14px; font-size: 0.85rem; text-align: center; }
+.form-msg.error { color: var(--bad); }
+
+.btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    font-family: 'Oswald', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+    font-size: 0.85rem; padding: 13px 24px; border-radius: 12px; width: 100%; cursor: pointer; border: none;
+    transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+.btn-primary { background: linear-gradient(135deg, var(--ember-soft), var(--ember-deep)); color: #fff; box-shadow: 0 10px 30px var(--glow); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 16px 40px var(--glow); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* ===== HEADER =========================================================== */
+.hist-header {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(10, 3, 0, 0.92);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--line);
+    padding: 16px clamp(16px, 4vw, 36px);
+}
+.hist-header-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+.hist-header-acciones { display: flex; gap: 10px; }
+
+.hist-filtros {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    align-items: end;
+}
+.hist-campo--busqueda { grid-column: span 2; }
+.hist-campo { display: grid; gap: 6px; }
+.hist-campo span { font-size: 0.66rem; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+.hist-campo input, .hist-campo select {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+    color: var(--cream);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    transition: border-color 0.25s var(--ease);
+}
+.hist-campo input:focus, .hist-campo select:focus { outline: none; border-color: var(--ember); }
+.hist-campo select { cursor: pointer; }
+.hist-btn-exportar {
+    width: auto;
+    align-self: end;
+    white-space: nowrap;
+    padding: 10px 20px;
+}
+
+/* ===== MAIN ============================================================= */
+.hist-main { max-width: 1280px; margin: 0 auto; padding: 22px clamp(16px, 4vw, 36px) 60px; }
+
+.hist-resumen {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+}
+.hist-resumen > div {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px;
+    display: grid;
+    gap: 4px;
+}
+.hist-num { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 1.5rem; color: var(--ember); }
+.hist-lbl { font-size: 0.68rem; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
+
+.menu-estado, .menu-vacio { text-align: center; color: var(--muted); padding: 40px 20px; }
+
+/* ===== TABLA ============================================================= */
+.hist-tabla-wrap {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+.hist-tabla { width: 100%; border-collapse: collapse; }
+.hist-tabla thead th {
+    text-align: left;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--line);
+}
+.hist-tabla tbody td {
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    font-size: 0.86rem;
+    color: var(--text);
+    vertical-align: top;
+}
+.hist-tabla tbody tr:last-child td { border-bottom: none; }
+.hist-tabla tbody tr:hover { background: rgba(255, 255, 255, 0.02); }
+
+.hist-items {
+    max-width: 340px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.hist-total { font-family: 'Oswald', sans-serif; font-weight: 600; color: var(--cream); white-space: nowrap; }
+.hist-direccion { font-size: 0.74rem; color: var(--muted); }
+
+.hist-badge {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 30px;
+    white-space: nowrap;
+}
+.hist-badge--pendiente  { background: rgba(226, 69, 43, 0.16); color: #ff8f78; }
+.hist-badge--preparando { background: var(--glow); color: var(--ember-soft); }
+.hist-badge--listo      { background: rgba(111, 174, 85, 0.16); color: #9ad682; }
+.hist-badge--entregado  { background: rgba(111, 174, 85, 0.22); color: var(--ok); }
+.hist-badge--cancelado  { background: rgba(226, 69, 43, 0.16); color: var(--bad); }
+
+/* ===== RESPONSIVE — la tabla se vuelve tarjetas en pantallas chicas ==== */
+@media (max-width: 760px) {
+    .hist-campo--busqueda { grid-column: 1 / -1; }
+    .hist-tabla thead { display: none; }
+    .hist-tabla, .hist-tabla tbody, .hist-tabla tr, .hist-tabla td { display: block; width: 100%; }
+    .hist-tabla tr {
+        padding: 14px 18px;
+        border-bottom: 1px solid var(--line);
+        display: grid;
+        gap: 6px;
+    }
+    .hist-tabla td {
+        border: none;
+        padding: 0;
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        white-space: normal;
+    }
+    .hist-tabla td::before {
+        content: attr(data-th);
+        font-size: 0.66rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--muted);
+        flex: 0 0 auto;
+    }
+    .hist-items { max-width: 60%; text-align: right; white-space: normal; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .btn-primary { transition: none; }
+}
