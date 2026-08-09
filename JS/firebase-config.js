@@ -1,5 +1,10 @@
 /* =====================================================================
    FIREBASE — CONFIGURACIÓN
+   =====================================================================
+   Este archivo reemplaza al firebase-config.js que ya tienes en tu
+   proyecto. Es idéntico, solo se agregó UNA línea nueva al final:
+   COLECCION_PEDIDOS. Si prefieres no reemplazar el archivo, basta con
+   que agregues esa línea a tu firebase-config.js actual.
    ===================================================================== */
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js';
@@ -37,3 +42,8 @@ export const COLECCION_CATEGORIAS = 'menuCategorias';
    escrita a mano y se desincronizaban entre sí). */
 export const COLECCION_BEBIDAS = 'menuBebidas';
 export const COLECCION_EXTRAS = 'menuExtras';
+
+/* NUEVO — Pedidos activos de mesero.html / cocina.html (sistema KDS).
+   Cada documento es una comanda: mesa, estado, items, total y
+   marcas de tiempo de creación/actualización. */
+export const COLECCION_PEDIDOS = 'pedidos';
