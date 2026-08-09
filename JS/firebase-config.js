@@ -16,12 +16,27 @@
         • el dispositivo recupera internet (evento 'online')
         • cada 5 minutos, como respaldo silencioso, por si ninguno de
           los eventos anteriores se disparó
+
+   ACTUALIZACIÓN — caché offline multi-pestaña:
+   Antes "db" se creaba con getFirestore(app) a secas, y cocina.js
+   activaba la persistencia offline por su cuenta con la API vieja
+   enableIndexedDbPersistence(db). Esa API solo permite que UNA
+   pestaña tenga el caché a la vez; si abrías cocina.html en dos
+   pestañas (o dos pantallas), la segunda fallaba con:
+     "Failed to obtain exclusive access to the persistence layer"
+   Ahora la persistencia se configura aquí mismo, al crear "db", con
+   persistentLocalCache + persistentMultipleTabManager. Así CUALQUIER
+   página que importe "db" (cocina, mesero, historial, menú...) tiene
+   caché offline desde el primer momento, y varias pestañas pueden
+   compartirlo sin pelear por el candado. Ya no hace falta llamar a
+   enableIndexedDbPersistence en ningún otro archivo.
    ===================================================================== */
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js';
 import { getAuth }       from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js';
 import {
-    getFirestore, enableNetwork, disableNetwork
+    initializeFirestore, persistentLocalCache, persistentMultipleTabManager,
+    enableNetwork, disableNetwork
 } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
 
 const firebaseConfig = {
@@ -36,7 +51,17 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
-export const db   = getFirestore(app);
+
+/* Caché local persistente (IndexedDB) con soporte multi-pestaña.
+   Si el navegador no soporta IndexedDB (modo incógnito muy
+   restringido, navegadores muy antiguos, etc.), Firestore cae solo
+   a caché en memoria — la app sigue funcionando igual, solo sin
+   persistencia offline entre recargas. */
+export const db = initializeFirestore(app, {
+    localCache: persistentLocalCache({
+        tabManager: persistentMultipleTabManager()
+    })
+});
 
 /* Nombre de la colección donde se guardan las promociones. */
 export const COLECCION = 'promociones';
