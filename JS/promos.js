@@ -6,10 +6,16 @@
      y cuyos días incluyan el día de HOY.
    • Si Firebase no responde, usa la lista de respaldo de más abajo,
      así la página nunca queda rota.
+
+   CAMBIO CLAVE: antes esto se leía UNA sola vez con getDocs() al
+   cargar la página — por eso un cambio en el admin (nueva promo,
+   editar precio, activar/desactivar) no aparecía hasta recargar.
+   Ahora usa onSnapshot(), igual que cocina.js: en cuanto guardas algo
+   en el panel de promociones, se refleja aquí solo, sin recargar.
    ===================================================================== */
 
 import { db, COLECCION } from './firebase-config.js';
-import { collection, getDocs }
+import { collection, onSnapshot }
     from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
 
 /* Respaldo: solo se usa si Firebase aún no está configurado o falla.
@@ -32,18 +38,6 @@ function textoDias(dias) {
     if (contiguo && arr.length >= 3) return `${NOMBRE[arr[0]]} a ${NOMBRE[arr[arr.length - 1]]}`;
     if (arr.length === 1) return NOMBRE[arr[0]];
     return arr.slice(0, -1).map(d => NOMBRE[d]).join(', ') + ' y ' + NOMBRE[arr[arr.length - 1]];
-}
-
-async function cargar() {
-    try {
-        /* Sin orderBy: una promoción sin campo "orden" quedaría
-           invisible si Firestore ordenara en el servidor. */
-        const snap = await getDocs(collection(db, COLECCION));
-        return snap.docs.map(d => d.data()).sort((a, b) => (a.orden ?? Infinity) - (b.orden ?? Infinity));
-    } catch (err) {
-        console.warn('[promos] No se pudo leer Firebase, uso respaldo:', err);
-        return RESPALDO;
-    }
 }
 
 /* ¿Esta promoción se muestra hoy? Activa + el día de hoy está en su lista. */
@@ -75,20 +69,38 @@ function tarjeta(p) {
         </section>`;
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
     const wrap = document.getElementById('combosActivos');
     if (!wrap) return;   // esta página no tiene zona de promociones
 
-    const hoy = new Date().getDay();   // 0 = domingo … 6 = sábado
-    const promos = await cargar();
-    const delDia = promos.filter(p => seMuestraHoy(p, hoy));
+    let ultimasPromos = RESPALDO;
 
-    if (delDia.length === 0) {
-        wrap.innerHTML = '';
-        wrap.classList.remove('has-combos');   // sin promos hoy → no ocupa espacio
-        return;
+    function pintar() {
+        const hoy = new Date().getDay();   // 0 = domingo … 6 = sábado
+        const delDia = ultimasPromos.filter(p => seMuestraHoy(p, hoy));
+
+        if (delDia.length === 0) {
+            wrap.innerHTML = '';
+            wrap.classList.remove('has-combos');   // sin promos hoy → no ocupa espacio
+            return;
+        }
+        wrap.innerHTML = delDia.map(tarjeta).join('');
+        wrap.classList.add('has-combos');
     }
 
-    wrap.innerHTML = delDia.map(tarjeta).join('');
-    wrap.classList.add('has-combos');
+    onSnapshot(collection(db, COLECCION), snap => {
+        /* Sin orderBy: una promoción sin campo "orden" quedaría
+           invisible si Firestore ordenara en el servidor. */
+        ultimasPromos = snap.docs.map(d => d.data()).sort((a, b) => (a.orden ?? Infinity) - (b.orden ?? Infinity));
+        pintar();
+    }, err => {
+        console.warn('[promos] No se pudo escuchar Firebase, uso respaldo:', err);
+        ultimasPromos = RESPALDO;
+        pintar();
+    });
+
+    /* Repinta cada 5 min por si la pantalla queda abierta y cruza la
+       medianoche — así "hoy" se recalcula sin depender de un nuevo
+       cambio en el admin. */
+    setInterval(pintar, 5 * 60 * 1000);
 });
