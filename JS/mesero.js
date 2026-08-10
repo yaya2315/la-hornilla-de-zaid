@@ -735,38 +735,50 @@ document.getElementById('btnCapturaDomicilio')?.addEventListener('click', async 
     }
 });
 
-/* ===== ENCABEZADO COMPACTO AL HACER SCROLL ============================
+/* ===== ENCABEZADO QUE SE COLAPSA JUNTO CON EL SCROLL ===================
    El bloque de mesa/cliente puede ocupar bastante alto (sobre todo en
-   domicilio, con teléfono + dirección + mapa). Al deslizar hacia abajo
-   en la pantalla (swipe up) se compacta para dejar ver más del menú;
-   al deslizar hacia arriba (swipe down), o cerca del tope de la
-   página, vuelve a mostrarse completo. Si el mesero está escribiendo
-   dentro del formulario, no se compacta solo, para no taparle el
-   campo justo cuando el teclado empuja la vista. */
+   domicilio, con teléfono + dirección + mapa). En vez de un interruptor
+   "abierto/cerrado" con animación de tiempo fijo (que "palpitaba" si se
+   soltaba el dedo a medio camino), la altura visible se controla en
+   cada evento de scroll y avanza exactamente lo mismo que se deslizó:
+   ni un pixel más. Así nunca queda a medio abrir tratando de terminar
+   una animación — siempre refleja el scroll actual, en ambas direcciones. */
 let ultimoScrollY = window.scrollY;
-let headerEnCompacto = false;
+let altoOcultoHeader = 0; // px ya "recogidos" del bloque colapsable (0 = totalmente visible)
+let scrollFramePendiente = false;
 
-function fijarHeaderCompacto(valor) {
-    if (valor === headerEnCompacto) return;
-    headerEnCompacto = valor;
-    document.querySelector('.kds-header')?.classList.toggle('is-compacto', valor);
-}
-
-function alHacerScroll() {
-    const y = window.scrollY;
-    const diferencia = y - ultimoScrollY;
-    const cercaDelTope = y < 80;
-    const wrap = document.getElementById('kdsHeaderColapsable');
-    const escribiendoDentro = !!(wrap && document.activeElement && wrap.contains(document.activeElement) && document.activeElement !== document.body);
-
-    if (cercaDelTope || diferencia < -6) {
-        fijarHeaderCompacto(false);
-    } else if (!escribiendoDentro && diferencia > 6) {
-        fijarHeaderCompacto(true);
+function aplicarAltoHeaderColapsable() {
+    const outer = document.getElementById('kdsHeaderColapsable');
+    const inner = document.getElementById('kdsHeaderColapsableInner');
+    if (!outer || !inner) return;
+    const altoTotal = inner.scrollHeight;
+    altoOcultoHeader = Math.min(Math.max(altoOcultoHeader, 0), altoTotal);
+    if (altoOcultoHeader <= 0) {
+        outer.style.height = ''; // totalmente visible: alto natural, sin recorte
+    } else {
+        outer.style.height = Math.max(0, altoTotal - altoOcultoHeader) + 'px';
     }
-    ultimoScrollY = y;
 }
-window.addEventListener('scroll', alHacerScroll, { passive: true });
+
+function procesarScroll() {
+    scrollFramePendiente = false;
+    const y = Math.max(0, window.scrollY);
+    const diferencia = y - ultimoScrollY;
+    ultimoScrollY = y;
+
+    if (y <= 0) {
+        altoOcultoHeader = 0; // en el tope: siempre expandido
+    } else {
+        altoOcultoHeader += diferencia; // sube con lo que se baja, baja con lo que se sube
+    }
+    aplicarAltoHeaderColapsable();
+}
+
+window.addEventListener('scroll', () => {
+    if (scrollFramePendiente) return;
+    scrollFramePendiente = true;
+    requestAnimationFrame(procesarScroll);
+}, { passive: true });
 
 /* ===== INICIALIZACIÓN ================================================ */
 document.addEventListener('DOMContentLoaded', () => {
