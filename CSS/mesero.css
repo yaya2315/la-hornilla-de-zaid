@@ -45,6 +45,28 @@
     margin-right: 10px;
 }
 
+/* ===== ENCABEZADO COLAPSABLE AL HACER SCROLL ===========================
+   El bloque de mesa/cliente (y en domicilio, teléfono + dirección + pin)
+   puede ocupar bastante alto. Al deslizar hacia abajo en la pantalla se
+   compacta para dejar ver más menú; al deslizar hacia arriba (o cerca
+   del tope) vuelve a mostrarse completo. Usa grid-template-rows en vez
+   de max-height para animarse bien sin importar cuánto mida el
+   contenido (cambia según el tipo de pedido y si hay pin marcado). */
+.kds-header-colapsable {
+    display: grid;
+    grid-template-rows: 1fr;
+    transition: grid-template-rows 0.4s var(--ease), opacity 0.3s var(--ease);
+    opacity: 1;
+}
+.kds-header-colapsable-inner { overflow: hidden; min-height: 0; padding-top: 14px; }
+.kds-header.is-compacto .kds-header-colapsable {
+    grid-template-rows: 0fr;
+    opacity: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+    .kds-header-colapsable { transition: none; }
+}
+
 /* ===== MESAS ========================================================= */
 .mesas-wrap {
     display: flex;
@@ -122,7 +144,6 @@
 .cliente-form {
     display: grid;
     gap: 12px;
-    margin-top: 14px;
     max-width: 480px;
 }
 @media (min-width: 560px) {
