@@ -95,6 +95,7 @@ function renderTicket(p) {
             <span class="ticket-tiempo" data-id="${p.id}">${formatoHora(p.creadoEn)} · hace <b>${mins}</b> min</span>
         </header>
         ${p.tipo === 'domicilio' && p.direccion ? `<p class="ticket-direccion">📍 ${esc(p.direccion)}</p>` : ''}
+        ${p.tipo === 'domicilio' && p.telefono ? `<p class="ticket-direccion">📞 ${esc(p.telefono)}</p>` : ''}
         <ul class="ticket-items">
             ${(p.items || []).map(it => `
                 <li>
