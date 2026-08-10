@@ -149,6 +149,52 @@
 }
 .cliente-form .ficha-notas:focus { outline: none; border-color: var(--ember); background: rgba(255, 255, 255, 0.08); }
 
+/* ===== BLOQUE DE UBICACIÓN (domicilio) ================================ */
+.ubicacion-bloque { display: grid; gap: 10px; grid-column: 1 / -1; }
+.ubicacion-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.btn-ubicacion-mapa {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--line);
+    color: var(--text);
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 0.78rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 10px 16px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: border-color 0.25s var(--ease), color 0.25s var(--ease);
+}
+.btn-ubicacion-mapa:hover { border-color: var(--ember); color: var(--ember); }
+.ubicacion-estado { display: inline-flex; }
+.ubicacion-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(111, 174, 85, 0.14);
+    border: 1px solid rgba(111, 174, 85, 0.4);
+    color: #9fd88a;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 7px 8px 7px 14px;
+    border-radius: 30px;
+}
+.ubicacion-chip button {
+    width: 20px; height: 20px;
+    display: grid; place-items: center;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.12);
+    color: inherit;
+    font-size: 0.7rem;
+    cursor: pointer;
+}
+.ubicacion-chip button:hover { background: rgba(255, 255, 255, 0.22); }
+
 /* ===== LAYOUT PRINCIPAL =============================================== */
 .kds-layout {
     max-width: 1400px;
@@ -501,6 +547,14 @@
 .btn-cerrar-domicilio:hover { background: rgba(255, 255, 255, 0.12); }
 
 .domicilio-modal-header { text-align: center; margin-bottom: 22px; }
+.domicilio-captura-area {
+    background: linear-gradient(180deg, #241004 0%, #0c0400 100%);
+    border-radius: 16px;
+    padding: 20px 18px 4px;
+    margin-bottom: 22px;
+}
+.domicilio-captura-area .domicilio-modal-header { margin-bottom: 20px; }
+.domicilio-captura-area .domicilio-modal-datos { margin-bottom: 4px; }
 .domicilio-modal-icon {
     display: inline-grid;
     place-items: center;
@@ -584,6 +638,26 @@
     box-shadow: 0 10px 26px rgba(37, 168, 85, 0.35);
 }
 .btn-domicilio-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(37, 168, 85, 0.45); }
+.btn-domicilio-maps {
+    background: rgba(95, 217, 196, 0.12);
+    border: 1px solid rgba(95, 217, 196, 0.4);
+    color: #a8ece1;
+}
+.btn-domicilio-maps:hover { border-color: #5fd9c4; color: #cffaf1; transform: translateY(-2px); }
+
+/* ===== SELECTOR DE UBICACIÓN EN MAPA (Leaflet, sin API key) =========== */
+.mapa-modal-card { width: min(460px, 100%); }
+.mapa-picker {
+    width: 100%;
+    height: 280px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+}
+.mapa-btn-confirmar { margin-top: 16px; }
+/* Leaflet inyecta sus propios estilos con !important en algunos casos;
+   nos aseguramos de que su contenedor herede el radio del picker. */
+.mapa-picker .leaflet-container { background: #100804; border-radius: 14px; font-family: 'Inter', sans-serif; }
 
 @media (prefers-reduced-motion: reduce) {
     .ficha-panel { animation: none; }
