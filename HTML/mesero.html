@@ -13,6 +13,8 @@
 
     <link rel="stylesheet" href="../CSS/style.css">
     <link rel="stylesheet" href="../CSS/mesero.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 </head>
 <body class="kds-body">
 
@@ -55,10 +57,22 @@
 
     <div id="kdsToasts" class="kds-toasts" role="status" aria-live="polite"></div>
 
-    <script type="module" src="../JS/mesero.js"></script>
-</body>
-</html>
-    <div id="kdsToasts" class="kds-toasts" role="status" aria-live="polite"></div>
+    <div id="domicilioModalBackdrop" class="domicilio-modal-backdrop"></div>
+    <div id="domicilioModal" class="domicilio-modal" role="dialog" aria-modal="true" aria-label="Datos de entrega a domicilio">
+        <div class="domicilio-modal-card">
+            <button type="button" id="btnCerrarDomicilio" class="btn-cerrar-domicilio" aria-label="Cerrar">✕</button>
+            <div class="domicilio-modal-header">
+                <span class="domicilio-modal-icon" aria-hidden="true">🛵</span>
+                <h2>Datos para el domicilio</h2>
+                <p class="domicilio-modal-sub">Pedido enviado a cocina — comparte estos datos con el repartidor</p>
+            </div>
+            <div id="domicilioModalDatos" class="domicilio-modal-datos"></div>
+            <div class="domicilio-modal-acciones">
+                <button type="button" id="btnCapturaDomicilio" class="btn-domicilio-accion btn-domicilio-captura">📸 Enviar captura</button>
+                <button type="button" id="btnWhatsappDomicilio" class="btn-domicilio-accion btn-domicilio-whatsapp">🟢 Enviar a WhatsApp</button>
+            </div>
+        </div>
+    </div>
 
     <script type="module" src="../JS/mesero.js"></script>
 </body>
