@@ -74,6 +74,17 @@ function minutosDesde(ts) {
     return Math.max(0, Math.round((Date.now() - ts.toDate().getTime()) / 60000));
 }
 
+/* Misma prioridad que usa mesero.js: pin marcado en el mapa > enlace
+   pegado a mano > búsqueda por la dirección escrita. */
+function enlaceMapsPedido(p) {
+    if (p.ubicacionLat != null && p.ubicacionLng != null) {
+        return `https://www.google.com/maps?q=${p.ubicacionLat},${p.ubicacionLng}`;
+    }
+    if (p.ubicacionLink) return p.ubicacionLink;
+    if (p.direccion) return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.direccion)}`;
+    return null;
+}
+
 /* ===== RENDER DEL TABLERO ============================================ */
 /* Encabezado del ticket: mesa numerada, o para llevar/domicilio con el
    nombre del cliente. El campo "mesa" se reusa como identificador en
@@ -96,6 +107,7 @@ function renderTicket(p) {
         </header>
         ${p.tipo === 'domicilio' && p.direccion ? `<p class="ticket-direccion">📍 ${esc(p.direccion)}</p>` : ''}
         ${p.tipo === 'domicilio' && p.telefono ? `<p class="ticket-direccion">📞 ${esc(p.telefono)}</p>` : ''}
+        ${p.tipo === 'domicilio' && enlaceMapsPedido(p) ? `<p class="ticket-direccion"><a class="ticket-maps-link" href="${esc(enlaceMapsPedido(p))}" target="_blank" rel="noopener">🗺️ Ver ubicación en Maps</a></p>` : ''}
         <ul class="ticket-items">
             ${(p.items || []).map(it => `
                 <li>
