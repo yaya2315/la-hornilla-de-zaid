@@ -51,6 +51,11 @@ let mesaActual = null;      // solo aplica a tipo 'local'
 let clienteActual = '';     // aplica a 'llevar' / 'domicilio'
 let direccionActual = '';   // aplica solo a 'domicilio'
 let telefonoActual = '';    // aplica solo a 'domicilio'
+let ubicacionLat = null;         // pin marcado en el mapa (domicilio)
+let ubicacionLng = null;
+let ubicacionLinkActual = '';    // enlace de Maps pegado a mano (ej. ubicación que envió el cliente)
+let mapaLeaflet = null;          // instancia de Leaflet (se crea una sola vez)
+let mapaMarcador = null;
 let pedidoIdActual = null;  // null = pedido nuevo
 let itemsCarrito = [];      // { platillo, cantidad, notas, precio }
 
@@ -311,6 +316,9 @@ function cambiarTipoPedido(t) {
     clienteActual = '';
     direccionActual = '';
     telefonoActual = '';
+    ubicacionLat = null;
+    ubicacionLng = null;
+    ubicacionLinkActual = '';
     renderTipoPedido();
     renderOrigen();
     renderCarrito();
@@ -339,7 +347,16 @@ function renderOrigen() {
             </label>
             <label class="ficha-lbl">Dirección de entrega
                 <input type="text" id="direccionInput" class="ficha-notas" placeholder="Ej. Col. Escalón, casa #12" maxlength="140" value="${esc(direccionActual)}">
-            </label>` : ''}
+            </label>
+            <div class="ubicacion-bloque">
+                <div class="ubicacion-row">
+                    <button type="button" id="btnMarcarMapa" class="btn-ubicacion-mapa">📍 Marcar en el mapa</button>
+                    <span id="ubicacionEstado" class="ubicacion-estado"></span>
+                </div>
+                <label class="ficha-lbl">Enlace de ubicación (opcional)
+                    <input type="url" id="enlaceUbicacionInput" class="ficha-notas" placeholder="Pega aquí el enlace de Maps que te compartió el cliente" value="${esc(ubicacionLinkActual)}">
+                </label>
+            </div>` : ''}
         </div>`;
 
     document.getElementById('clienteInput')?.addEventListener('input', e => {
@@ -353,6 +370,11 @@ function renderOrigen() {
         telefonoActual = e.target.value;
         renderCarrito();
     });
+    document.getElementById('enlaceUbicacionInput')?.addEventListener('input', e => {
+        ubicacionLinkActual = e.target.value;
+    });
+    document.getElementById('btnMarcarMapa')?.addEventListener('click', abrirModalMapa);
+    renderEstadoUbicacion();
 }
 
 /* ===== MESAS ========================================================= */
@@ -391,6 +413,95 @@ async function seleccionarMesa(n) {
     }
     renderCarrito();
 }
+
+/* ===== UBICACIÓN DE ENTREGA (domicilio) ==============================
+   Tres formas de dejar la ubicación lista para el repartidor, sin
+   depender de una API de pago:
+   1) Marcar un pin en un mapa libre (Leaflet + OpenStreetMap).
+   2) Pegar un enlace de Maps que el cliente ya haya compartido.
+   3) Si no hay ni pin ni enlace, se arma un enlace de búsqueda de Maps
+      a partir de la dirección escrita — siempre hay una forma de
+      "cómo llegar", aunque solo se haya tecleado el texto. */
+function enlaceMapsActual() {
+    if (ubicacionLat != null && ubicacionLng != null) {
+        return `https://www.google.com/maps?q=${ubicacionLat},${ubicacionLng}`;
+    }
+    if (ubicacionLinkActual.trim()) return ubicacionLinkActual.trim();
+    if (direccionActual.trim()) return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccionActual.trim())}`;
+    return null;
+}
+
+function renderEstadoUbicacion() {
+    const el = document.getElementById('ubicacionEstado');
+    if (!el) return;
+    if (ubicacionLat != null && ubicacionLng != null) {
+        el.innerHTML = `<span class="ubicacion-chip">📍 Pin marcado <button type="button" id="btnQuitarPin" aria-label="Quitar pin">✕</button></span>`;
+        document.getElementById('btnQuitarPin')?.addEventListener('click', () => {
+            ubicacionLat = null; ubicacionLng = null;
+            renderEstadoUbicacion();
+        });
+    } else {
+        el.innerHTML = '';
+    }
+}
+
+function abrirModalMapa() {
+    document.getElementById('mapaModal')?.classList.add('is-abierto');
+    document.getElementById('mapaModalBackdrop')?.classList.add('is-abierto');
+    /* Leaflet necesita que su contenedor ya sea visible para calcular
+       el tamaño correctamente — se inicializa justo después de abrir. */
+    setTimeout(inicializarMapaPicker, 60);
+}
+function cerrarModalMapa() {
+    document.getElementById('mapaModal')?.classList.remove('is-abierto');
+    document.getElementById('mapaModalBackdrop')?.classList.remove('is-abierto');
+}
+
+function inicializarMapaPicker() {
+    if (typeof L === 'undefined') {
+        toast('No se pudo cargar el mapa. Revisa tu conexión.', 'error');
+        return;
+    }
+    const centro = (ubicacionLat != null && ubicacionLng != null)
+        ? [ubicacionLat, ubicacionLng]
+        : [13.6929, -89.2182]; // San Salvador — centro por defecto
+
+    if (!mapaLeaflet) {
+        mapaLeaflet = L.map('mapaPicker').setView(centro, 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap',
+            maxZoom: 19
+        }).addTo(mapaLeaflet);
+        mapaMarcador = L.marker(centro, { draggable: true }).addTo(mapaLeaflet);
+        mapaLeaflet.on('click', e => mapaMarcador.setLatLng(e.latlng));
+    } else {
+        mapaLeaflet.setView(centro, 15);
+        mapaMarcador.setLatLng(centro);
+        mapaLeaflet.invalidateSize();
+    }
+
+    /* Si aún no hay pin guardado, intenta centrar en la ubicación real
+       del dispositivo para ahorrar el paso de mover el pin a mano. */
+    if (ubicacionLat == null && navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => {
+            const c = [pos.coords.latitude, pos.coords.longitude];
+            mapaLeaflet.setView(c, 16);
+            mapaMarcador.setLatLng(c);
+        }, () => { /* sin permiso o sin señal — se queda en el centro por defecto */ }, { timeout: 4000 });
+    }
+}
+
+document.getElementById('btnCerrarMapa')?.addEventListener('click', cerrarModalMapa);
+document.getElementById('mapaModalBackdrop')?.addEventListener('click', cerrarModalMapa);
+document.getElementById('btnConfirmarMapa')?.addEventListener('click', () => {
+    if (!mapaMarcador) return;
+    const { lat, lng } = mapaMarcador.getLatLng();
+    ubicacionLat = lat;
+    ubicacionLng = lng;
+    renderEstadoUbicacion();
+    cerrarModalMapa();
+    toast('Ubicación marcada en el mapa');
+});
 
 /* ===== CARRITO / COMANDA ============================================= */
 function renderCarrito() {
@@ -452,7 +563,11 @@ async function enviarPedido() {
     const nombreOrigen = tipoActual === 'local' ? `mesa ${mesaActual}` : clienteActual.trim();
     const origen = tipoActual === 'local'
         ? { tipo: 'local', mesa: mesaActual }
-        : { tipo: tipoActual, mesa: clienteActual.trim(), cliente: clienteActual.trim(), direccion: direccionActual.trim(), telefono: telefonoActual.trim() };
+        : {
+            tipo: tipoActual, mesa: clienteActual.trim(), cliente: clienteActual.trim(),
+            direccion: direccionActual.trim(), telefono: telefonoActual.trim(),
+            ubicacionLat, ubicacionLng, ubicacionLink: ubicacionLinkActual.trim()
+        };
 
     try {
         if (pedidoIdActual) {
@@ -506,6 +621,9 @@ function datosDomicilioHTML() {
 function abrirModalDomicilio() {
     const cont = document.getElementById('domicilioModalDatos');
     if (cont) cont.innerHTML = datosDomicilioHTML();
+    const btnMaps = document.getElementById('btnMapsDomicilio');
+    const enlace = enlaceMapsActual();
+    if (btnMaps) btnMaps.classList.toggle('hidden', !enlace);
     document.getElementById('domicilioModal')?.classList.add('is-abierto');
     document.getElementById('domicilioModalBackdrop')?.classList.add('is-abierto');
 }
@@ -515,19 +633,25 @@ function cerrarModalDomicilio() {
 }
 document.getElementById('btnCerrarDomicilio')?.addEventListener('click', cerrarModalDomicilio);
 document.getElementById('domicilioModalBackdrop')?.addEventListener('click', cerrarModalDomicilio);
+document.getElementById('btnMapsDomicilio')?.addEventListener('click', () => {
+    const enlace = enlaceMapsActual();
+    if (enlace) window.open(enlace, '_blank');
+});
 
 /* Botón "Enviar a WhatsApp" — abre WhatsApp (app o web) con el texto ya
    armado, sin número fijo, para que el mesero elija al repartidor que
    corresponda desde su lista de contactos. */
 document.getElementById('btnWhatsappDomicilio')?.addEventListener('click', () => {
+    const enlaceMaps = enlaceMapsActual();
     const texto = [
         '🛵 *Pedido a domicilio — La Hornilla de Zaid*',
         '',
         `👤 Cliente: ${clienteActual.trim()}`,
         `📞 Teléfono: ${telefonoActual.trim()}`,
         `📍 Dirección: ${direccionActual.trim()}`,
+        enlaceMaps ? `🗺️ Ubicación: ${enlaceMaps}` : '',
         `💵 Total: ${money(totalCarritoActual())}`
-    ].join('\n');
+    ].filter(Boolean).join('\n');
     window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
 });
 
@@ -537,8 +661,8 @@ document.getElementById('btnWhatsappDomicilio')?.addEventListener('click', () =>
    descarga la imagen para adjuntarla a mano. */
 document.getElementById('btnCapturaDomicilio')?.addEventListener('click', async () => {
     const btn = document.getElementById('btnCapturaDomicilio');
-    const tarjeta = document.querySelector('#domicilioModal .domicilio-modal-card');
-    if (!tarjeta) return;
+    const area = document.getElementById('domicilioCapturaArea');
+    if (!area) return;
     if (typeof html2canvas === 'undefined') {
         toast('No se pudo cargar el generador de capturas', 'error');
         return;
@@ -547,10 +671,7 @@ document.getElementById('btnCapturaDomicilio')?.addEventListener('click', async 
     btn.disabled = true;
     btn.textContent = 'Generando…';
     try {
-        const ocultar = tarjeta.querySelector('.btn-cerrar-domicilio');
-        if (ocultar) ocultar.style.visibility = 'hidden';
-        const canvas = await html2canvas(tarjeta, { backgroundColor: '#1d0c03', scale: 2 });
-        if (ocultar) ocultar.style.visibility = '';
+        const canvas = await html2canvas(area, { backgroundColor: '#1d0c03', scale: 2 });
         canvas.toBlob(async blob => {
             if (!blob) { btn.disabled = false; btn.textContent = textoOriginal; return; }
             const nombreArchivo = `domicilio-${clienteActual.trim().replace(/\s+/g, '-') || 'pedido'}.png`;
@@ -609,6 +730,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (itemsCarrito.length && !confirm('Se perderán los ítems no enviados. ¿Continuar?')) return;
         mesaActual = null; pedidoIdActual = null; itemsCarrito = [];
         clienteActual = ''; direccionActual = ''; telefonoActual = '';
+        ubicacionLat = null; ubicacionLng = null; ubicacionLinkActual = '';
         renderOrigen(); renderCarrito();
         document.getElementById('comandaBanner').textContent = bannerInicial();
     });
