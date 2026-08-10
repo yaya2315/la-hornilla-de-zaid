@@ -13,8 +13,10 @@
 
     <link rel="stylesheet" href="../CSS/style.css">
     <link rel="stylesheet" href="../CSS/mesero.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>
 </head>
 <body class="kds-body">
 
@@ -61,16 +63,33 @@
     <div id="domicilioModal" class="domicilio-modal" role="dialog" aria-modal="true" aria-label="Datos de entrega a domicilio">
         <div class="domicilio-modal-card">
             <button type="button" id="btnCerrarDomicilio" class="btn-cerrar-domicilio" aria-label="Cerrar">✕</button>
-            <div class="domicilio-modal-header">
-                <span class="domicilio-modal-icon" aria-hidden="true">🛵</span>
-                <h2>Datos para el domicilio</h2>
-                <p class="domicilio-modal-sub">Pedido enviado a cocina — comparte estos datos con el repartidor</p>
+            <div id="domicilioCapturaArea" class="domicilio-captura-area">
+                <div class="domicilio-modal-header">
+                    <span class="domicilio-modal-icon" aria-hidden="true">🛵</span>
+                    <h2>Datos para el domicilio</h2>
+                    <p class="domicilio-modal-sub">Pedido enviado a cocina — comparte estos datos con el repartidor</p>
+                </div>
+                <div id="domicilioModalDatos" class="domicilio-modal-datos"></div>
             </div>
-            <div id="domicilioModalDatos" class="domicilio-modal-datos"></div>
             <div class="domicilio-modal-acciones">
                 <button type="button" id="btnCapturaDomicilio" class="btn-domicilio-accion btn-domicilio-captura">📸 Enviar captura</button>
                 <button type="button" id="btnWhatsappDomicilio" class="btn-domicilio-accion btn-domicilio-whatsapp">🟢 Enviar a WhatsApp</button>
+                <button type="button" id="btnMapsDomicilio" class="btn-domicilio-accion btn-domicilio-maps hidden">🗺️ Cómo llegar</button>
             </div>
+        </div>
+    </div>
+
+    <div id="mapaModalBackdrop" class="domicilio-modal-backdrop"></div>
+    <div id="mapaModal" class="domicilio-modal" role="dialog" aria-modal="true" aria-label="Marcar ubicación de entrega">
+        <div class="domicilio-modal-card mapa-modal-card">
+            <button type="button" id="btnCerrarMapa" class="btn-cerrar-domicilio" aria-label="Cerrar">✕</button>
+            <div class="domicilio-modal-header">
+                <span class="domicilio-modal-icon" aria-hidden="true">📍</span>
+                <h2>Marcar ubicación</h2>
+                <p class="domicilio-modal-sub">Toca el mapa o arrastra el pin hasta la entrega</p>
+            </div>
+            <div id="mapaPicker" class="mapa-picker"></div>
+            <button type="button" id="btnConfirmarMapa" class="btn-domicilio-accion btn-domicilio-whatsapp mapa-btn-confirmar">Usar esta ubicación</button>
         </div>
     </div>
 
