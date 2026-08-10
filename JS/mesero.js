@@ -57,6 +57,7 @@ let ubicacionLinkActual = '';    // enlace de Maps pegado a mano (ej. ubicación
 let mapaLeaflet = null;          // instancia de Leaflet (se crea una sola vez)
 let mapaMarcador = null;
 let pedidoIdActual = null;  // null = pedido nuevo
+let estadoPedidoActual = null; // estado de cocina del pedido activo (pendiente/preparando/listo)
 let itemsCarrito = [];      // { platillo, cantidad, notas, precio }
 
 /* ===== UTILIDADES ==================================================== */
@@ -306,24 +307,47 @@ function actualizarBotonNuevo() {
     if (btn) btn.textContent = tipoActual === 'local' ? 'Cambiar de mesa' : 'Nuevo pedido';
 }
 
+/* Calcula el texto del banner según lo que haya en memoria en este
+   momento. Se reutiliza al cambiar de pestaña o de mesa — ninguno de
+   los dos borra ya el pedido en construcción, así que el banner debe
+   poder "recalcularse" en vez de fijarse una sola vez. */
+function actualizarBannerEstado() {
+    const el = document.getElementById('comandaBanner');
+    if (!el) return;
+
+    const nombreOrigen = tipoActual === 'local'
+        ? (mesaActual != null ? `la mesa ${mesaActual}` : null)
+        : (clienteActual.trim() || null);
+
+    if (!itemsCarrito.length) {
+        el.textContent = nombreOrigen ? `Pedido nuevo para ${nombreOrigen}` : bannerInicial();
+        return;
+    }
+    if (pedidoIdActual) {
+        const estadoTxt = estadoPedidoActual ? ` · estado: <strong>${esc(estadoPedidoActual)}</strong>` : '';
+        el.innerHTML = nombreOrigen
+            ? `Editando el pedido <strong>activo</strong> de ${esc(nombreOrigen)}${estadoTxt}`
+            : `Editando un pedido <strong>activo</strong>${estadoTxt}`;
+    } else {
+        el.innerHTML = nombreOrigen
+            ? `Construyendo el pedido para ${esc(nombreOrigen)} · <strong>aún sin enviar</strong>`
+            : `Tienes ${itemsCarrito.length} ítem(s) en la orden · <strong>aún sin enviar</strong>`;
+    }
+}
+
+/* Cambiar entre Comer aquí / Para llevar / Domicilio ya NO borra nada:
+   ni los platillos agregados, ni el nombre/teléfono/dirección/pin, ni
+   la mesa seleccionada. Lo único que cambia es qué formulario se ve.
+   La información solo se pierde si se usa el botón explícito "Nuevo
+   pedido" / "Cambiar de mesa". */
 function cambiarTipoPedido(t) {
     if (t === tipoActual) return;
-    if (itemsCarrito.length && !confirm('Cambiar el tipo de pedido descarta lo que llevas sin enviar en la comanda. ¿Continuar?')) return;
     tipoActual = t;
-    mesaActual = null;
-    pedidoIdActual = null;
-    itemsCarrito = [];
-    clienteActual = '';
-    direccionActual = '';
-    telefonoActual = '';
-    ubicacionLat = null;
-    ubicacionLng = null;
-    ubicacionLinkActual = '';
     renderTipoPedido();
     renderOrigen();
     renderCarrito();
     actualizarBotonNuevo();
-    document.getElementById('comandaBanner').textContent = bannerInicial();
+    actualizarBannerEstado();
 }
 
 function renderOrigen() {
@@ -390,28 +414,35 @@ function renderMesas() {
     });
 }
 
+/* Cambiar de mesa ya NO borra los ítems sin enviar. Si el carrito
+   tiene algo, simplemente se reasigna a la mesa recién tocada (se
+   invalida el pedidoIdActual anterior para no pisar por error el
+   ticket de la mesa vieja). Si el carrito está vacío, se busca en
+   Firestore si esa mesa ya tiene un pedido activo para retomarlo. */
 async function seleccionarMesa(n) {
-    if (itemsCarrito.length && mesaActual !== n) {
-        const confirmar = confirm(`Tienes ${itemsCarrito.length} ítem(s) sin enviar en la mesa ${mesaActual}. ¿Cambiar de mesa y descartarlos?`);
-        if (!confirmar) return;
-    }
+    const cambioDeMesa = mesaActual !== n;
     mesaActual = n;
-    pedidoIdActual = null;
-    itemsCarrito = [];
     renderMesas();
-    renderCarrito();
+
+    if (itemsCarrito.length) {
+        if (cambioDeMesa) { pedidoIdActual = null; estadoPedidoActual = null; }
+        renderCarrito();
+        actualizarBannerEstado();
+        return;
+    }
+
+    pedidoIdActual = null;
+    estadoPedidoActual = null;
     document.getElementById('comandaBanner').textContent = `Buscando pedido activo de la mesa ${n}…`;
 
     const activo = await buscarPedidoActivoPorMesa(n);
     if (activo) {
         pedidoIdActual = activo.id;
+        estadoPedidoActual = activo.estado || null;
         itemsCarrito = (activo.items || []).map(it => ({ ...it }));
-        document.getElementById('comandaBanner').innerHTML =
-            `Editando el pedido <strong>activo</strong> de la mesa ${n} · estado: <strong>${esc(activo.estado)}</strong>`;
-    } else {
-        document.getElementById('comandaBanner').textContent = `Pedido nuevo para la mesa ${n}`;
     }
     renderCarrito();
+    actualizarBannerEstado();
 }
 
 /* ===== UBICACIÓN DE ENTREGA (domicilio) ==============================
@@ -575,10 +606,10 @@ async function enviarPedido() {
             toast(`Cambios guardados — ${nombreOrigen}`);
         } else {
             pedidoIdActual = await crearPedido(origen, itemsCarrito);
+            estadoPedidoActual = 'pendiente';
             toast(`Pedido enviado a cocina — ${nombreOrigen}`);
         }
-        document.getElementById('comandaBanner').innerHTML =
-            `Editando el pedido <strong>activo</strong> de ${esc(nombreOrigen)} · estado: <strong>pendiente</strong>`;
+        actualizarBannerEstado();
         if (tipoActual === 'domicilio') abrirModalDomicilio();
     } catch (err) {
         console.error('[mesero] Error al guardar el pedido:', err);
@@ -704,6 +735,39 @@ document.getElementById('btnCapturaDomicilio')?.addEventListener('click', async 
     }
 });
 
+/* ===== ENCABEZADO COMPACTO AL HACER SCROLL ============================
+   El bloque de mesa/cliente puede ocupar bastante alto (sobre todo en
+   domicilio, con teléfono + dirección + mapa). Al deslizar hacia abajo
+   en la pantalla (swipe up) se compacta para dejar ver más del menú;
+   al deslizar hacia arriba (swipe down), o cerca del tope de la
+   página, vuelve a mostrarse completo. Si el mesero está escribiendo
+   dentro del formulario, no se compacta solo, para no taparle el
+   campo justo cuando el teclado empuja la vista. */
+let ultimoScrollY = window.scrollY;
+let headerEnCompacto = false;
+
+function fijarHeaderCompacto(valor) {
+    if (valor === headerEnCompacto) return;
+    headerEnCompacto = valor;
+    document.querySelector('.kds-header')?.classList.toggle('is-compacto', valor);
+}
+
+function alHacerScroll() {
+    const y = window.scrollY;
+    const diferencia = y - ultimoScrollY;
+    const cercaDelTope = y < 80;
+    const wrap = document.getElementById('kdsHeaderColapsable');
+    const escribiendoDentro = !!(wrap && document.activeElement && wrap.contains(document.activeElement) && document.activeElement !== document.body);
+
+    if (cercaDelTope || diferencia < -6) {
+        fijarHeaderCompacto(false);
+    } else if (!escribiendoDentro && diferencia > 6) {
+        fijarHeaderCompacto(true);
+    }
+    ultimoScrollY = y;
+}
+window.addEventListener('scroll', alHacerScroll, { passive: true });
+
 /* ===== INICIALIZACIÓN ================================================ */
 document.addEventListener('DOMContentLoaded', () => {
     activarReconexionAutomatica();
@@ -714,7 +778,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCarrito();
     suscribirMenu();
     actualizarBotonNuevo();
-    document.getElementById('comandaBanner').textContent = bannerInicial();
+    actualizarBannerEstado();
 
     const buscar = document.getElementById('menuBuscar');
     if (buscar) {
@@ -728,10 +792,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btnEnviarPedido')?.addEventListener('click', enviarPedido);
     document.getElementById('btnNuevaMesa')?.addEventListener('click', () => {
         if (itemsCarrito.length && !confirm('Se perderán los ítems no enviados. ¿Continuar?')) return;
-        mesaActual = null; pedidoIdActual = null; itemsCarrito = [];
+        mesaActual = null; pedidoIdActual = null; estadoPedidoActual = null; itemsCarrito = [];
         clienteActual = ''; direccionActual = ''; telefonoActual = '';
         ubicacionLat = null; ubicacionLng = null; ubicacionLinkActual = '';
         renderOrigen(); renderCarrito();
-        document.getElementById('comandaBanner').textContent = bannerInicial();
+        actualizarBannerEstado();
     });
 });
