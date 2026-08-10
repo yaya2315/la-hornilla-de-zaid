@@ -438,6 +438,154 @@
 .kds-toast.is-visible { opacity: 1; transform: none; }
 .kds-toast--error { border-color: rgba(226, 75, 43, 0.6); color: #ffb199; }
 
+/* ===== MODAL DE DATOS DE DOMICILIO =====================================
+   Aparece justo después de enviar/actualizar un pedido a domicilio.
+   Usa exactamente los mismos tokens que el resto del sistema (--ember,
+   --card, --line, --cream, --radius-lg, --glow) para verse como una
+   extensión natural del panel de comanda, no como un elemento aparte. */
+.domicilio-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 2, 0, 0.72);
+    backdrop-filter: blur(5px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.35s var(--ease), visibility 0.35s var(--ease);
+    z-index: 2500;
+}
+.domicilio-modal-backdrop.is-abierto { opacity: 1; visibility: visible; }
+
+.domicilio-modal {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    z-index: 2600;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.35s var(--ease), visibility 0.35s var(--ease);
+}
+.domicilio-modal.is-abierto { opacity: 1; visibility: visible; pointer-events: auto; }
+
+.domicilio-modal-card {
+    width: min(420px, 100%);
+    background: linear-gradient(180deg, #1d0c03 0%, #0c0400 100%);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 30px 26px 26px;
+    position: relative;
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.02);
+    transform: translateY(14px) scale(0.98);
+    transition: transform 0.4s var(--ease);
+}
+.domicilio-modal.is-abierto .domicilio-modal-card { transform: translateY(0) scale(1); }
+
+.btn-cerrar-domicilio {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.06);
+    border: none;
+    color: var(--cream);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.25s var(--ease);
+}
+.btn-cerrar-domicilio:hover { background: rgba(255, 255, 255, 0.12); }
+
+.domicilio-modal-header { text-align: center; margin-bottom: 22px; }
+.domicilio-modal-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--ember-soft), var(--ember-deep));
+    box-shadow: 0 10px 26px var(--glow);
+    font-size: 1.4rem;
+    margin-bottom: 12px;
+}
+.domicilio-modal-header h2 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 1.15rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--cream);
+}
+.domicilio-modal-sub {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 6px;
+    line-height: 1.4;
+}
+
+.domicilio-modal-datos { display: grid; gap: 10px; margin-bottom: 24px; }
+.domicilio-dato {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 14px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--line);
+}
+.domicilio-dato-lbl {
+    font-size: 0.68rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    flex: 0 0 auto;
+}
+.domicilio-dato-val {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    color: var(--cream);
+    text-align: right;
+    word-break: break-word;
+}
+.domicilio-dato-total { color: var(--ember); font-family: 'Oswald', sans-serif; font-size: 1.05rem; }
+
+.domicilio-modal-acciones { display: grid; gap: 10px; }
+.btn-domicilio-accion {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 13px;
+    border-radius: 30px;
+    border: none;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 0.84rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), opacity 0.25s var(--ease);
+}
+.btn-domicilio-accion:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-domicilio-captura {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--line);
+    color: var(--cream);
+}
+.btn-domicilio-captura:hover:not(:disabled) { border-color: var(--ember); color: var(--ember); transform: translateY(-2px); }
+.btn-domicilio-whatsapp {
+    background: linear-gradient(135deg, #2fbd67, #1c8f4a);
+    color: #fff;
+    box-shadow: 0 10px 26px rgba(37, 168, 85, 0.35);
+}
+.btn-domicilio-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(37, 168, 85, 0.45); }
+
 @media (prefers-reduced-motion: reduce) {
     .ficha-panel { animation: none; }
+    .domicilio-modal-card { transition: none; }
 }
