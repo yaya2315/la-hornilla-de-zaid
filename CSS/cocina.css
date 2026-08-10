@@ -162,6 +162,12 @@
 .ticket-tiempo { font-size: 0.74rem; color: var(--muted); white-space: nowrap; }
 .ticket-tiempo b { color: var(--text); }
 .ticket-direccion { font-size: 0.78rem; color: var(--muted); margin-top: -4px; }
+.ticket-maps-link {
+    color: var(--ember-soft);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+.ticket-maps-link:hover { color: var(--ember); }
 
 .ticket-items { display: grid; gap: 8px; }
 .ticket-items li {
