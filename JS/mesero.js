@@ -50,6 +50,7 @@ let tipoActual = 'local';   // 'local' | 'llevar' | 'domicilio'
 let mesaActual = null;      // solo aplica a tipo 'local'
 let clienteActual = '';     // aplica a 'llevar' / 'domicilio'
 let direccionActual = '';   // aplica solo a 'domicilio'
+let telefonoActual = '';    // aplica solo a 'domicilio'
 let pedidoIdActual = null;  // null = pedido nuevo
 let itemsCarrito = [];      // { platillo, cantidad, notas, precio }
 
@@ -74,7 +75,9 @@ function toast(msg, tipo = 'ok') {
 
 /* ¿Hay suficiente información para poder enviar el pedido? */
 function origenListo() {
-    return tipoActual === 'local' ? !!mesaActual : clienteActual.trim().length > 0;
+    if (tipoActual === 'local') return !!mesaActual;
+    if (tipoActual === 'domicilio') return clienteActual.trim().length > 0 && telefonoActual.trim().length > 0;
+    return clienteActual.trim().length > 0;
 }
 
 /* ===== NORMALIZAR EL MENÚ A "FICHAS" ================================ */
@@ -226,7 +229,7 @@ function renderMenu() {
                         <input type="text" class="ficha-notas" placeholder="Ej. sin cebolla, extra picante" maxlength="120">
                     </label>
                 </div>
-                <button type="button" class="btn-agregar-comanda">Agregar a la comanda <span class="arrow">→</span></button>
+                <button type="button" class="btn-agregar-comanda">Agregar a la orden <span class="arrow">→</span></button>
             </div>
         </article>`;
     }).join('');
@@ -269,7 +272,7 @@ function renderMenu() {
             fichaAbierta = null;
             renderMenu();
             renderCarrito();
-            toast(`${f.nombre} agregado a la comanda`);
+            toast(`${f.nombre} agregado a la orden`);
         });
     });
 }
@@ -307,6 +310,7 @@ function cambiarTipoPedido(t) {
     itemsCarrito = [];
     clienteActual = '';
     direccionActual = '';
+    telefonoActual = '';
     renderTipoPedido();
     renderOrigen();
     renderCarrito();
@@ -330,6 +334,9 @@ function renderOrigen() {
                 <input type="text" id="clienteInput" class="ficha-notas" placeholder="Ej. Juan Pérez" maxlength="60" value="${esc(clienteActual)}">
             </label>
             ${tipoActual === 'domicilio' ? `
+            <label class="ficha-lbl">Teléfono del cliente
+                <input type="tel" id="telefonoInput" class="ficha-notas" placeholder="Ej. 7123-4567" maxlength="20" inputmode="tel" value="${esc(telefonoActual)}">
+            </label>
             <label class="ficha-lbl">Dirección de entrega
                 <input type="text" id="direccionInput" class="ficha-notas" placeholder="Ej. Col. Escalón, casa #12" maxlength="140" value="${esc(direccionActual)}">
             </label>` : ''}
@@ -341,6 +348,10 @@ function renderOrigen() {
     });
     document.getElementById('direccionInput')?.addEventListener('input', e => {
         direccionActual = e.target.value;
+    });
+    document.getElementById('telefonoInput')?.addEventListener('input', e => {
+        telefonoActual = e.target.value;
+        renderCarrito();
     });
 }
 
@@ -441,7 +452,7 @@ async function enviarPedido() {
     const nombreOrigen = tipoActual === 'local' ? `mesa ${mesaActual}` : clienteActual.trim();
     const origen = tipoActual === 'local'
         ? { tipo: 'local', mesa: mesaActual }
-        : { tipo: tipoActual, mesa: clienteActual.trim(), cliente: clienteActual.trim(), direccion: direccionActual.trim() };
+        : { tipo: tipoActual, mesa: clienteActual.trim(), cliente: clienteActual.trim(), direccion: direccionActual.trim(), telefono: telefonoActual.trim() };
 
     try {
         if (pedidoIdActual) {
@@ -453,6 +464,7 @@ async function enviarPedido() {
         }
         document.getElementById('comandaBanner').innerHTML =
             `Editando el pedido <strong>activo</strong> de ${esc(nombreOrigen)} · estado: <strong>pendiente</strong>`;
+        if (tipoActual === 'domicilio') abrirModalDomicilio();
     } catch (err) {
         console.error('[mesero] Error al guardar el pedido:', err);
         toast('No se pudo guardar. Revisa tu conexión — se reintentará solo.', 'error');
@@ -460,6 +472,116 @@ async function enviarPedido() {
         renderCarrito();
     }
 }
+
+/* ===== MODAL DE DATOS DE DOMICILIO ===================================
+   Se muestra justo después de enviar (o actualizar) un pedido a
+   domicilio, para que el mesero pueda pasarle al repartidor el nombre,
+   teléfono y dirección sin tener que ir a buscarlos de nuevo — ya sea
+   mandando una captura de la tarjeta o abriendo WhatsApp con el texto
+   ya armado. */
+function totalCarritoActual() {
+    return itemsCarrito.reduce((a, it) => a + it.precio * it.cantidad, 0);
+}
+
+function datosDomicilioHTML() {
+    return `
+        <div class="domicilio-dato">
+            <span class="domicilio-dato-lbl">Cliente</span>
+            <span class="domicilio-dato-val">${esc(clienteActual.trim())}</span>
+        </div>
+        <div class="domicilio-dato">
+            <span class="domicilio-dato-lbl">Teléfono</span>
+            <span class="domicilio-dato-val">${esc(telefonoActual.trim())}</span>
+        </div>
+        <div class="domicilio-dato">
+            <span class="domicilio-dato-lbl">Dirección</span>
+            <span class="domicilio-dato-val">${esc(direccionActual.trim())}</span>
+        </div>
+        <div class="domicilio-dato">
+            <span class="domicilio-dato-lbl">Total del pedido</span>
+            <span class="domicilio-dato-val domicilio-dato-total">${money(totalCarritoActual())}</span>
+        </div>`;
+}
+
+function abrirModalDomicilio() {
+    const cont = document.getElementById('domicilioModalDatos');
+    if (cont) cont.innerHTML = datosDomicilioHTML();
+    document.getElementById('domicilioModal')?.classList.add('is-abierto');
+    document.getElementById('domicilioModalBackdrop')?.classList.add('is-abierto');
+}
+function cerrarModalDomicilio() {
+    document.getElementById('domicilioModal')?.classList.remove('is-abierto');
+    document.getElementById('domicilioModalBackdrop')?.classList.remove('is-abierto');
+}
+document.getElementById('btnCerrarDomicilio')?.addEventListener('click', cerrarModalDomicilio);
+document.getElementById('domicilioModalBackdrop')?.addEventListener('click', cerrarModalDomicilio);
+
+/* Botón "Enviar a WhatsApp" — abre WhatsApp (app o web) con el texto ya
+   armado, sin número fijo, para que el mesero elija al repartidor que
+   corresponda desde su lista de contactos. */
+document.getElementById('btnWhatsappDomicilio')?.addEventListener('click', () => {
+    const texto = [
+        '🛵 *Pedido a domicilio — La Hornilla de Zaid*',
+        '',
+        `👤 Cliente: ${clienteActual.trim()}`,
+        `📞 Teléfono: ${telefonoActual.trim()}`,
+        `📍 Dirección: ${direccionActual.trim()}`,
+        `💵 Total: ${money(totalCarritoActual())}`
+    ].join('\n');
+    window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
+});
+
+/* Botón "Enviar captura" — genera una imagen de la tarjeta de datos con
+   html2canvas. En celular, si el navegador soporta compartir archivos,
+   abre directamente el panel nativo (WhatsApp incluido); si no,
+   descarga la imagen para adjuntarla a mano. */
+document.getElementById('btnCapturaDomicilio')?.addEventListener('click', async () => {
+    const btn = document.getElementById('btnCapturaDomicilio');
+    const tarjeta = document.querySelector('#domicilioModal .domicilio-modal-card');
+    if (!tarjeta) return;
+    if (typeof html2canvas === 'undefined') {
+        toast('No se pudo cargar el generador de capturas', 'error');
+        return;
+    }
+    const textoOriginal = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Generando…';
+    try {
+        const ocultar = tarjeta.querySelector('.btn-cerrar-domicilio');
+        if (ocultar) ocultar.style.visibility = 'hidden';
+        const canvas = await html2canvas(tarjeta, { backgroundColor: '#1d0c03', scale: 2 });
+        if (ocultar) ocultar.style.visibility = '';
+        canvas.toBlob(async blob => {
+            if (!blob) { btn.disabled = false; btn.textContent = textoOriginal; return; }
+            const nombreArchivo = `domicilio-${clienteActual.trim().replace(/\s+/g, '-') || 'pedido'}.png`;
+            const archivo = new File([blob], nombreArchivo, { type: 'image/png' });
+            try {
+                if (navigator.canShare && navigator.canShare({ files: [archivo] })) {
+                    await navigator.share({ files: [archivo], title: 'Datos de domicilio' });
+                } else {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url; a.download = nombreArchivo;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    URL.revokeObjectURL(url);
+                    toast('Captura descargada');
+                }
+            } catch (err) {
+                if (err?.name !== 'AbortError') console.warn('[mesero] No se pudo compartir la captura:', err);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = textoOriginal;
+            }
+        }, 'image/png');
+    } catch (err) {
+        console.error('[mesero] Error al generar la captura:', err);
+        toast('No se pudo generar la captura', 'error');
+        btn.disabled = false;
+        btn.textContent = textoOriginal;
+    }
+});
 
 /* ===== INICIALIZACIÓN ================================================ */
 document.addEventListener('DOMContentLoaded', () => {
@@ -486,7 +608,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btnNuevaMesa')?.addEventListener('click', () => {
         if (itemsCarrito.length && !confirm('Se perderán los ítems no enviados. ¿Continuar?')) return;
         mesaActual = null; pedidoIdActual = null; itemsCarrito = [];
-        clienteActual = ''; direccionActual = '';
+        clienteActual = ''; direccionActual = ''; telefonoActual = '';
         renderOrigen(); renderCarrito();
         document.getElementById('comandaBanner').textContent = bannerInicial();
     });
