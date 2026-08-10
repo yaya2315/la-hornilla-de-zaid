@@ -37,12 +37,13 @@ export function calcularTotal(items = []) {
    origen = { tipo, mesa, cliente, direccion } — solo "tipo" y "mesa"
    son obligatorios; cliente/direccion aplican a llevar/domicilio. */
 export async function crearPedido(origen, items) {
-    const { tipo = 'local', mesa = '', cliente = '', direccion = '' } = origen || {};
+    const { tipo = 'local', mesa = '', cliente = '', direccion = '', telefono = '' } = origen || {};
     const ref = await addDoc(collection(db, COLECCION_PEDIDOS), {
         tipo,
         mesa: String(mesa || ''),
         cliente: cliente || '',
         direccion: direccion || '',
+        telefono: telefono || '',
         estado: 'pendiente',
         items,
         total: calcularTotal(items),
