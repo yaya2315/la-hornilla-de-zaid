@@ -13,6 +13,9 @@
 
     <link rel="stylesheet" href="../CSS/style.css">
     <link rel="stylesheet" href="../CSS/pedido.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>
 </head>
 <body>
 
@@ -124,6 +127,15 @@
                 <div class="campo hidden" id="campoDireccion">
                     <label for="clienteDireccion">Dirección de entrega</label>
                     <input type="text" id="clienteDireccion" placeholder="Dirección completa y alguna referencia" autocomplete="street-address">
+
+                    <div class="ubicacion-bloque">
+                        <div class="ubicacion-row">
+                            <button type="button" id="btnMarcarMapa" class="btn-ubicacion-mapa">📍 Marcar en el mapa</button>
+                            <span id="ubicacionEstado" class="ubicacion-estado"></span>
+                        </div>
+                        <label for="enlaceUbicacionInput">Enlace de Google Maps (opcional)</label>
+                        <input type="url" id="enlaceUbicacionInput" placeholder="Busca el lugar por su nombre en Google Maps, comparte y pega aquí el enlace">
+                    </div>
                 </div>
             </div>
 
@@ -205,6 +217,21 @@
             </div>
         </div>
     </aside>
+
+    <!-- ===== MODAL: MARCAR UBICACIÓN EN EL MAPA (igual que en mesero.html) ===== -->
+    <div id="mapaModalBackdrop" class="mapa-modal-backdrop"></div>
+    <div id="mapaModal" class="mapa-modal" role="dialog" aria-modal="true" aria-label="Marcar ubicación de entrega">
+        <div class="mapa-modal-card">
+            <button type="button" id="btnCerrarMapa" class="btn-cerrar-mapa" aria-label="Cerrar">✕</button>
+            <div class="mapa-modal-header">
+                <span class="mapa-modal-icon" aria-hidden="true">📍</span>
+                <h2>Marcar ubicación</h2>
+                <p class="mapa-modal-sub">Toca el mapa o arrastra el pin hasta tu dirección</p>
+            </div>
+            <div id="mapaPicker" class="mapa-picker"></div>
+            <button type="button" id="btnConfirmarMapa" class="btn-primary mapa-btn-confirmar">Usar esta ubicación</button>
+        </div>
+    </div>
 
     <script src="../JS/loader.js"></script>
     <script src="../JS/script.js"></script>

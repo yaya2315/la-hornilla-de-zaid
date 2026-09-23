@@ -452,6 +452,137 @@
 .campo input::placeholder { color: var(--muted); }
 .campo input:focus { outline: none; border-color: var(--ember); background: rgba(255, 255, 255, 0.08); }
 
+/* ===== UBICACIÓN DE ENTREGA (mapa) — mismo mecanismo que mesero.html === */
+.ubicacion-bloque { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+.ubicacion-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.btn-ubicacion-mapa {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--line);
+    color: var(--text);
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 0.78rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 10px 16px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: border-color 0.25s var(--ease), color 0.25s var(--ease);
+}
+.btn-ubicacion-mapa:hover { border-color: var(--ember); color: var(--ember); }
+.ubicacion-estado { display: inline-flex; }
+.ubicacion-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(111, 174, 85, 0.14);
+    border: 1px solid rgba(111, 174, 85, 0.4);
+    color: #9fd88a;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 7px 8px 7px 14px;
+    border-radius: 30px;
+}
+.ubicacion-chip button {
+    width: 20px; height: 20px;
+    display: grid; place-items: center;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.12);
+    color: inherit;
+    font-size: 0.7rem;
+    cursor: pointer;
+}
+.ubicacion-chip button:hover { background: rgba(255, 255, 255, 0.22); }
+.ubicacion-msg { font-size: 0.78rem; color: var(--muted); }
+
+/* ===== MODAL: MARCAR UBICACIÓN EN EL MAPA (Leaflet, sin API key) ======= */
+.mapa-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 2, 0, 0.72);
+    backdrop-filter: blur(5px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.35s var(--ease), visibility 0.35s var(--ease);
+    z-index: 2500;
+}
+.mapa-modal-backdrop.is-abierto { opacity: 1; visibility: visible; }
+.mapa-modal {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    z-index: 2600;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.35s var(--ease), visibility 0.35s var(--ease);
+}
+.mapa-modal.is-abierto { opacity: 1; visibility: visible; pointer-events: auto; }
+.mapa-modal-card {
+    width: min(460px, 100%);
+    background: linear-gradient(180deg, #1d0c03 0%, #0c0400 100%);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 30px 26px 26px;
+    position: relative;
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.02);
+    transform: translateY(14px) scale(0.98);
+    transition: transform 0.4s var(--ease);
+}
+.mapa-modal.is-abierto .mapa-modal-card { transform: translateY(0) scale(1); }
+.btn-cerrar-mapa {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.06);
+    border: none;
+    color: var(--cream);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.25s var(--ease);
+}
+.btn-cerrar-mapa:hover { background: rgba(255, 255, 255, 0.12); }
+.mapa-modal-header { text-align: center; margin-bottom: 22px; }
+.mapa-modal-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--ember-soft), var(--ember-deep));
+    box-shadow: 0 10px 26px var(--glow);
+    font-size: 1.4rem;
+    margin-bottom: 12px;
+}
+.mapa-modal-header h2 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 1.15rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--cream);
+}
+.mapa-modal-sub { font-size: 0.8rem; color: var(--muted); margin-top: 6px; line-height: 1.4; }
+.mapa-picker { width: 100%; height: 280px; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); }
+.mapa-btn-confirmar { margin-top: 16px; width: 100%; justify-content: center; }
+/* Leaflet inyecta sus propios estilos con !important en algunos casos;
+   nos aseguramos de que su contenedor herede el radio del picker. */
+.mapa-picker .leaflet-container { background: #100804; border-radius: 14px; font-family: 'Inter', sans-serif; }
+@media (prefers-reduced-motion: reduce) {
+    .mapa-modal-card { transition: none; }
+}
+
 .entrega-resumen {
     background: var(--char-800);
     border: 1px solid var(--line);

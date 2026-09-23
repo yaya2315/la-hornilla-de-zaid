@@ -125,6 +125,14 @@ let claveContador = 0;
 let tipoEntrega = '';
 const registro = new Map();
 
+/* Ubicación de entrega (delivery) — mismo mecanismo que mesero.html:
+   pin en el mapa (Leaflet) o enlace de Maps pegado a mano. */
+let ubicacionLat = null;
+let ubicacionLng = null;
+let ubicacionLinkActual = '';
+let mapaLeaflet = null;
+let mapaMarcador = null;
+
 function cargarCarritoGuardado() {
     try {
         const raw = sessionStorage.getItem('hornilla_carrito');
@@ -498,6 +506,86 @@ function renderCarrito() {
     if (entregaVisible) renderResumenEntrega();
 }
 
+/* ── Ubicación de entrega (mapa) ────────────────────────────────────
+   Dos formas de dejar la ubicación lista, sin depender de una API de
+   pago (igual que en mesero.html):
+   1) Marcar un pin en un mapa libre (Leaflet + OpenStreetMap).
+   2) Pegar un enlace de Maps: buscas el lugar por su nombre en Google
+      Maps, tocas "Compartir" y pegas ese enlace aquí.
+   Si no hay ni pin ni enlace, se arma un enlace de búsqueda de Maps a
+   partir del texto de la dirección, para que siempre haya un "cómo
+   llegar" cuando el pedido llega por WhatsApp. */
+function enlaceMapsActual() {
+    if (ubicacionLat != null && ubicacionLng != null) {
+        return `https://www.google.com/maps?q=${ubicacionLat},${ubicacionLng}`;
+    }
+    if (ubicacionLinkActual.trim()) return ubicacionLinkActual.trim();
+    const direccion = document.getElementById('clienteDireccion')?.value.trim() || '';
+    if (direccion) return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccion)}`;
+    return null;
+}
+
+function renderEstadoUbicacion() {
+    const el = document.getElementById('ubicacionEstado');
+    if (!el) return;
+    if (ubicacionLat != null && ubicacionLng != null) {
+        el.innerHTML = `<span class="ubicacion-chip">📍 Pin marcado <button type="button" id="btnQuitarPin" aria-label="Quitar pin">✕</button></span>`;
+        document.getElementById('btnQuitarPin')?.addEventListener('click', () => {
+            ubicacionLat = null; ubicacionLng = null;
+            renderEstadoUbicacion();
+        });
+    } else {
+        el.innerHTML = '';
+    }
+}
+
+function abrirModalMapa() {
+    document.getElementById('mapaModal')?.classList.add('is-abierto');
+    document.getElementById('mapaModalBackdrop')?.classList.add('is-abierto');
+    /* Leaflet necesita que su contenedor ya sea visible para calcular
+       el tamaño correctamente — se inicializa justo después de abrir. */
+    setTimeout(inicializarMapaPicker, 60);
+}
+function cerrarModalMapa() {
+    document.getElementById('mapaModal')?.classList.remove('is-abierto');
+    document.getElementById('mapaModalBackdrop')?.classList.remove('is-abierto');
+}
+
+function inicializarMapaPicker() {
+    const estado = document.getElementById('ubicacionEstado');
+    if (typeof L === 'undefined') {
+        if (estado) estado.innerHTML = '<span class="ubicacion-msg">No se pudo cargar el mapa. Revisa tu conexión.</span>';
+        return;
+    }
+    const centro = (ubicacionLat != null && ubicacionLng != null)
+        ? [ubicacionLat, ubicacionLng]
+        : [13.6929, -89.2182]; // San Salvador — centro por defecto
+
+    if (!mapaLeaflet) {
+        mapaLeaflet = L.map('mapaPicker').setView(centro, 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap',
+            maxZoom: 19
+        }).addTo(mapaLeaflet);
+        mapaMarcador = L.marker(centro, { draggable: true }).addTo(mapaLeaflet);
+        mapaLeaflet.on('click', e => mapaMarcador.setLatLng(e.latlng));
+    } else {
+        mapaLeaflet.setView(centro, 15);
+        mapaMarcador.setLatLng(centro);
+        mapaLeaflet.invalidateSize();
+    }
+
+    /* Si aún no hay pin guardado, intenta centrar en la ubicación real
+       del dispositivo para ahorrar el paso de mover el pin a mano. */
+    if (ubicacionLat == null && navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => {
+            const c = [pos.coords.latitude, pos.coords.longitude];
+            mapaLeaflet.setView(c, 16);
+            mapaMarcador.setLatLng(c);
+        }, () => { /* sin permiso o sin señal — se queda en el centro por defecto */ }, { timeout: 4000 });
+    }
+}
+
 /* ── Paso de entrega + resumen final ────────────────────────────── */
 function renderResumenEntrega() {
     const subtotal = calcularSubtotal();
@@ -543,7 +631,11 @@ function construirMensaje() {
     partes.push(`Total estimado: ${money(total)}`);
     partes.push('');
     partes.push(`Tipo de pedido: ${ETIQUETAS_ENTREGA[tipoEntrega] || tipoEntrega}`);
-    if (tipoEntrega === 'delivery') partes.push(`Dirección: ${direccion}`);
+    if (tipoEntrega === 'delivery') {
+        partes.push(`Dirección: ${direccion}`);
+        const linkMaps = enlaceMapsActual();
+        if (linkMaps) partes.push(`Ubicación: ${linkMaps}`);
+    }
     partes.push('');
     partes.push(`Mi nombre es ${nombre}.`);
     return partes.join('\n');
@@ -658,6 +750,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     document.getElementById('clienteNombre').addEventListener('input', renderResumenEntrega);
     document.getElementById('clienteDireccion').addEventListener('input', renderResumenEntrega);
+
+    /* Ubicación de entrega: pin en el mapa o enlace de Maps pegado a mano. */
+    document.getElementById('enlaceUbicacionInput')?.addEventListener('input', e => {
+        ubicacionLinkActual = e.target.value;
+    });
+    document.getElementById('btnMarcarMapa')?.addEventListener('click', abrirModalMapa);
+    document.getElementById('btnCerrarMapa')?.addEventListener('click', cerrarModalMapa);
+    document.getElementById('mapaModalBackdrop')?.addEventListener('click', cerrarModalMapa);
+    document.getElementById('btnConfirmarMapa')?.addEventListener('click', () => {
+        if (!mapaMarcador) return;
+        const { lat, lng } = mapaMarcador.getLatLng();
+        ubicacionLat = lat;
+        ubicacionLng = lng;
+        renderEstadoUbicacion();
+        cerrarModalMapa();
+    });
+    renderEstadoUbicacion();
 
     document.getElementById('btnEnviar').addEventListener('click', () => {
         const mensaje = construirMensaje();
