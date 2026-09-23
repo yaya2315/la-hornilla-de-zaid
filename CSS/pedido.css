@@ -1,0 +1,489 @@
+/* =====================================================================
+   PEDIDO — Página de pedidos en línea
+   Reutiliza variables y base de style.css.
+   ===================================================================== */
+
+.pedido-hero-sub {
+    color: var(--muted);
+    margin-top: 10px;
+    font-size: 0.98rem;
+}
+
+/* ===== ⭐ COMBO DE LA SEMANA (versión Pedido — se agrega al carrito) ===== */
+.combo-pedido-wrap {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 0 clamp(20px, 5vw, 60px);
+}
+.combo-pedido-wrap.has-combo { margin-top: clamp(28px, 4vw, 44px); }
+.combo-pedido-wrap:not(.has-combo) { display: none; }
+
+.combo-week {
+    position: relative;
+    padding: clamp(24px, 4vw, 40px) clamp(22px, 4vw, 48px);
+    border-radius: var(--radius-lg);
+    background:
+        radial-gradient(120% 140% at 0% 0%, rgba(255,102,0,0.18), transparent 55%),
+        linear-gradient(145deg, #2a1305, #160800);
+    border: 1px solid rgba(255,102,0,0.35);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,102,0,0.08);
+    overflow: hidden;
+    isolation: isolate;
+}
+.combo-week + .combo-week { margin-top: 22px; }
+/* Borde con resplandor pulsante de brasa */
+.combo-week::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(120deg, var(--ember), transparent 40%, transparent 60%, var(--ember-soft));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    opacity: 0.7;
+    animation: comboGlow 3.5s ease-in-out infinite;
+    pointer-events: none;
+}
+@keyframes comboGlow { 0%,100% { opacity: 0.35; } 50% { opacity: 0.9; } }
+/* Brillo que recorre la tarjeta */
+.combo-week::after {
+    content: "";
+    position: absolute;
+    top: 0; left: -60%;
+    width: 50%; height: 100%;
+    background: linear-gradient(100deg, transparent, rgba(255,255,255,0.07), transparent);
+    transform: skewX(-18deg);
+    animation: comboShine 6s ease-in-out infinite;
+    pointer-events: none;
+    z-index: -1;
+}
+@keyframes comboShine { 0% { left: -60%; } 35%, 100% { left: 130%; } }
+
+.combo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--ember);
+    color: #fff;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    padding: 7px 16px;
+    border-radius: 30px;
+    margin-bottom: 18px;
+}
+.combo-badge .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 0 0 rgba(255,255,255,0.7);
+    animation: comboPulse 1.8s infinite;
+}
+@keyframes comboPulse {
+    0%   { box-shadow: 0 0 0 0 rgba(255,255,255,0.7); }
+    70%  { box-shadow: 0 0 0 9px rgba(255,255,255,0); }
+    100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+}
+
+.combo-vigencia {
+    color: var(--muted);
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+}
+
+.combo-grid {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: clamp(16px, 4vw, 40px);
+    align-items: center;
+}
+.combo-name {
+    font-size: clamp(1.6rem, 4.5vw, 2.4rem);
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    line-height: 1.05;
+}
+.combo-desc { color: var(--text); margin-top: 10px; max-width: 44ch; }
+.combo-price {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    color: var(--ember);
+    line-height: 1;
+    text-shadow: 0 6px 30px var(--glow);
+    white-space: nowrap;
+}
+.combo-price small {
+    display: block;
+    font-size: 0.72rem;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+/* Controles de carrito dentro de la tarjeta del combo (reutiliza .stepper / .btn-agregar) */
+.combo-controles {
+    position: relative;
+    z-index: 1;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+/* El select de carne del combo vive en una fila horizontal (no en una
+   tarjeta angosta como el resto), así que le damos un ancho propio
+   para que no quede apretado junto al stepper y el botón. */
+.campo-mini--combo { min-width: 190px; flex: 0 1 220px; }
+
+@media (max-width: 860px) {
+    .combo-grid { grid-template-columns: 1fr; text-align: center; }
+    .combo-desc { margin-inline: auto; }
+    .combo-controles { justify-content: center; }
+}
+
+/* ===== LAYOUT PRINCIPAL: menú + carrito ==================== */
+.pedido-layout {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: clamp(40px, 6vw, 64px) clamp(20px, 5vw, 60px) 0;
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: clamp(24px, 4vw, 40px);
+    align-items: start;
+}
+
+.pedido-cargando {
+    color: var(--muted);
+    text-align: center;
+    padding: 60px 0;
+    font-size: 0.95rem;
+}
+
+/* ===== SECCIONES DEL MENÚ =================================== */
+.pedido-seccion { margin-bottom: clamp(40px, 6vw, 64px); }
+.pedido-seccion h2 {
+    font-size: clamp(1.5rem, 3.5vw, 2rem);
+    color: var(--cream);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 22px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+}
+.pedido-subcategoria {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--ember);
+    margin: 26px 0 14px;
+}
+.pedido-subcategoria:first-of-type { margin-top: 4px; }
+
+.pedido-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 16px;
+}
+
+/* ===== TARJETA DE PLATILLO =================================== */
+.pedido-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: border-color 0.3s var(--ease);
+}
+.pedido-card:hover { border-color: var(--ember); }
+
+.pedido-card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.pedido-card-head h3 {
+    font-size: 1.08rem;
+    color: var(--ember);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.pedido-nota {
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap;
+}
+.pedido-desc { color: var(--muted); font-size: 0.84rem; line-height: 1.5; margin-top: -6px; }
+
+.pedido-controles { display: flex; flex-direction: column; gap: 10px; }
+
+.campo-mini { display: flex; flex-direction: column; gap: 5px; }
+.campo-mini label {
+    font-size: 0.68rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+.campo-mini select {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 9px 12px;
+    color: var(--cream);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.86rem;
+    transition: border-color 0.25s var(--ease), background 0.25s var(--ease);
+}
+.campo-mini select:focus { outline: none; border-color: var(--ember); background: rgba(255, 255, 255, 0.08); }
+
+.chk-piña {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 102, 0, 0.08);
+    border: 1px solid rgba(255, 102, 0, 0.3);
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 0.84rem;
+    color: var(--text);
+    cursor: pointer;
+    width: fit-content;
+}
+.chk-piña-input { accent-color: var(--ember); width: 15px; height: 15px; cursor: pointer; }
+
+.stepper {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: fit-content;
+}
+.stepper-btn {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--cream);
+    font-size: 1.1rem;
+    line-height: 1;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: border-color 0.25s var(--ease), color 0.25s var(--ease);
+}
+.stepper-btn:hover { border-color: var(--ember); color: var(--ember); }
+.stepper-val { font-family: 'Oswald', sans-serif; font-weight: 600; min-width: 18px; text-align: center; }
+
+.btn-agregar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(135deg, var(--ember-soft), var(--ember-deep));
+    color: #fff;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 11px 16px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+.btn-agregar:hover { transform: translateY(-2px); box-shadow: 0 10px 24px var(--glow); }
+.btn-agregar.is-added { background: linear-gradient(135deg, #4f9b3f, #2f6f22); }
+.precio-actual { font-weight: 700; }
+
+.pedido-card--bebida .pedido-controles {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+.precio-fijo {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    color: var(--ember);
+    font-size: 1.05rem;
+}
+.btn-agregar--bebida { padding: 9px 18px; }
+
+/* ===== CARRITO (panel lateral) =============================== */
+.pedido-carrito {
+    position: sticky;
+    top: 100px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+}
+.carrito-inner { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+.carrito-head-row { display: flex; align-items: baseline; justify-content: space-between; }
+.carrito-head-row h2 {
+    font-size: 1.15rem;
+    color: var(--cream);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+.carrito-vaciar {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 0.76rem;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+    transition: color 0.25s var(--ease);
+}
+.carrito-vaciar:hover { color: var(--ember); }
+.carrito-vaciar.hidden { visibility: hidden; }
+
+.carrito-lineas { display: flex; flex-direction: column; gap: 10px; max-height: 320px; overflow-y: auto; }
+.carrito-vacio { color: var(--muted); font-size: 0.86rem; text-align: center; padding: 18px 0; }
+.carrito-vacio.hidden { display: none; }
+
+.carrito-linea {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: start;
+    gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+    font-size: 0.86rem;
+}
+.carrito-linea-info { display: flex; gap: 6px; color: var(--text); line-height: 1.4; }
+.carrito-linea-cant { color: var(--ember); font-weight: 700; flex-shrink: 0; }
+.carrito-linea-precio { font-family: 'Oswald', sans-serif; font-weight: 700; color: var(--ember); white-space: nowrap; }
+.carrito-linea-quitar {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    border: none;
+    color: var(--muted);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.25s var(--ease), color 0.25s var(--ease);
+}
+.carrito-linea-quitar svg { width: 11px; height: 11px; stroke: currentColor; stroke-width: 2.4; fill: none; }
+.carrito-linea-quitar:hover { background: var(--ember); color: #fff; }
+
+.carrito-subtotal {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+    font-family: 'Oswald', sans-serif;
+}
+.carrito-subtotal span:first-child { color: var(--muted); font-size: 0.82rem; text-transform: uppercase; letter-spacing: 1.5px; }
+.carrito-subtotal span:last-child { font-size: 1.35rem; font-weight: 700; color: var(--ember); }
+
+.carrito-continuar { width: 100%; justify-content: center; }
+.carrito-continuar:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* ===== SECCIÓN DE ENTREGA (paso 2) ============================ */
+.entrega-section { max-width: 760px; margin: 0 auto; padding: clamp(56px, 8vw, 90px) clamp(20px, 5vw, 60px); }
+
+.entrega-opciones {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 30px;
+}
+.entrega-opcion { display: block; cursor: pointer; }
+.entrega-opcion input { position: absolute; opacity: 0; width: 0; height: 0; }
+.entrega-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    text-align: center;
+    align-items: center;
+    background: var(--card);
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px 14px;
+    transition: border-color 0.25s var(--ease), background 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+.entrega-card strong { color: var(--cream); font-size: 0.98rem; }
+.entrega-card small { color: var(--muted); font-size: 0.78rem; }
+.entrega-opcion input:checked + .entrega-card {
+    border-color: var(--ember);
+    background: rgba(255, 102, 0, 0.1);
+    box-shadow: 0 10px 30px var(--glow);
+}
+.entrega-opcion input:checked + .entrega-card strong { color: var(--ember); }
+.entrega-opcion input:focus-visible + .entrega-card { outline: 2px solid var(--ember-soft); outline-offset: 2px; }
+
+.entrega-datos { display: flex; flex-direction: column; gap: 16px; margin-bottom: 28px; }
+.campo { display: flex; flex-direction: column; gap: 6px; }
+.campo label { font-size: 0.78rem; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
+.campo input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 13px 16px;
+    color: var(--cream);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    transition: border-color 0.25s var(--ease), background 0.25s var(--ease);
+}
+.campo input::placeholder { color: var(--muted); }
+.campo input:focus { outline: none; border-color: var(--ember); background: rgba(255, 255, 255, 0.08); }
+
+.entrega-resumen {
+    background: var(--char-800);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px clamp(18px, 4vw, 28px);
+    margin-bottom: 26px;
+}
+.resumen-lineas { display: flex; flex-direction: column; gap: 8px; padding-bottom: 14px; margin-bottom: 14px; border-bottom: 1px solid var(--line); }
+.resumen-linea { display: flex; justify-content: space-between; gap: 12px; font-size: 0.88rem; color: var(--text); }
+.resumen-totales { display: flex; flex-direction: column; gap: 8px; }
+.resumen-fila { display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--muted); }
+.resumen-total { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 1.3rem; color: var(--ember); padding-top: 8px; border-top: 1px solid var(--line); }
+.resumen-total span:first-child { color: var(--cream); font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; }
+
+#btnEnviar { width: 100%; justify-content: center; }
+#btnEnviar:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.pedido-nota-final { text-align: center; color: var(--muted); font-size: 0.8rem; margin-top: 16px; }
+
+/* ===== RESPONSIVE =============================================== */
+@media (max-width: 960px) {
+    .pedido-layout { grid-template-columns: 1fr; }
+    .pedido-carrito { position: static; }
+    .carrito-lineas { max-height: none; }
+}
+@media (max-width: 640px) {
+    .pedido-grid { grid-template-columns: 1fr; }
+    .entrega-opciones { grid-template-columns: 1fr; }
+    .pedido-card--bebida .pedido-controles { flex-direction: column; align-items: stretch; }
+}
