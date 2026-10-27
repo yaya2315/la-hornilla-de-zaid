@@ -357,6 +357,8 @@ a { color: inherit; }
 .footer-links a {
     color: var(--muted);
     text-decoration: none;
+    display: inline-block;
+    padding: 10px 4px;           /* área táctil cómoda */
     font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 1.5px;
@@ -719,7 +721,7 @@ summary:focus-visible,
     text-decoration: underline;
     text-underline-offset: 3px;
     text-decoration-color: rgba(157, 139, 124, 0.4);
-    padding: 6px 2px;            /* área táctil cómoda */
+    padding: 12px 4px;           /* área táctil cómoda (≈44px) */
     transition: color 0.25s var(--ease);
 }
 .footer-legal a:hover,
