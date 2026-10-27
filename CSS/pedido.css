@@ -436,6 +436,21 @@
 .entrega-opcion input:checked + .entrega-card strong { color: var(--ember); }
 .entrega-opcion input:focus-visible + .entrega-card { outline: 2px solid var(--ember-soft); outline-offset: 2px; }
 
+/* Mientras solo hay delivery (SOLO_DELIVERY en pedido.js) */
+.aviso-delivery {
+    text-align: center;
+    color: var(--text);
+    background: rgba(255, 102, 0, 0.08);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    margin: -12px auto 24px;
+    max-width: 560px;
+    font-size: 0.92rem;
+    line-height: 1.5;
+}
+.entrega-opciones--una { grid-template-columns: minmax(0, 320px); justify-content: center; }
+
 .entrega-datos { display: flex; flex-direction: column; gap: 16px; margin-bottom: 28px; }
 .campo { display: flex; flex-direction: column; gap: 6px; }
 .campo label { font-size: 0.78rem; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }

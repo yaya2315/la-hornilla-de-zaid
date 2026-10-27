@@ -111,6 +111,11 @@ function comboSeMuestraHoy(p, hoy) {
 const CATEGORIAS_CARNE_GRUPO = ['Tacos', 'Burrito', 'Tortas', 'Nachos', 'Quesadillas'];
 const CATEGORIAS_CARNE_APARTE = ['Sopa de Tortilla'];
 const CARNES_INDEPENDIENTES = ['Pastor', 'Pollo pastor', 'Suadero', 'Cochinita pibil', 'Birria'];
+/* SOLO DELIVERY — mientras no hay local físico solo se ofrece delivery.
+   Cuando abra el nuevo local, cambia a false y vuelven a aparecer
+   "Comer en el local" y "Para llevar" (no hay que tocar el HTML). */
+const SOLO_DELIVERY = true;
+
 const ETIQUETAS_ENTREGA = { local: 'Comer en el local', delivery: 'Delivery', recoger: 'Para llevar (pasa a recogerlo)' };
 
 function tienePiña(nombreCarne = '') { return nombreCarne.toLowerCase().includes('pastor'); }
@@ -748,6 +753,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             renderResumenEntrega();
         });
     });
+    if (SOLO_DELIVERY) {
+        document.querySelectorAll('input[name="tipoEntrega"]').forEach(r => {
+            if (r.value !== 'delivery') r.closest('.entrega-opcion')?.remove();
+        });
+        const soloDelivery = document.querySelector('input[name="tipoEntrega"][value="delivery"]');
+        if (soloDelivery) {
+            soloDelivery.checked = true;
+            tipoEntrega = 'delivery';
+            document.getElementById('campoDireccion').classList.remove('hidden');
+        }
+        document.querySelector('.entrega-opciones')?.classList.add('entrega-opciones--una');
+        document.getElementById('avisoSoloDelivery')?.classList.remove('hidden');
+    }
     document.getElementById('clienteNombre').addEventListener('input', renderResumenEntrega);
     document.getElementById('clienteDireccion').addEventListener('input', renderResumenEntrega);
 

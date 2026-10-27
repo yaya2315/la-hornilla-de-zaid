@@ -62,3 +62,20 @@
     .ubicacion-grid { grid-template-columns: 1fr; }
     .map-wrap, .map-wrap iframe { min-height: 320px; }
 }
+/* --- Aviso mientras no hay local físico (ocupa el lugar del mapa) --- */
+.map-pronto {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    text-align: center;
+    padding: clamp(32px, 6vw, 56px) clamp(22px, 5vw, 44px);
+    background:
+        radial-gradient(120% 140% at 0% 0%, rgba(255, 102, 0, 0.16), transparent 55%),
+        linear-gradient(145deg, #2a1305, #160800);
+}
+.map-pronto-icono { font-size: 2.6rem; }
+.map-pronto h2 { font-size: clamp(1.6rem, 4vw, 2.2rem); color: #fff; text-transform: uppercase; letter-spacing: 1px; }
+.map-pronto p { color: var(--text); max-width: 38ch; line-height: 1.6; }
+.map-pronto-acciones { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 6px; }

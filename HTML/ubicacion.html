@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ubicación y horarios — La Hornilla de Zaid</title>
-    <meta name="description" content="Dirección, horarios y contacto de La Hornilla de Zaid en Sonsonate. Escríbenos por WhatsApp al 7099-1660.">
+    <meta name="description" content="Por ahora atendemos solo por delivery en Sonsonate y muy pronto abriremos nuestro nuevo local. Pide por WhatsApp al 7099-1660.">
     <meta name="theme-color" content="#120600">
     <link rel="canonical" href="https://yaya2315.github.io/la-hornilla-de-zaid/HTML/ubicacion.html">
 
@@ -13,7 +13,7 @@
     <meta property="og:locale" content="es_SV">
     <meta property="og:type" content="website">
     <meta property="og:title" content="Ubicación y horarios — La Hornilla de Zaid">
-    <meta property="og:description" content="Dirección, horarios y contacto de La Hornilla de Zaid en Sonsonate. Escríbenos por WhatsApp al 7099-1660.">
+    <meta property="og:description" content="Por ahora atendemos solo por delivery en Sonsonate y muy pronto abriremos nuestro nuevo local. Pide por WhatsApp al 7099-1660.">
     <meta property="og:url" content="https://yaya2315.github.io/la-hornilla-de-zaid/HTML/ubicacion.html">
     <meta property="og:image" content="https://yaya2315.github.io/la-hornilla-de-zaid/Imagenes/og-hornilla.jpg">
     <meta property="og:image:width" content="1200">
@@ -66,7 +66,7 @@
     <main id="contenido" class="page-main">
 
         <section class="page-hero">
-            <span class="eyebrow">Ven a visitarnos</span>
+            <span class="eyebrow">Nuevo local muy pronto</span>
             <h1>Ubicación</h1>
         </section>
 
@@ -80,8 +80,8 @@
                             <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
                         </span>
                         <div>
-                            <h4>Dirección</h4>
-                            <p>Plaza Nova, Local #2<br>10 Av. Norte 9-10, Sonzacate, Sonsonate</p>
+                            <h4>Dónde estamos</h4>
+                            <p>Por ahora atendemos solo por <strong>delivery</strong> en Sonsonate.<br>Muy pronto abriremos nuestro nuevo local físico; aquí publicaremos la dirección.</p>
                         </div>
                     </div>
 
@@ -112,15 +112,17 @@
                     </div>
                 </div>
 
-                <!-- Mapa -->
-                <div class="map-wrap reveal" data-delay="2">
-                    <iframe
-                        title="Mapa de La Hornilla de Zaid"
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3875.8954024981995!2d-89.72113842613747!3d13.72478199792095!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8f62b7006d9a5cdd%3A0x23587f10ceb73cc!2sLa%20hornilla%20de%20Zaid!5e0!3m2!1ses-419!2ssv!4v1780535840792!5m2!1ses-419!2ssv"
-                        allowfullscreen=""
-                        loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade">
-                    </iframe>
+                <!-- Mapa: mientras no hay local físico se muestra este aviso.
+                     Cuando abra el nuevo local, reemplázalo por el <iframe>
+                     de Google Maps de la nueva dirección (Compartir → Insertar un mapa). -->
+                <div class="map-wrap map-pronto reveal" data-delay="2">
+                    <span class="map-pronto-icono" aria-hidden="true">🛵</span>
+                    <h2>Nuevo local muy pronto</h2>
+                    <p>Mientras terminamos nuestro nuevo espacio, te llevamos la comida a domicilio en Sonsonate.</p>
+                    <div class="map-pronto-acciones">
+                        <a class="btn-primary" href="pedido.html">Pedir delivery <span class="arrow">→</span></a>
+                        <a class="btn-ghost" href="../index.html#club">Avísame cuando abran <span class="arrow">→</span></a>
+                    </div>
                 </div>
 
             </div>
