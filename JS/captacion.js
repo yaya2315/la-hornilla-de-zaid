@@ -23,8 +23,11 @@ import {
     collection, doc, getDocs, getDoc, setDoc, addDoc, query, where, serverTimestamp
 } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
 
-const GOOGLE_RESENAS_URL = '';   // ej. 'https://g.page/r/XXXXXXXX/review'
+const GOOGLE_RESENAS_URL = 'https://g.page/r/Ccxz6wzxhzUCEBM/review';   // ej. 'https://g.page/r/XXXXXXXX/review'
 const WHATSAPP_NUM = '50370991660';
+// Enlace de invitación del Canal de WhatsApp de La Hornilla (WhatsApp Business → Actualizaciones → Canales).
+// Ej.: 'https://whatsapp.com/channel/0029VaXXXXXXXXXXXX'. Vacío = se usa el chat directo como antes.
+const CANAL_WHATSAPP_URL = 'https://whatsapp.com/channel/0029Vb8zxK1AjPXHdtwCnh0q';
 const POR_PAGINA = 6;
 
 const $ = id => document.getElementById(id);
@@ -202,10 +205,13 @@ function normalizarTel(v) {
 function mostrarExito(nombre, telefono, yaEstaba, enfocar = true) {
     $('formClub').classList.add('hidden');
     const exito = $('clubExito');
+    const hayCanal = !!CANAL_WHATSAPP_URL;
     $('clubExitoTitulo').textContent = yaEstaba ? '¡Ya estabas en el club!' : '¡Ya eres parte del club!';
-    $('clubExitoTexto').textContent = cupon
-        ? 'Escríbenos por WhatsApp con tu código para usar tu beneficio y guardar nuestro número.'
-        : 'Escríbenos por WhatsApp para guardar nuestro número y recibir las promos.';
+    $('clubExitoTexto').textContent = hayCanal
+        ? 'Sigue nuestro canal de WhatsApp: ahí publicamos las promos y los combos de la semana, para todos a la vez.'
+        : (cupon
+            ? 'Escríbenos por WhatsApp con tu código para usar tu beneficio y guardar nuestro número.'
+            : 'Escríbenos por WhatsApp para guardar nuestro número y recibir las promos.');
     if (cupon) {
         const c = $('clubCupon');
         c.innerHTML = `<small>Tu código</small><strong>${esc(cupon.codigo)}</strong><span>${esc(cupon.beneficio)}</span>${cupon.condiciones ? `<span>${esc(cupon.condiciones)}</span>` : ''}`;
@@ -214,13 +220,33 @@ function mostrarExito(nombre, telefono, yaEstaba, enfocar = true) {
     const texto = cupon
         ? `¡Hola! Me uní al Club La Hornilla. Soy ${nombre}. Quiero usar mi cupón ${cupon.codigo}.`
         : `¡Hola! Me uní al Club La Hornilla. Soy ${nombre}. Quiero recibir las promos por aquí.`;
-    $('btnClubWhatsapp').href = `https://wa.me/${WHATSAPP_NUM}?text=${encodeURIComponent(texto)}`;
+    const chat = `https://wa.me/${WHATSAPP_NUM}?text=${encodeURIComponent(texto)}`;
+    const btnChat = $('btnClubWhatsapp');
+    const btnCanal = $('btnClubCanal');
+    if (hayCanal) {
+        btnCanal.href = CANAL_WHATSAPP_URL;
+        btnCanal.classList.remove('hidden');
+        btnChat.href = chat;
+        btnChat.textContent = cupon ? 'Usar mi cupón por WhatsApp' : 'Escribirnos por WhatsApp';
+        btnChat.className = 'club-enlace';
+        if (!cupon) btnChat.classList.add('hidden');
+    } else {
+        btnChat.href = chat;
+    }
     exito.classList.remove('hidden');
     if (enfocar) exito.focus();
 }
 
 function iniciarClub() {
-    const form = $('formClub');
+    if (CANAL_WHATSAPP_URL) {
+        const a = $('clubCanalDirecto');
+        a.href = CANAL_WHATSAPP_URL;
+        a.classList.remove('hidden');
+        track('club_canal_visible');
+        a.addEventListener('click', () => track('club_canal_click', { origen: 'directo' }));
+        $('btnClubCanal').addEventListener('click', () => track('club_canal_click', { origen: 'tras_registro' }));
+    }
+        const form = $('formClub');
     const msg = $('clubMsg');
     const tel = $('clubTel');
 

@@ -233,6 +233,27 @@
 .club-cupon strong { font-family: 'Oswald', sans-serif; font-size: 1.7rem; letter-spacing: 3px; color: #ffd21f; }
 .club-cupon span { color: var(--text); font-size: 0.85rem; }
 
+/* Canal de WhatsApp */
+.btn-canal {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+    min-height: 48px;
+    padding: 12px 22px;
+    border-radius: 999px;
+    border: 1px solid rgba(37, 211, 102, 0.55);
+    background: rgba(37, 211, 102, 0.12);
+    color: #8be9ab;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.25s var(--ease), transform 0.25s var(--ease);
+}
+.btn-canal:hover { background: rgba(37, 211, 102, 0.22); transform: translateY(-1px); }
+.btn-canal:focus-visible { outline: 2px solid var(--ember-soft); outline-offset: 3px; }
+.club-enlace { color: var(--ember-soft); font-size: 0.9rem; text-decoration: underline; text-underline-offset: 3px; min-height: 44px; display: inline-flex; align-items: center; }
+.club-exito .hidden, .club-texto .hidden { display: none !important; }
+
 /* Indicador para bajar desde el hero */
 .hero-scroll { text-decoration: none; padding: 8px 12px; }
 
