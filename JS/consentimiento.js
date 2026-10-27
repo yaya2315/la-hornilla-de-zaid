@@ -21,7 +21,7 @@
     'use strict';
 
     const CONFIG = {
-        GA4_ID: '',          // ej. 'G-ABC123XYZ'  — vacío = Analytics apagado
+        GA4_ID: 'G-LV3YXM4VL1',          // ej. 'G-ABC123XYZ'  — vacío = Analytics apagado
         META_PIXEL_ID: '',   // ej. '123456789012345' — vacío = Píxel apagado
         VERSION: 1
     };
