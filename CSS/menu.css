@@ -7,7 +7,7 @@
 .page-hero .horario {
     display: inline-block;
     margin-top: 24px;
-    background: linear-gradient(135deg, var(--ember-soft), var(--ember-deep));
+    background: linear-gradient(135deg, var(--ember-fill), var(--ember-fill-deep));
     color: #fff;
     padding: 11px 26px;
     border-radius: 40px;
@@ -73,7 +73,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: var(--ember);
+    background: var(--ember-fill);
     color: #fff;
     font-family: 'Oswald', sans-serif;
     font-weight: 700;
@@ -195,7 +195,7 @@
     border: 1px solid rgba(255,102,0,0.4);
 }
 .nuevo-tag {
-    background: var(--ember);
+    background: var(--ember-fill);
     color: #fff;
     font-family: 'Oswald', sans-serif;
     font-weight: 700;

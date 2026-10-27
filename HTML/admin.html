@@ -208,6 +208,40 @@
             .promo-tools{grid-column:1 / -1;justify-content:flex-end}
         }
         @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+
+        /* ===== CLIENTES: reseñas y club ===== */
+        .aviso-regla{background:rgba(255,102,0,.07);border:1px solid var(--line);border-left:3px solid var(--ember);
+            border-radius:12px;padding:14px 16px;color:var(--text);font-size:.86rem;line-height:1.55;margin-bottom:22px}
+        .aviso-regla b{color:var(--cream)}
+        .sub-titulo{font-family:'Oswald',sans-serif;font-size:1.15rem;color:var(--cream);letter-spacing:1px;
+            text-transform:uppercase;margin:38px 0 14px}
+        .resena-adm{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;
+            display:grid;grid-template-columns:1fr auto;gap:14px;align-items:start}
+        .resena-adm h3{color:var(--cream);font-size:1.05rem;letter-spacing:.5px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+        .resena-adm .fecha{color:var(--muted);font-size:.74rem;font-family:'Inter',sans-serif;font-weight:400;letter-spacing:0;text-transform:none}
+        .resena-adm .stars{color:#ffc23a;letter-spacing:2px;margin:4px 0 6px}
+        .resena-adm .stars i{color:rgba(255,255,255,.18);font-style:normal}
+        .resena-adm p{color:var(--text);font-size:.9rem;line-height:1.55;overflow-wrap:anywhere}
+        .resena-adm .resp{border-left:2px solid var(--ember);padding-left:12px;margin-top:10px;color:var(--muted);font-size:.84rem}
+        .btn-mini{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:9px;font-size:.74rem;font-weight:700;
+            letter-spacing:.8px;text-transform:uppercase;background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--text);
+            font-family:'Oswald',sans-serif;transition:border-color .2s var(--ease),color .2s var(--ease)}
+        .btn-mini:hover{border-color:var(--ember);color:var(--ember)}
+        .btn-mini.ok:hover{border-color:var(--ok);color:var(--ok)}
+        .btn-mini.bad:hover{border-color:var(--bad);color:var(--bad)}
+        .acciones-col{display:flex;flex-direction:column;gap:6px}
+        .club-config{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px}
+        .club-config .field-row{display:flex;gap:12px;flex-wrap:wrap}
+        .club-config .field-row .field{flex:1;min-width:200px}
+        .club-tabla-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius)}
+        .club-tabla{width:100%;border-collapse:collapse;font-size:.88rem;min-width:520px}
+        .club-tabla th,.club-tabla td{padding:11px 14px;text-align:left;border-bottom:1px solid var(--line);color:var(--text)}
+        .club-tabla th{font-size:.7rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-weight:600}
+        .club-tabla tr:last-child td{border-bottom:none}
+        .club-tabla a{color:var(--ember-soft)}
+        .contador-chip{display:inline-block;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:20px;
+            padding:2px 10px;font-size:.74rem;color:var(--muted);margin-left:8px;font-family:'Inter',sans-serif;letter-spacing:0}
+        @media (max-width:560px){.resena-adm{grid-template-columns:1fr}.acciones-col{flex-direction:row;flex-wrap:wrap}}
     </style>
 </head>
 <body>
@@ -252,6 +286,7 @@
             <button class="top-tab" data-tab="pupusas">Pupusas</button>
             <button class="top-tab" data-tab="bebidas">Bebidas</button>
             <button class="top-tab" data-tab="extras">Extras</button>
+            <button class="top-tab" data-tab="clientes">Clientes</button>
         </nav>
 
         <!-- ===== VISTA: PROMOCIONES ===== -->
@@ -325,6 +360,63 @@
                 <h3>Aún no hay extras</h3>
                 <p>Agrega el primero con el botón "Nuevo extra".</p>
             </div>
+        </section>
+        <!-- ===== VISTA: CLIENTES (reseñas + club) ===== -->
+        <section id="vistaClientes" class="hidden">
+            <p class="panel-sub">Reseñas que llegan desde la web y personas que se unieron al Club La Hornilla.</p>
+
+            <div class="aviso-regla">
+                <b>Regla de las reseñas:</b> aprueba <b>todas las reseñas reales</b>, aunque sean negativas — respóndelas con amabilidad.
+                Solo rechaza spam, insultos, publicidad o datos personales de otras personas. Nunca publiques reseñas inventadas:
+                la Ley de Protección al Consumidor sanciona la publicidad engañosa.
+            </div>
+
+            <nav class="cat-tabs" id="filtroResenas" aria-label="Filtrar reseñas">
+                <button class="cat-tab active" data-estado="pendiente">Pendientes <span class="count" id="cntPendiente">0</span></button>
+                <button class="cat-tab" data-estado="aprobada">Publicadas <span class="count" id="cntAprobada">0</span></button>
+                <button class="cat-tab" data-estado="rechazada">Rechazadas <span class="count" id="cntRechazada">0</span></button>
+            </nav>
+            <p class="loading" id="loadingResenas">Cargando reseñas...</p>
+            <div class="promo-list" id="listaResenas"></div>
+            <div class="empty hidden" id="vacioResenas"><h3>Nada por aquí</h3><p>No hay reseñas en este grupo.</p></div>
+
+            <h2 class="sub-titulo">Cupón de bienvenida del club</h2>
+            <div class="club-config">
+                <div class="check-row">
+                    <input type="checkbox" id="cfgActivo">
+                    <label for="cfgActivo">Mostrar cupón al unirse al club</label>
+                </div>
+                <div class="field-row">
+                    <div class="field">
+                        <label for="cfgCodigo">Código</label>
+                        <input type="text" id="cfgCodigo" maxlength="20" placeholder="CLUB10">
+                    </div>
+                    <div class="field">
+                        <label for="cfgBeneficio">Beneficio</label>
+                        <input type="text" id="cfgBeneficio" maxlength="80" placeholder="Bebida gratis en tu primer pedido">
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="cfgCondiciones">Condiciones (vigencia y límites)</label>
+                    <input type="text" id="cfgCondiciones" maxlength="160" placeholder="Válido hasta el 30 de noviembre. Un uso por persona.">
+                </div>
+                <button class="btn btn-primary" id="btnGuardarCupon">Guardar cupón</button>
+                <p class="campo-ayuda" style="margin:12px 0 0">Escribe condiciones claras (fecha límite y si es de un solo uso): una promoción sin condiciones claras puede considerarse engañosa.</p>
+            </div>
+
+            <h2 class="sub-titulo">Miembros del club <span class="contador-chip" id="cntClub">0</span></h2>
+            <div class="panel-actions" style="margin-bottom:14px">
+                <button class="btn btn-ghost" id="btnCsvClub">Descargar lista (CSV)</button>
+                <button class="btn btn-ghost" id="btnCopiarClub">Copiar números</button>
+            </div>
+            <p class="loading" id="loadingClub">Cargando club...</p>
+            <div class="club-tabla-wrap hidden" id="clubTablaWrap">
+                <table class="club-tabla">
+                    <thead><tr><th scope="col">Nombre</th><th scope="col">WhatsApp</th><th scope="col">Se unió</th><th scope="col">Origen</th><th scope="col"><span class="sr-only">Acciones</span></th></tr></thead>
+                    <tbody id="listaClub"></tbody>
+                </table>
+            </div>
+            <div class="empty hidden" id="vacioClub"><h3>Aún no hay miembros</h3><p>Comparte el enlace del club: la página de inicio, sección Club.</p></div>
         </section>
     </main>
 
@@ -621,9 +713,10 @@
             menu: { el: $('vistaMenu'), titulo: 'Menú principal', nuevaBtn: false },
             pupusas: { el: $('vistaPupusas'), titulo: 'Pupusas', nuevaBtn: false },
             bebidas: { el: $('vistaBebidas'), titulo: 'Bebidas', nuevaBtn: false },
-            extras: { el: $('vistaExtras'), titulo: 'Extras', nuevaBtn: false }
+            extras: { el: $('vistaExtras'), titulo: 'Extras', nuevaBtn: false },
+            clientes: { el: $('vistaClientes'), titulo: 'Clientes', nuevaBtn: false }
         };
-        let menuIniciado = false, pupusasIniciado = false, bebidasIniciado = false, extrasIniciado = false;
+        let menuIniciado = false, pupusasIniciado = false, bebidasIniciado = false, extrasIniciado = false, clientesIniciado = false;
         document.querySelectorAll('.top-tab').forEach(tab => {
             tab.addEventListener('click', () => {
                 document.querySelectorAll('.top-tab').forEach(t => t.classList.remove('active'));
@@ -636,6 +729,7 @@
                 if (key === 'pupusas' && !pupusasIniciado && window.iniciarMenu) { pupusasIniciado = true; window.iniciarMenu('pupusas'); }
                 if (key === 'bebidas' && !bebidasIniciado && window.iniciarBebidas) { bebidasIniciado = true; window.iniciarBebidas(); }
                 if (key === 'extras' && !extrasIniciado && window.iniciarExtras) { extrasIniciado = true; window.iniciarExtras(); }
+                if (key === 'clientes' && !clientesIniciado && window.iniciarClientes) { clientesIniciado = true; window.iniciarClientes(); }
             });
         });
 
@@ -1525,5 +1619,19 @@
             if (e.key === 'Escape') { cerrarModalBebida(); cerrarModalExtra(); }
         });
     </script>
+    <!-- ========== MODAL: RESPONDER RESEÑA ========== -->
+    <div class="modal-bg" id="modalRespBg">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalRespTitulo">
+            <h2 id="modalRespTitulo">Responder reseña</h2>
+            <p style="color:var(--muted);font-size:.86rem;margin:-10px 0 16px">Tu respuesta se publica debajo de la reseña. Agradece, y si hubo un problema, explica cómo lo resolviste.</p>
+            <textarea id="respTexto" maxlength="400" placeholder="¡Gracias por visitarnos! ..."></textarea>
+            <div class="modal-foot">
+                <button class="btn btn-ghost" id="btnCancelarResp">Cancelar</button>
+                <button class="btn btn-primary" id="btnGuardarResp">Guardar respuesta</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="../JS/admin-clientes.js"></script>
 </body>
 </html>

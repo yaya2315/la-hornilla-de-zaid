@@ -7,7 +7,7 @@
 .page-hero .horario {
     display: inline-block;
     margin-top: 24px;
-    background: linear-gradient(135deg, var(--ember-soft), var(--ember-deep));
+    background: linear-gradient(135deg, var(--ember-fill), var(--ember-fill-deep));
     color: #fff;
     padding: 11px 26px;
     border-radius: 40px;
@@ -57,7 +57,7 @@
 .subnav-pill:hover { color: var(--cream); border-color: var(--ember); }
 .subnav-pill.is-active {
     color: #fff;
-    background: linear-gradient(135deg, var(--ember-soft), var(--ember-deep));
+    background: linear-gradient(135deg, var(--ember-fill), var(--ember-fill-deep));
     border-color: transparent;
     box-shadow: 0 6px 18px var(--glow);
 }
@@ -120,7 +120,7 @@
 .cat-pill.is-red   { background: linear-gradient(135deg, #e23b2e, #b21e16); }
 .cat-pill.is-gold  { background: linear-gradient(135deg, #f0a830, #d4830c); }
 .cat-pill.is-green { background: linear-gradient(135deg, #4f9b3f, #2f6f22); }
-.cat-pill.is-ember { background: linear-gradient(135deg, var(--ember-soft), var(--ember-deep)); }
+.cat-pill.is-ember { background: linear-gradient(135deg, var(--ember-fill), var(--ember-fill-deep)); }
 
 .cat-precio-fijo {
     font-family: 'Oswald', sans-serif;

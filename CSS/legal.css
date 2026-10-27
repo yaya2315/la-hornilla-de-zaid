@@ -1,0 +1,167 @@
+/* =====================================================================
+   LEGAL — Privacidad, términos, cookies y reclamos
+   Lectura larga: columna angosta (~70 caracteres), interlineado amplio
+   y jerarquía clara para que se entienda sin ser abogado.
+   ===================================================================== */
+
+.legal-wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: clamp(40px, 7vw, 72px) clamp(20px, 5vw, 32px) clamp(64px, 9vw, 96px);
+}
+
+.legal-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    color: var(--muted);
+    font-size: 0.82rem;
+    margin-bottom: 28px;
+}
+
+/* Resumen en lenguaje sencillo al inicio de cada página */
+.legal-resumen {
+    background: rgba(255, 102, 0, 0.07);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--ember);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    margin-bottom: 40px;
+}
+.legal-resumen h2 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--ember-soft);
+    margin-bottom: 10px;
+}
+.legal-resumen ul { padding-left: 18px; display: grid; gap: 6px; }
+.legal-resumen li { color: var(--text); font-size: 0.94rem; line-height: 1.55; }
+
+/* Índice */
+.legal-indice {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px 22px;
+    margin-bottom: 44px;
+    background: var(--char-800);
+}
+.legal-indice p {
+    font-size: 0.74rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+}
+.legal-indice ol { padding-left: 20px; display: grid; gap: 4px; }
+.legal-indice a { color: var(--text); text-decoration: none; font-size: 0.92rem; }
+.legal-indice a:hover { color: var(--ember); text-decoration: underline; }
+
+/* Contenido */
+.legal-cuerpo section { margin-bottom: 40px; scroll-margin-top: 96px; }
+.legal-cuerpo h2 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.15rem, 3vw, 1.35rem);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--cream);
+    margin-bottom: 14px;
+    line-height: 1.2;
+}
+.legal-cuerpo h3 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    color: var(--ember-soft);
+    margin: 22px 0 8px;
+}
+.legal-cuerpo p,
+.legal-cuerpo li {
+    color: var(--text);
+    font-size: 0.98rem;
+    line-height: 1.75;
+}
+.legal-cuerpo p + p { margin-top: 12px; }
+.legal-cuerpo ul,
+.legal-cuerpo ol { padding-left: 22px; display: grid; gap: 6px; margin-top: 10px; }
+.legal-cuerpo a { color: var(--ember-soft); text-underline-offset: 3px; }
+.legal-cuerpo strong { color: var(--cream); }
+
+/* Tablas: se desplazan solas en pantallas pequeñas */
+.legal-tabla-wrap {
+    overflow-x: auto;
+    margin-top: 14px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+}
+.legal-tabla {
+    width: 100%;
+    min-width: 560px;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+}
+.legal-tabla caption {
+    text-align: left;
+    padding: 12px 14px 0;
+    color: var(--muted);
+    font-size: 0.78rem;
+}
+.legal-tabla th,
+.legal-tabla td {
+    text-align: left;
+    vertical-align: top;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--line);
+    color: var(--text);
+    line-height: 1.5;
+}
+.legal-tabla th {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 0.74rem;
+    color: var(--muted);
+    background: rgba(255, 255, 255, 0.03);
+}
+.legal-tabla tr:last-child td { border-bottom: none; }
+.legal-tabla code {
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 0.82rem;
+    color: var(--cream);
+    background: rgba(255, 255, 255, 0.06);
+    padding: 1px 6px;
+    border-radius: 5px;
+}
+
+/* Dato pendiente de completar por el negocio: imposible de pasar por alto */
+.pendiente {
+    background: #ffd21f;
+    color: #141414;
+    font-weight: 700;
+    padding: 0 6px;
+    border-radius: 4px;
+}
+
+.legal-contacto {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+}
+.legal-contacto a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 10px 18px;
+    border: 1.5px solid var(--line);
+    border-radius: 30px;
+    color: var(--cream);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: border-color 0.2s var(--ease), color 0.2s var(--ease);
+}
+.legal-contacto a:hover { border-color: var(--ember); color: var(--ember); }

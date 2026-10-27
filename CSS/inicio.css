@@ -31,7 +31,7 @@
      y su regla nth-child aquí (mantén el delay = índice × 4.5s). */
 .hero-slide:nth-child(1)  { background-image: url('../Imagenes/Quesadilla.jpg');   animation-delay: 0s;    }
 .hero-slide:nth-child(2)  { background-image: url('../Imagenes/Tacos 1.jpg');     animation-delay: 4.5s;  }
-.hero-slide:nth-child(3)  { background-image: url('../Imagenes/torta 1.jpg');     animation-delay: 9s;    }
+.hero-slide:nth-child(3)  { background-image: url('../Imagenes/Torta\ 1.jpg');     animation-delay: 9s;    }
 .hero-slide:nth-child(4)  { background-image: url('../Imagenes/papa\ asada.jpeg'); animation-delay: 13.5s; }
 .hero-slide:nth-child(5)  { background-image: url('../Imagenes/Minitorta.jpg');   animation-delay: 18s;   }
 .hero-slide:nth-child(6)  { background-image: url('../Imagenes/Tacos\ 1.jpg');   animation-delay: 22.5s; }

@@ -10,6 +10,11 @@
     --ember-soft:   #ff8533;
     --glow:         rgba(255, 102, 0, 0.35);
     --line:         rgba(255, 102, 0, 0.18);
+    /* Rellenos sólidos con texto blanco encima: versión más oscura del
+       naranja para cumplir contraste WCAG AA (4.5:1). --ember sigue
+       siendo el color de marca para textos, bordes y acentos. */
+    --ember-fill:      #c84a00;
+    --ember-fill-deep: #a83a00;
 
     /* Fondos (tonos brasa / leña) */
     --char-900:     #0a0300;
@@ -135,13 +140,15 @@ a { color: inherit; }
     border-left: 1px solid var(--line);
     padding: 110px clamp(28px, 5vw, 44px) 40px;
     transform: translateX(100%);
-    transition: transform 0.5s var(--ease);
+    /* visibility evita que el teclado entre al menú cuando está cerrado */
+    visibility: hidden;
+    transition: transform 0.5s var(--ease), visibility 0s linear 0.5s;
     z-index: 900;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
 }
-.sidebar.active { transform: translateX(0); }
+.sidebar.active { transform: translateX(0); visibility: visible; transition: transform 0.5s var(--ease), visibility 0s; }
 
 .nav-menu ul { list-style: none; }
 .nav-menu li { overflow: hidden; }
@@ -220,7 +227,7 @@ a { color: inherit; }
 .social-link svg { width: 22px; height: 22px; fill: currentColor; }
 .social-link:hover {
     transform: translateY(-4px);
-    background: var(--ember);
+    background: var(--ember-fill);
     color: #fff;
     box-shadow: 0 8px 22px var(--glow);
 }
@@ -265,7 +272,7 @@ a { color: inherit; }
                 background 0.3s var(--ease), color 0.3s var(--ease);
 }
 .btn-primary {
-    background: linear-gradient(135deg, var(--ember-soft), var(--ember-deep));
+    background: linear-gradient(135deg, var(--ember-fill), var(--ember-fill-deep));
     color: #fff;
     box-shadow: 0 10px 30px var(--glow);
 }
@@ -277,7 +284,7 @@ a { color: inherit; }
     border: 1.5px solid var(--ember);
     color: var(--ember);
 }
-.btn-ghost:hover { background: var(--ember); color: #fff; transform: translateY(-3px); }
+.btn-ghost:hover { background: var(--ember-fill); border-color: var(--ember-fill); color: #fff; transform: translateY(-3px); }
 
 /* ===== PÁGINA INTERNA (menú y ubicación) ================== */
 .page-main { padding-top: 92px; background: var(--char-700); }
@@ -357,7 +364,7 @@ a { color: inherit; }
 }
 .footer-links a:hover { color: var(--ember); }
 .footer-social { display: flex; gap: 12px; }
-.footer-copy { color: #5a4a3d; font-size: 0.8rem; }
+.footer-copy { color: var(--muted); font-size: 0.8rem; }
 
 /* ===== ANIMACIÓN DE APARICIÓN AL HACER SCROLL ============= */
 .reveal {
@@ -457,7 +464,7 @@ a { color: inherit; }
 .carta-cat-pill:hover { color: var(--cream); border-color: var(--ember); }
 .carta-cat-pill.is-active {
     color: #fff;
-    background: linear-gradient(135deg, var(--ember-soft), var(--ember-deep));
+    background: linear-gradient(135deg, var(--ember-fill), var(--ember-fill-deep));
     border-color: transparent;
     box-shadow: 0 6px 18px var(--glow);
 }
@@ -490,7 +497,7 @@ mark.carta-match {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: linear-gradient(135deg, var(--ember-soft), var(--ember-deep));
+    background: linear-gradient(135deg, var(--ember-fill), var(--ember-fill-deep));
     color: #fff;
     font-family: 'Oswald', sans-serif;
     font-weight: 600;
@@ -648,4 +655,147 @@ button:focus-visible {
     .flame-glow { animation: none; clip-path: inset(0% 0 0 0); }
     .pageload-embers span { animation: none; opacity: 0; }
     .pageload-word { animation: none; opacity: 1; }
+}
+
+/* =====================================================================
+   ACCESIBILIDAD, LEGAL Y CAPTACIÓN — componentes compartidos
+   ===================================================================== */
+
+/* Enlace "Saltar al contenido" (visible solo al navegar con teclado) */
+.skip-link {
+    position: absolute;
+    left: 16px; top: -60px;
+    z-index: 3000;
+    background: var(--ember-fill);
+    color: #fff;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    padding: 12px 18px;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: top 0.2s var(--ease);
+}
+.skip-link:focus { top: 16px; }
+
+/* Foco visible también en campos y controles personalizados */
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+    outline: 2px solid var(--ember-soft);
+    outline-offset: 2px;
+}
+
+/* Lectores de pantalla (también disponible fuera del inicio) */
+.sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ---- Enlaces legales del footer ---- */
+.footer-legal {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 18px;
+    font-size: 0.78rem;
+}
+.footer-legal a,
+.footer-legal button {
+    color: var(--muted);
+    background: none;
+    border: none;
+    font: inherit;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: rgba(157, 139, 124, 0.4);
+    padding: 6px 2px;            /* área táctil cómoda */
+    transition: color 0.25s var(--ease);
+}
+.footer-legal a:hover,
+.footer-legal button:hover { color: var(--ember); }
+
+/* ---- Aviso de cookies ---- */
+.cookie-banner {
+    position: fixed;
+    left: 16px; right: 16px; bottom: 16px;
+    z-index: 2800;
+    max-width: 560px;
+    margin: 0 auto;
+    background: linear-gradient(180deg, #1d0c03 0%, #0c0400 100%);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+    padding: 22px 22px 20px;
+    color: var(--text);
+    transform: translateY(16px);
+    opacity: 0;
+    transition: transform 0.4s var(--ease), opacity 0.4s var(--ease);
+}
+.cookie-banner.is-visible { transform: none; opacity: 1; }
+.cookie-banner h2 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.05rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--cream);
+    margin-bottom: 8px;
+}
+.cookie-banner p { font-size: 0.86rem; line-height: 1.55; color: var(--text); }
+.cookie-banner p a { color: var(--ember-soft); }
+.cookie-acciones {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 16px;
+}
+/* Rechazar y aceptar con el mismo peso visual: rechazar debe ser tan
+   fácil como aceptar. */
+.cookie-btn {
+    min-height: 44px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 0.82rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: 1.5px solid var(--line);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--cream);
+    transition: border-color 0.2s var(--ease), background 0.2s var(--ease);
+}
+.cookie-btn:hover { border-color: var(--ember); }
+.cookie-btn--fuerte { background: var(--ember-fill); border-color: var(--ember-fill); color: #fff; }
+.cookie-btn--fuerte:hover { background: var(--ember-fill-deep); border-color: var(--ember-fill-deep); }
+.cookie-opciones { margin-top: 14px; display: grid; gap: 10px; }
+.cookie-opcion {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+}
+.cookie-opcion strong { display: block; color: var(--cream); font-size: 0.88rem; }
+.cookie-opcion span { display: block; color: var(--muted); font-size: 0.78rem; line-height: 1.45; }
+.cookie-opcion input { width: 22px; height: 22px; accent-color: var(--ember-fill); }
+@media (max-width: 480px) {
+    .cookie-acciones { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .cookie-banner { transition: none; }
 }

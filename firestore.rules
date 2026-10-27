@@ -1,0 +1,51 @@
+// =====================================================================
+// REGLAS DE FIRESTORE — colecciones de captación de clientes
+// Cópialas en Firebase Console → Firestore Database → Reglas, DENTRO de
+// tu bloque "match /databases/{database}/documents { ... }" existente,
+// junto a las reglas que ya tienes para el menú, promociones y pedidos.
+// "esAdmin" = cualquier usuario con sesión iniciada en el panel admin.
+// =====================================================================
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ... aquí siguen tus reglas actuales ...
+
+    function esAdmin() { return request.auth != null; }
+
+    // Reseñas: cualquiera envía (llega pendiente), el público solo lee las aprobadas
+    match /resenas/{id} {
+      allow read: if resource.data.estado == 'aprobada' || esAdmin();
+      allow create: if request.resource.data.keys().hasOnly(['nombre', 'estrellas', 'comentario', 'estado', 'aceptoPublicar', 'creado'])
+        && request.resource.data.estado == 'pendiente'
+        && request.resource.data.aceptoPublicar == true
+        && request.resource.data.nombre is string
+        && request.resource.data.nombre.size() >= 2 && request.resource.data.nombre.size() <= 40
+        && request.resource.data.comentario is string
+        && request.resource.data.comentario.size() >= 10 && request.resource.data.comentario.size() <= 500
+        && request.resource.data.estrellas is int
+        && request.resource.data.estrellas >= 1 && request.resource.data.estrellas <= 5
+        && request.resource.data.creado == request.time;
+      allow update, delete: if esAdmin();
+    }
+
+    // Club: cualquiera se inscribe UNA vez (id = número), solo el admin lee la lista
+    match /club/{tel} {
+      allow create: if tel.matches('503[67][0-9]{7}')
+        && request.resource.data.telefono == tel
+        && request.resource.data.keys().hasOnly(['nombre', 'telefono', 'consentimiento', 'textoConsentimiento', 'origen', 'creado'])
+        && request.resource.data.consentimiento == true
+        && request.resource.data.nombre is string
+        && request.resource.data.nombre.size() >= 2 && request.resource.data.nombre.size() <= 40
+        && request.resource.data.origen is string && request.resource.data.origen.size() <= 40
+        && request.resource.data.creado == request.time;
+      allow read, update, delete: if esAdmin();
+    }
+
+    // Configuración pública (cupón del club): todos leen, solo el admin edita
+    match /config/{docId} {
+      allow read: if true;
+      allow write: if esAdmin();
+    }
+  }
+}

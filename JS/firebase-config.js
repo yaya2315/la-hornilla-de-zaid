@@ -86,6 +86,18 @@ export const COLECCION_EXTRAS = 'menuExtras';
    total y marcas de tiempo de creación/actualización. */
 export const COLECCION_PEDIDOS = 'pedidos';
 
+/* Captación de clientes (index.html + pestaña "Clientes" del admin).
+   • resenas: reseñas reales enviadas desde la web. Llegan como
+     estado 'pendiente' y solo se publican las 'aprobada'.
+   • club:    personas que se unieron al Club La Hornilla con su
+     consentimiento (nombre + WhatsApp). El id del documento es el
+     número, así nadie se registra dos veces.
+   • config:  documento 'club' con el cupón de bienvenida (activo,
+     código, beneficio, condiciones) que se edita desde el admin. */
+export const COLECCION_RESENAS = 'resenas';
+export const COLECCION_CLUB = 'club';
+export const COLECCION_CONFIG = 'config';
+
 /* ===== RECONEXIÓN AUTOMÁTICA ========================================= */
 let _reconectando = false;
 let _activada = false;

@@ -771,6 +771,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('btnEnviar').addEventListener('click', () => {
         const mensaje = construirMensaje();
         const url = `https://wa.me/${WHATSAPP_NUM}?text=${encodeURIComponent(mensaje)}`;
+        /* Medición (solo si la persona aceptó cookies — ver consentimiento.js):
+           cuántos pedidos salen del sitio y de qué tipo. */
+        try {
+            const sub = calcularSubtotal();
+            const total = sub + (tipoEntrega === 'local' ? sub * 0.05 : 0);
+            window.hornillaTrack?.('pedido_whatsapp', { tipo_entrega: tipoEntrega, value: Number(total.toFixed(2)), currency: 'USD' });
+        } catch { /* la medición nunca bloquea el pedido */ }
         window.open(url, '_blank', 'noopener');
     });
 });

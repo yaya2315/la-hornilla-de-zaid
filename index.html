@@ -3,14 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>La Hornilla de Zaid — Cocina mexicana hecha a la leña</title>
-    <meta name="description" content="Tacos, burritos, birria, pupusas con un toque mexicano y más. Sabor auténtico mexicano en Plaza Nova, Sonzacate. Ven a visitarnos.">
+    <title>La Hornilla de Zaid — Comida mexicana y pupusas en Sonsonate</title>
+    <meta name="description" content="Tacos, burritos, birria, quesadillas y pupusas con un toque mexicano en Sonsonate. Pide en línea por WhatsApp: para comer aquí, para llevar o delivery.">
     <meta name="theme-color" content="#120600">
+    <link rel="canonical" href="https://yaya2315.github.io/la-hornilla-de-zaid/">
 
-    <!-- Open Graph -->
-    <meta property="og:title" content="La Hornilla de Zaid">
-    <meta property="og:description" content="Cocina mexicana hecha a la leña. Tacos, burritos, birria y más.">
+    <!-- Vista previa al compartir (WhatsApp, Facebook, Instagram, X) -->
+    <meta property="og:site_name" content="La Hornilla de Zaid">
+    <meta property="og:locale" content="es_SV">
     <meta property="og:type" content="restaurant">
+    <meta property="og:title" content="La Hornilla de Zaid — Comida mexicana y pupusas en Sonsonate">
+    <meta property="og:description" content="Tacos, burritos, birria, quesadillas y pupusas con un toque mexicano en Sonsonate. Pide en línea por WhatsApp: para comer aquí, para llevar o delivery.">
+    <meta property="og:url" content="https://yaya2315.github.io/la-hornilla-de-zaid/">
+    <meta property="og:image" content="https://yaya2315.github.io/la-hornilla-de-zaid/Imagenes/og-hornilla.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Tacos de La Hornilla de Zaid servidos en una bandeja sobre mesa de madera">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Datos estructurados para Google (ficha de restaurante).
+         PENDIENTE al tener el nuevo local:
+         • agregar "streetAddress" dentro de "address" y el bloque "geo"
+           { "@type": "GeoCoordinates", "latitude": ..., "longitude": ... }
+         • agregar "openingHoursSpecification" con el horario confirmado.
+         No se agregan estrellas (aggregateRating): Google no permite
+         mostrar reseñas propias del negocio en su propio sitio. -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Restaurant",
+        "name": "La Hornilla de Zaid",
+        "url": "https://yaya2315.github.io/la-hornilla-de-zaid/",
+        "image": "https://yaya2315.github.io/la-hornilla-de-zaid/Imagenes/og-hornilla.jpg",
+        "logo": "https://yaya2315.github.io/la-hornilla-de-zaid/Imagenes/IMG-20260215-WA0049.jpg.png",
+        "telephone": "+503 7099-1660",
+        "email": "hornillaz.14@gmail.com",
+        "servesCuisine": ["Mexicana", "Salvadoreña", "Pupusas"],
+        "priceRange": "$",
+        "currenciesAccepted": "USD",
+        "hasMenu": "https://yaya2315.github.io/la-hornilla-de-zaid/HTML/menu.html",
+        "acceptsReservations": false,
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Sonsonate",
+            "addressRegion": "Sonsonate",
+            "addressCountry": "SV"
+        },
+        "potentialAction": {
+            "@type": "OrderAction",
+            "target": "https://yaya2315.github.io/la-hornilla-de-zaid/HTML/pedido.html",
+            "deliveryMethod": ["http://purl.org/goodrelations/v1#DeliveryModeOwnFleet", "http://purl.org/goodrelations/v1#DeliveryModePickUp"]
+        },
+        "sameAs": [
+            "https://www.instagram.com/la_hornilla_de_zaid",
+            "https://www.facebook.com/profile.php?id=100090295385638",
+            "https://www.tiktok.com/@lahornilladezaid"
+        ]
+    }
+    </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,6 +68,7 @@
 
     <link rel="stylesheet" href="CSS/style.css">
     <link rel="stylesheet" href="CSS/inicio.css">
+    <link rel="stylesheet" href="CSS/captacion.css">
 
     <!-- Dos botones apilados en el hero -->
     <style>
@@ -35,8 +86,10 @@
             backdrop-filter: blur(4px);
         }
     </style>
+    <script src="JS/consentimiento.js" defer></script>
 </head>
 <body>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
     <!-- ===== PANTALLA DE CARGA — Fueguito ===== -->
     <div class="pageload" id="pageload" role="status" aria-live="polite" aria-label="Cargando La Hornilla de Zaid">
@@ -70,7 +123,7 @@
     </header>
 
     <!-- ===== HERO ===== -->
-    <main>
+    <main id="contenido">
         <section class="hero" id="inicio">
             <div class="hero-slides" aria-hidden="true">
                 <div class="hero-slide"></div>
@@ -96,7 +149,141 @@
                     <a href="HTML/pupusas.html" class="btn-ghost">Menú de Pupusas <span class="arrow">→</span></a>
                 </div>
             </div>
+
+            <a class="hero-scroll" href="#opiniones">Opiniones y club<span aria-hidden="true"></span></a>
+        </section>
+
+        <!-- ===== OPINIONES REALES ===== -->
+        <section class="cap-section" id="opiniones" aria-labelledby="tituloOpiniones">
+            <div class="section-header reveal">
+                <span class="eyebrow">Opiniones reales</span>
+                <h2 id="tituloOpiniones">Lo que dicen nuestros clientes</h2>
+                <p>Publicamos todas las reseñas reales, buenas o malas. Nunca inventamos opiniones.</p>
+            </div>
+
+            <div class="resenas-resumen hidden" id="resenasResumen" aria-live="polite"></div>
+            <div class="resenas-grid" id="resenasLista" aria-live="polite">
+                <p class="cap-estado" id="resenasEstado">Cargando opiniones…</p>
+            </div>
+            <button type="button" class="btn-ghost resenas-mas hidden" id="btnMasResenas">Ver más opiniones</button>
+
+            <div class="resena-acciones">
+                <button type="button" class="btn-primary" id="btnAbrirResena" aria-expanded="false" aria-controls="formResena">
+                    Dejar mi reseña <span class="arrow">→</span>
+                </button>
+                <a class="btn-ghost hidden" id="btnResenaGoogle" href="#" target="_blank" rel="noopener">
+                    Reseñar en Google <span class="arrow">↗</span>
+                </a>
+            </div>
+
+            <form class="cap-form hidden" id="formResena" novalidate>
+                <h3>Cuéntanos cómo te fue</h3>
+
+                <fieldset class="estrellas-input">
+                    <legend>Tu calificación <span class="req" aria-hidden="true">*</span></legend>
+                    <div class="estrellas-fila" id="estrellasFila">
+                        <input type="radio" name="estrellas" id="est1" value="1" class="sr-only" required><label for="est1" title="1 de 5"><span aria-hidden="true">★</span><span class="sr-only">1 estrella</span></label>
+                        <input type="radio" name="estrellas" id="est2" value="2" class="sr-only"><label for="est2" title="2 de 5"><span aria-hidden="true">★</span><span class="sr-only">2 estrellas</span></label>
+                        <input type="radio" name="estrellas" id="est3" value="3" class="sr-only"><label for="est3" title="3 de 5"><span aria-hidden="true">★</span><span class="sr-only">3 estrellas</span></label>
+                        <input type="radio" name="estrellas" id="est4" value="4" class="sr-only"><label for="est4" title="4 de 5"><span aria-hidden="true">★</span><span class="sr-only">4 estrellas</span></label>
+                        <input type="radio" name="estrellas" id="est5" value="5" class="sr-only"><label for="est5" title="5 de 5"><span aria-hidden="true">★</span><span class="sr-only">5 estrellas</span></label>
+                    </div>
+                </fieldset>
+
+                <div class="cap-campo">
+                    <label for="resNombre">Tu nombre o apodo <span class="req" aria-hidden="true">*</span></label>
+                    <input type="text" id="resNombre" maxlength="40" autocomplete="given-name" required placeholder="Ej. Ana M.">
+                </div>
+                <div class="cap-campo">
+                    <label for="resComentario">Tu opinión <span class="req" aria-hidden="true">*</span></label>
+                    <textarea id="resComentario" maxlength="500" rows="4" required placeholder="¿Qué pediste? ¿Qué te gustó o qué podemos mejorar?" aria-describedby="resContador"></textarea>
+                    <span class="cap-ayuda" id="resContador">0 / 500</span>
+                </div>
+                <!-- Campo trampa para bots: las personas no lo ven ni lo llenan -->
+                <div class="cap-trampa" aria-hidden="true">
+                    <label for="resWeb">No llenar</label>
+                    <input type="text" id="resWeb" tabindex="-1" autocomplete="off">
+                </div>
+                <label class="cap-check">
+                    <input type="checkbox" id="resAcepto" required>
+                    <span>Acepto que publiquen mi nombre y reseña, y la <a href="HTML/privacidad.html" target="_blank">política de privacidad</a>. Soy mayor de 18 años.</span>
+                </label>
+                <p class="cap-msg" id="resMsg" role="status" aria-live="polite"></p>
+                <button type="submit" class="btn-primary" id="btnEnviarResena">Enviar reseña <span class="arrow">→</span></button>
+            </form>
+        </section>
+
+        <!-- ===== CLUB LA HORNILLA ===== -->
+        <section class="cap-section cap-section--club" id="club" aria-labelledby="tituloClub">
+            <div class="club-card reveal">
+                <div class="club-texto">
+                    <span class="eyebrow">Club La Hornilla</span>
+                    <h2 id="tituloClub">Promos directo a tu WhatsApp</h2>
+                    <p>Únete y entérate primero de los combos de la semana, promociones y avisos importantes, como la dirección de nuestro nuevo local.</p>
+                    <p class="club-beneficio hidden" id="clubBeneficio"></p>
+                    <ul class="club-puntos">
+                        <li>Sin spam: solo lo importante.</li>
+                        <li>Te das de baja cuando quieras escribiendo <strong>BAJA</strong>.</li>
+                    </ul>
+                </div>
+
+                <form class="cap-form club-form" id="formClub" novalidate>
+                    <div class="cap-campo">
+                        <label for="clubNombre">Tu nombre <span class="req" aria-hidden="true">*</span></label>
+                        <input type="text" id="clubNombre" maxlength="40" autocomplete="given-name" required placeholder="Ej. Carlos">
+                    </div>
+                    <div class="cap-campo">
+                        <label for="clubTel">Tu WhatsApp <span class="req" aria-hidden="true">*</span></label>
+                        <div class="cap-tel">
+                            <span aria-hidden="true">+503</span>
+                            <input type="tel" id="clubTel" inputmode="numeric" maxlength="9" autocomplete="tel-national" required placeholder="7000-0000" aria-describedby="clubTelAyuda">
+                        </div>
+                        <span class="cap-ayuda" id="clubTelAyuda">Número de 8 dígitos con WhatsApp.</span>
+                    </div>
+                    <div class="cap-trampa" aria-hidden="true">
+                        <label for="clubWeb">No llenar</label>
+                        <input type="text" id="clubWeb" tabindex="-1" autocomplete="off">
+                    </div>
+                    <label class="cap-check">
+                        <input type="checkbox" id="clubAcepto" required>
+                        <span>Acepto recibir promociones de La Hornilla de Zaid por WhatsApp y la <a href="HTML/privacidad.html" target="_blank">política de privacidad</a>. Soy mayor de 18 años.</span>
+                    </label>
+                    <p class="cap-msg" id="clubMsg" role="status" aria-live="polite"></p>
+                    <button type="submit" class="btn-primary" id="btnUnirme">Unirme al club <span class="arrow">→</span></button>
+                </form>
+
+                <div class="club-exito hidden" id="clubExito" tabindex="-1">
+                    <span class="club-exito-icono" aria-hidden="true">🎉</span>
+                    <h3 id="clubExitoTitulo">¡Ya eres parte del club!</h3>
+                    <p id="clubExitoTexto"></p>
+                    <div class="club-cupon hidden" id="clubCupon"></div>
+                    <a class="btn-primary" id="btnClubWhatsapp" href="#" target="_blank" rel="noopener">Escribirnos por WhatsApp <span class="arrow">→</span></a>
+                </div>
+            </div>
+        </section>
     </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="main-footer">
+        <div class="footer-content">
+            <img src="Imagenes/IMG-20260215-WA0049.jpg.png" alt="La Hornilla de Zaid" class="footer-logo-img" width="108" height="48" loading="lazy">
+            <nav class="footer-links" aria-label="Secciones del sitio">
+                <a href="HTML/menu.html">Menú</a>
+                <a href="HTML/pupusas.html">Pupusas</a>
+                <a href="HTML/pedido.html">Pedir</a>
+                <a href="HTML/ubicacion.html">Ubicación</a>
+                <a href="#club">Club</a>
+            </nav>
+            <nav class="footer-legal" aria-label="Información legal">
+                <a href="HTML/privacidad.html">Privacidad</a>
+                <a href="HTML/terminos.html">Términos</a>
+                <a href="HTML/cookies.html">Cookies</a>
+                <a href="HTML/devoluciones.html">Cambios y reclamos</a>
+                <button type="button" data-abrir-cookies>Configurar cookies</button>
+            </nav>
+            <p class="footer-copy">© 2026 La Hornilla de Zaid. Todos los derechos reservados.</p>
+        </div>
+    </footer>
 
     <!-- ===== BACKDROP + SIDEBAR ===== -->
     <div class="backdrop" id="backdrop"></div>
@@ -142,5 +329,6 @@
 
     <script src="JS/loader.js"></script>
     <script src="JS/script.js"></script>
+    <script type="module" src="JS/captacion.js"></script>
 </body>
 </html>
