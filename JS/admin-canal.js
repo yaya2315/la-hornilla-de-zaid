@@ -45,8 +45,8 @@ En tacos, burritos, tortas y quesadillas.
 🛵 Únicamente delivery en Sonsonate
 📲 Pide aquí: {pedido}
 📞 {telefono}` },
-    { titulo: 'Combo de la semana', imagen: '', texto:
-`🔥 *COMBO DE LA SEMANA* 🔥
+    { titulo: 'Combo extra especial', imagen: '', texto:
+`🔥 *COMBO EXTRA ESPECIAL* 🔥
 
 [Nombre del combo]
 [Qué incluye]
@@ -56,16 +56,7 @@ En tacos, burritos, tortas y quesadillas.
 
 🛵 Únicamente delivery en Sonsonate
 📲 Pide aquí: {pedido}` },
-    { titulo: 'Ya estamos atendiendo', imagen: '', texto:
-`👋 ¡Buenas! Ya estamos recibiendo pedidos 🌮
-
-🕒 Hoy atendemos de [hora] a [hora]
-🛵 Únicamente delivery en Sonsonate
-
-📖 Mira el menú: {menu}
-📲 Pide aquí: {pedido}
-📞 {telefono}` },
-    { titulo: 'Aviso: hoy no hay servicio', imagen: '', texto:
+    { titulo: 'Aviso: hoy no hay servicio', imagen: 'sin-servicio.jpg', texto:
 `📢 *AVISO*
 
 Hoy [día] no tendremos servicio. [motivo]
@@ -399,6 +390,37 @@ function renderHistorial() {
         <li><b>${esc(h.titulo || 'Publicación')}</b><span>${esc(fechaHora(h.fecha))}${h.imagen ? ' · con imagen' : ''}</span></li>`).join('');
 }
 
+/* Ajustes a plantillas que ya se habían creado (solo si no las editaste):
+   "Combo de la semana" → "Combo extra especial", se quita "Ya estamos
+   atendiendo" y el aviso de "hoy no hay servicio" recibe su imagen. */
+const TEXTO_ATENDIENDO_VIEJO = `👋 ¡Buenas! Ya estamos recibiendo pedidos 🌮
+
+🕒 Hoy atendemos de [hora] a [hora]
+🛵 Únicamente delivery en Sonsonate
+
+📖 Mira el menú: {menu}
+📲 Pide aquí: {pedido}
+📞 {telefono}`;
+let migrado = false;
+async function migrarPlantillas() {
+    if (migrado) return;
+    migrado = true;
+    try {
+        for (const p of plantillas) {
+            if (p.titulo === 'Ya estamos atendiendo' && p.texto === TEXTO_ATENDIENDO_VIEJO) {
+                await deleteDoc(doc(db, COLECCION_CANAL, p.id));
+            } else if (p.titulo === 'Combo de la semana') {
+                await updateDoc(doc(db, COLECCION_CANAL, p.id), {
+                    titulo: 'Combo extra especial',
+                    texto: (p.texto || '').replace('COMBO DE LA SEMANA', 'COMBO EXTRA ESPECIAL'),
+                });
+            } else if (p.titulo === 'Aviso: hoy no hay servicio' && !p.imagen) {
+                await updateDoc(doc(db, COLECCION_CANAL, p.id), { imagen: 'sin-servicio.jpg' });
+            }
+        }
+    } catch (err) { console.error('[canal] No se pudieron ajustar las plantillas', err); }
+}
+
 async function sembrarPlantillas() {
     if (sembrado) return;
     sembrado = true;
@@ -422,7 +444,10 @@ export function iniciarCanal() {
     onSnapshot(collection(db, COLECCION_CANAL), snap => {
         plantillas = snap.docs.map(d => ({ id: d.id, ...d.data() }))
             .sort((a, b) => (a.orden || 0) - (b.orden || 0));
-        if (!plantillas.length && !snap.metadata?.fromCache) { sembrarPlantillas(); }
+        if (!snap.metadata?.fromCache) {
+            if (!plantillas.length) sembrarPlantillas();
+            else migrarPlantillas();
+        }
         renderPlantillas();
     }, err => {
         $('loadingCanal').textContent = 'No se pudieron cargar las plantillas. Revisa las reglas de Firestore (canalPlantillas).';

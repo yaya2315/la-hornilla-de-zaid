@@ -12,4 +12,5 @@ export const CARPETA_IMAGENES_CANAL = '../Imagenes/promos/';
 
 export const IMAGENES_CANAL = [
     { archivo: 'precios-charros.jpg', titulo: 'Precios Charros (29 oct – 1 nov)' },
+    { archivo: 'sin-servicio.jpg', titulo: 'Hoy no hay servicio' },
 ];
