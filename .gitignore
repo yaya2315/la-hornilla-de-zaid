@@ -1,0 +1,9 @@
+# Videos y archivos pesados: no se suben a la página (GitHub limita el tamaño)
+*.mp4
+*.mov
+
+# Archivo de publicaciones (imágenes en alta calidad y videos): solo en la computadora
+Publicaciones La Hornilla/
+
+# Música para los videos (licencia Pixabay: no se puede repartir el audio suelto en un repositorio público)
+Imagenes/audios/

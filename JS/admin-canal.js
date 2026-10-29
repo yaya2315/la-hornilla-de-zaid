@@ -15,7 +15,7 @@ import { db, COLECCION, COLECCION_CANAL, COLECCION_CANAL_HIST } from './firebase
 import {
     collection, onSnapshot, doc, addDoc, updateDoc, deleteDoc, getDocs, serverTimestamp
 } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
-import { IMAGENES_CANAL, CARPETA_IMAGENES_CANAL } from './canal-imagenes.js';
+import { IMAGENES_CANAL, CARPETA_IMAGENES_CANAL, CARPETAS_CANAL } from './canal-imagenes.js';
 
 const SITIO = 'https://yaya2315.github.io/la-hornilla-de-zaid/';
 const CANAL_URL = 'https://whatsapp.com/channel/0029Vb8zxK1AjPXHdtwCnh0q';
@@ -56,7 +56,7 @@ En tacos, burritos, tortas y quesadillas.
 
 🛵 Únicamente delivery en Sonsonate
 📲 Pide aquí: {pedido}` },
-    { titulo: 'Aviso: hoy no hay servicio', imagen: 'sin-servicio.jpg', texto:
+    { titulo: 'Aviso: hoy no hay servicio', imagen: 'hoy-descansamos.jpg', texto:
 `📢 *AVISO*
 
 Hoy [día] no tendremos servicio. [motivo]
@@ -83,7 +83,12 @@ function toast(texto, tipo = 'ok') {
 const fechaHora = ts => ts?.toDate
     ? ts.toDate().toLocaleString('es-SV', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' })
     : 'ahora';
-const rutaImagen = archivo => CARPETA_IMAGENES_CANAL + encodeURIComponent(archivo);
+// cada imagen vive en su carpeta (Imagenes/promociones, promos o avisos); se busca por nombre de archivo.
+// 'v' evita que el navegador muestre una versión vieja guardada en caché
+const rutaImagen = archivo => {
+    const e = IMAGENES_CANAL.find(i => i.archivo === archivo);
+    return CARPETA_IMAGENES_CANAL + (e?.carpeta ? e.carpeta + '/' : 'promos/') + encodeURIComponent(archivo) + (e?.v ? '?v=' + e.v : '');
+};
 const enGaleria = archivo => IMAGENES_CANAL.some(i => i.archivo === archivo);
 
 /* ============================ ESTADO ============================ */
@@ -140,10 +145,15 @@ function pintarGaleria() {
     const local = imagen?.tipo === 'local' ? imagen.url : null;
     $('cGaleria').innerHTML = `
         <button type="button" class="gal-item gal-sin" data-img="" aria-pressed="false"><span>Sin imagen</span></button>
-        ${IMAGENES_CANAL.map(i => `
+        ${Object.entries(CARPETAS_CANAL).map(([carpeta, nombre]) => {
+            const imgs = IMAGENES_CANAL.filter(i => i.carpeta === carpeta);
+            if (!imgs.length) return '';
+            return `<span style="grid-column:1/-1;font-size:.7rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-top:6px">${esc(nombre)}</span>` +
+                imgs.map(i => `
             <button type="button" class="gal-item" data-img="${esc(i.archivo)}" aria-pressed="false" title="${esc(i.titulo)}">
                 <img src="${rutaImagen(i.archivo)}" alt="${esc(i.titulo)}" loading="lazy">
-            </button>`).join('')}
+            </button>`).join('');
+        }).join('')}
         <button type="button" class="gal-item gal-local" data-img="__local" aria-pressed="false">
             ${local ? `<img src="${local}" alt="Imagen del celular">` : '<span>＋<br>Del celular</span>'}
         </button>`;
@@ -414,8 +424,9 @@ async function migrarPlantillas() {
                     titulo: 'Combo extra especial',
                     texto: (p.texto || '').replace('COMBO DE LA SEMANA', 'COMBO EXTRA ESPECIAL'),
                 });
-            } else if (p.titulo === 'Aviso: hoy no hay servicio' && !p.imagen) {
-                await updateDoc(doc(db, COLECCION_CANAL, p.id), { imagen: 'sin-servicio.jpg' });
+            } else if (p.imagen === 'sin-servicio.jpg' || (p.titulo === 'Aviso: hoy no hay servicio' && !p.imagen)) {
+                // la imagen del aviso cambió de nombre (versión "lotería")
+                await updateDoc(doc(db, COLECCION_CANAL, p.id), { imagen: 'hoy-descansamos.jpg' });
             }
         }
     } catch (err) { console.error('[canal] No se pudieron ajustar las plantillas', err); }
