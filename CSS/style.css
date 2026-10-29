@@ -821,3 +821,11 @@ summary:focus-visible,
     max-width: 100%;
 }
 .solo-delivery svg { color: var(--ember); flex-shrink: 0; }
+
+/* ===== MENÚ DE PUPUSAS APAGADO =====================================
+   Lo controla JS/interruptor-pupusas.js (admin → Pupusas → interruptor).
+   Todo lo marcado con data-pupusas se oculta mientras <html> no tenga
+   la clase "pupusas-on". En pupusas.html la página no se muestra hasta
+   confirmar que está activo (si no, redirige a menu.html). */
+html:not(.pupusas-on) [data-pupusas] { display: none !important; }
+html[data-pagina="pupusas"]:not(.pupusas-lista) body { visibility: hidden; }

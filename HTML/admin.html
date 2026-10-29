@@ -330,6 +330,13 @@
             .canal-info{flex:1 1 0;min-width:0;padding:12px 14px 6px}
             .canal-pub{flex-basis:100%;margin:6px 14px 14px}
         }
+        /* Interruptor del menú de pupusas en la web */
+        .interruptor{display:flex;align-items:center;gap:16px;padding:16px 18px;margin-bottom:22px;border-radius:14px;
+            background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1)}
+        .interruptor.off{border-color:rgba(255,180,80,.35);background:rgba(255,160,60,.06)}
+        .interruptor h3{font-size:1rem;margin:0 0 4px}
+        .interruptor p{margin:0;color:var(--muted);font-size:.86rem;line-height:1.45}
+        .interruptor p b{color:var(--text,#fff)}
     </style>
 </head>
 <body>
@@ -409,6 +416,16 @@
         <!-- ===== VISTA: PUPUSAS ===== -->
         <section id="vistaPupusas" class="hidden">
             <p class="panel-sub">Platillos del menú de pupusas. Cada uno aparece solo si está activo.</p>
+            <div class="interruptor off" id="pupusasInterruptor">
+                <label class="switch">
+                    <input type="checkbox" id="pupusasVisibles" aria-describedby="pupusasEstado" disabled>
+                    <span class="track"></span><span class="thumb"></span>
+                </label>
+                <div>
+                    <h3><label for="pupusasVisibles">Mostrar pupusas en la web</label></h3>
+                    <p id="pupusasEstado" aria-live="polite">Cargando…</p>
+                </div>
+            </div>
             <div class="panel-actions" style="margin-bottom:18px">
                 <button class="btn btn-primary" id="btnNuevoPlatoPupusas">+ Nuevo platillo</button>
                 <button class="btn btn-ghost" id="btnNuevaCatPupusas">+ Nueva categoría</button>
@@ -1073,10 +1090,10 @@
 
     <!-- ========== LÓGICA: MENÚ Y PUPUSAS ========== -->
     <script type="module">
-        import { db, COLECCION_MENU, COLECCION_PUPUSAS, COLECCION_CATEGORIAS } from '../JS/firebase-config.js';
+        import { db, COLECCION_MENU, COLECCION_PUPUSAS, COLECCION_CATEGORIAS, COLECCION_CONFIG } from '../JS/firebase-config.js';
         import {
             collection, onSnapshot,
-            addDoc, updateDoc, deleteDoc, doc, serverTimestamp, writeBatch
+            addDoc, updateDoc, deleteDoc, doc, serverTimestamp, writeBatch, setDoc
         } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
 
         const $$ = id => document.getElementById(id);
@@ -1096,6 +1113,43 @@
             clearTimeout(toast._timer);
             toast._timer = setTimeout(() => t.className = 'toast', 2600);
         }
+
+        /* ===== INTERRUPTOR: MOSTRAR PUPUSAS EN LA WEB =====
+           Guarda config/pupusas { activo }. Apagado (o sin documento) =
+           el menú de pupusas se oculta en la web, en Pedir en línea y en
+           la pantalla de mesero. Los platillos NO se borran. */
+        (() => {
+            const chk = $$('pupusasVisibles'), caja = $$('pupusasInterruptor'), estado = $$('pupusasEstado');
+            const ref = doc(db, COLECCION_CONFIG, 'pupusas');
+            const pintar = activo => {
+                chk.checked = activo;
+                caja.classList.toggle('off', !activo);
+                estado.innerHTML = activo
+                    ? '<b>Visible.</b> Las pupusas salen en el menú, en Pedir en línea y en mesero.'
+                    : '<b>Oculto.</b> Nadie ve las pupusas, pero todo sigue guardado aquí. Activa el interruptor para volver a mostrarlas.';
+            };
+            onSnapshot(ref, snap => {
+                pintar(snap.exists() && snap.data().activo === true);
+                chk.disabled = false;
+            }, err => {
+                console.error('[admin] interruptor pupusas:', err);
+                estado.textContent = 'No se pudo leer el estado.';
+            });
+            chk.addEventListener('change', async () => {
+                const activo = chk.checked;
+                chk.disabled = true;
+                try {
+                    await setDoc(ref, { activo, actualizado: serverTimestamp() });
+                    toast(activo ? 'Pupusas visibles en la web' : 'Pupusas ocultas en la web');
+                } catch (err) {
+                    console.error(err);
+                    chk.checked = !activo;
+                    toast('No se pudo guardar', 'bad');
+                } finally {
+                    chk.disabled = false;
+                }
+            });
+        })();
 
         /* Configuración por "menu": qué colección, qué elementos del DOM usar */
         const CFG = {

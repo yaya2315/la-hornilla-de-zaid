@@ -31,6 +31,7 @@
    ===================================================================== */
 
 import { db, COLECCION, COLECCION_MENU, COLECCION_PUPUSAS, COLECCION_CATEGORIAS } from './firebase-config.js';
+import { pupusasActivas } from './interruptor-pupusas.js';
 import { collection, getDocs }
     from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
 import { cargarBebidas } from './bebidas.js';
@@ -653,8 +654,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const cont = document.getElementById('pedidoMenu');
     const comboWrap = document.getElementById('pedidoCombo');
+    /* Las pupusas solo se ofrecen si están activas en el admin */
+    const conPupusas = await pupusasActivas();
     const [menuData, pupusasData, combosData, bebidasData] = await Promise.all([
-        cargarMenu(), cargarPupusas(), cargarCombos(), cargarBebidas()
+        cargarMenu(), conPupusas ? cargarPupusas() : null, cargarCombos(), cargarBebidas()
     ]);
 
     const hoy = new Date().getDay();   // 0 = domingo … 6 = sábado
@@ -673,15 +676,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         html += `</div></div>`;
     });
 
-    html += `<div class="pedido-seccion"><h2>Pupusas</h2>`;
-    pupusasData.categorias.forEach(cat => {
-        const platos = pupusasData.platos.filter(p => p.categoria === cat);
-        if (!platos.length) return;
-        html += `<p class="pedido-subcategoria">${esc(cat)}</p><div class="pedido-grid">`;
-        platos.forEach(p => { html += crearTarjetaPlato(p, 'pupusas'); });
+    if (pupusasData) {
+        html += `<div class="pedido-seccion"><h2>Pupusas</h2>`;
+        pupusasData.categorias.forEach(cat => {
+            const platos = pupusasData.platos.filter(p => p.categoria === cat);
+            if (!platos.length) return;
+            html += `<p class="pedido-subcategoria">${esc(cat)}</p><div class="pedido-grid">`;
+            platos.forEach(p => { html += crearTarjetaPlato(p, 'pupusas'); });
+            html += `</div>`;
+        });
         html += `</div>`;
-    });
-    html += `</div>`;
+    }
 
     html += `<div class="pedido-seccion"><h2>Bebidas</h2><div class="pedido-grid">${renderBebidas(bebidasData)}</div></div>`;
 

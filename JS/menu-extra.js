@@ -7,6 +7,7 @@
    ===================================================================== */
 
 import { db, COLECCION_PUPUSAS } from './firebase-config.js';
+import { pupusasActivas } from './interruptor-pupusas.js';
 import { collection, getDocs }
     from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
 import { cargarBebidas } from './bebidas.js';
@@ -55,6 +56,7 @@ function renderBebidasMenu(bebidas) {
 async function renderToquePreview() {
     const wrap = document.getElementById('toqueMexicanoPreview');
     if (!wrap) return;
+    if (!(await pupusasActivas())) return;   // menú de pupusas apagado en el admin
     try {
         /* Sin orderBy: un platillo sin campo "orden" quedaría invisible
            si Firestore lo ordenara en el servidor. Se ordena aquí. */

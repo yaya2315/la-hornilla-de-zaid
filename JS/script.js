@@ -4,6 +4,14 @@
     Firebase. Por eso aquí ya NO está la lista COMBOS_SEMANA.)
    ===================================================================== */
 
+/* ===== INTERRUPTOR DEL MENÚ DE PUPUSAS =====
+   Muestra u oculta los enlaces de pupusas según el admin
+   (ver JS/interruptor-pupusas.js). */
+(() => {
+    const base = document.currentScript?.src;
+    if (base) import(new URL('interruptor-pupusas.js', base).href).catch(err => console.warn('[pupusas]', err));
+})();
+
 document.addEventListener('DOMContentLoaded', () => {
 
     /* ===== MENÚ LATERAL ===== */

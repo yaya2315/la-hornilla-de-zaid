@@ -26,6 +26,7 @@ import { collection, onSnapshot, enableIndexedDbPersistence }
 import {
     moneyParse, money, crearPedido, actualizarItemsPedido, buscarPedidoActivoPorMesa
 } from './pedidos.js';
+import { pupusasActivas } from './interruptor-pupusas.js';
 
 /* Offline: si hay más de una pestaña abierta del sistema, Firestore
    solo puede activar la persistencia en una — el resto sigue
@@ -43,6 +44,7 @@ const TIPOS_PEDIDO = [
 const menu = { categorias: [], principal: [], pupusas: [], bebidas: [], extras: [] };
 let fichas = [];            // menú ya normalizado y listo para pintar
 let grupoActivo = 'todo';
+let conPupusas = false;     // menú de pupusas activo en el admin (interruptor-pupusas.js)
 let termino = '';
 let fichaAbierta = null;    // id de la ficha con el panel de opciones abierto
 
@@ -106,7 +108,7 @@ function normalizarPlato(p, grupo) {
 
 function reconstruirFichas() {
     const platosPrincipal = menu.principal.map(p => normalizarPlato(p, 'Menú mexicano')).filter(Boolean);
-    const platosPupusas   = menu.pupusas.map(p => normalizarPlato(p, 'Pupusas')).filter(Boolean);
+    const platosPupusas   = conPupusas ? menu.pupusas.map(p => normalizarPlato(p, 'Pupusas')).filter(Boolean) : [];
     const bebidas = menu.bebidas.filter(b => b.activo !== false).map(b => ({
         id: b.id, grupo: 'Bebidas', nombre: b.nombre, categoria: b.grupo === 'caliente' ? 'Caliente' : 'Fría',
         nota: '', descripcion: '', opciones: [{ label: null, precio: moneyParse(b.precio) }]
@@ -163,7 +165,7 @@ function coincideGrupo(f) {
 function renderPills() {
     const wrap = document.getElementById('grupoPills');
     if (!wrap) return;
-    const grupos = ['todo', 'Menú mexicano', 'Pupusas', 'Bebidas', 'Extras'];
+    const grupos = ['todo', 'Menú mexicano', 'Pupusas', 'Bebidas', 'Extras'].filter(g => g !== 'Pupusas' || conPupusas);
     wrap.innerHTML = grupos.map(g => `
         <button type="button" class="grupo-pill ${g === grupoActivo ? 'is-active' : ''}" data-grupo="${esc(g)}">
             ${g === 'todo' ? 'Todo' : esc(g)}
@@ -789,6 +791,12 @@ document.addEventListener('DOMContentLoaded', () => {
     renderPills();
     renderCarrito();
     suscribirMenu();
+    pupusasActivas().then(activo => {
+        conPupusas = activo;
+        if (!activo && grupoActivo === 'Pupusas') grupoActivo = 'todo';
+        renderPills();
+        if (menu.principal.length) reconstruirFichas();
+    });
     actualizarBotonNuevo();
     actualizarBannerEstado();
 
