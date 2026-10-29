@@ -98,6 +98,12 @@ export const COLECCION_RESENAS = 'resenas';
 export const COLECCION_CLUB = 'club';
 export const COLECCION_CONFIG = 'config';
 
+/* Canal de WhatsApp (solo el admin):
+   • canalPlantillas: textos e imagen predeterminados de cada publicación.
+   • canalPublicaciones: historial de lo que se compartió y cuándo. */
+export const COLECCION_CANAL = 'canalPlantillas';
+export const COLECCION_CANAL_HIST = 'canalPublicaciones';
+
 /* ===== RECONEXIÓN AUTOMÁTICA ========================================= */
 let _reconectando = false;
 let _activada = false;

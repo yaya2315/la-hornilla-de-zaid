@@ -245,6 +245,91 @@
         .contador-chip{display:inline-block;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:20px;
             padding:2px 10px;font-size:.74rem;color:var(--muted);margin-left:8px;font-family:'Inter',sans-serif;letter-spacing:0}
         @media (max-width:560px){.resena-adm{grid-template-columns:1fr}.acciones-col{flex-direction:row;flex-wrap:wrap}}
+        /* ===== CLIENTES: sub-pestañas ===== */
+        .cli-subnav{display:flex;gap:8px;flex-wrap:wrap;margin:-10px 0 22px;border-bottom:1px solid var(--line);padding-bottom:12px}
+        .cli-subtab{background:transparent;color:var(--muted);font-family:'Oswald',sans-serif;font-weight:600;font-size:.95rem;
+            letter-spacing:1px;text-transform:uppercase;padding:10px 14px;border-radius:10px;min-height:44px;transition:color .2s var(--ease),background .2s var(--ease)}
+        .cli-subtab:hover{color:var(--cream)}
+        .cli-subtab.active{color:#fff;background:rgba(255,102,0,.16);box-shadow:inset 0 -2px 0 var(--ember)}
+        .cli-subtab .count:not(:empty){display:inline-block;min-width:20px;padding:1px 6px;margin-left:6px;border-radius:10px;
+            background:var(--ember-deep);color:#fff;font-size:.72rem;font-family:'Inter',sans-serif}
+
+        /* ===== CANAL DE WHATSAPP ===== */
+        #btnAbrirCanal{text-decoration:none}
+        .canal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+        .canal-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;
+            display:flex;flex-direction:column;transition:border-color .2s var(--ease),transform .2s var(--ease)}
+        .canal-card:hover{border-color:var(--ember);transform:translateY(-2px)}
+        .canal-thumb{display:grid;place-items:center;aspect-ratio:4/3;background:rgba(0,0,0,.35);padding:0;overflow:hidden;width:100%}
+        .canal-thumb img{width:100%;height:100%;object-fit:cover;object-position:top}
+        .canal-thumb span{color:var(--muted);font-size:.8rem;letter-spacing:1.5px;text-transform:uppercase}
+        .canal-info{padding:14px 16px 8px;flex:1}
+        .canal-info h3{color:var(--cream);font-size:1.02rem;margin-bottom:6px}
+        .canal-info p{color:var(--text);font-size:.82rem;line-height:1.45;overflow-wrap:anywhere}
+        .canal-info small{display:block;color:var(--muted);font-size:.72rem;margin-top:8px}
+        .canal-pub{margin:6px 16px 16px;justify-content:center;min-height:40px}
+        .canal-hist{list-style:none;display:flex;flex-direction:column;gap:8px}
+        .canal-hist li{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);
+            border-radius:12px;padding:11px 14px;font-size:.86rem}
+        .canal-hist b{color:var(--cream)} .canal-hist span{color:var(--muted)}
+
+        #modalCanalBg,#modalPromoCanalBg{grid-template-columns:minmax(0,1fr)}
+        .modal.modal--ancho{width:min(900px,100%)}
+        .canal-editor{display:grid;grid-template-columns:1.1fr 1fr;gap:26px;align-items:start}
+        .canal-col{min-width:0}
+        .canal-galeria{display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:8px}
+        .gal-item{position:relative;aspect-ratio:4/5;border-radius:10px;overflow:hidden;background:rgba(0,0,0,.3);
+            border:2px solid var(--line);padding:0;display:grid;place-items:center;color:var(--muted);font-size:.7rem;line-height:1.3;
+            text-transform:uppercase;letter-spacing:.5px;text-align:center;transition:border-color .2s var(--ease)}
+        .gal-item img{width:100%;height:100%;object-fit:cover}
+        .gal-item:hover{border-color:var(--ember-soft)}
+        .gal-item[aria-pressed="true"]{border-color:var(--ember);box-shadow:0 0 0 3px rgba(255,102,0,.3)}
+        .gal-item[aria-pressed="true"]::after{content:"✓";position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;
+            background:var(--ember);color:#fff;font-size:.7rem;display:grid;place-items:center}
+        .canal-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+        .chip-var{background:rgba(255,255,255,.05);border:1px dashed var(--line);color:var(--ember-soft);border-radius:20px;
+            padding:7px 11px;font-size:.74rem;font-weight:600;min-height:34px}
+        .chip-var:hover{border-color:var(--ember);border-style:solid}
+        #cTexto{min-height:230px;font-size:.92rem;line-height:1.5}
+        .contador{float:right;color:var(--muted)} .contador.pasado{color:var(--bad);font-weight:700}
+        .prev-lbl{display:block;font-size:.74rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+        .wa-fondo{background:#0b141a;border-radius:14px;padding:14px;border:1px solid rgba(255,255,255,.06)}
+        .wa-burbuja{background:#1f2c34;border-radius:10px;padding:4px 4px 6px;max-width:100%;box-shadow:0 1px 1px rgba(0,0,0,.3)}
+        .wa-burbuja img{display:block;width:100%;border-radius:8px;max-height:340px;object-fit:cover;object-position:top}
+        .wa-texto{color:#e9edef;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;line-height:1.42;
+            padding:6px 8px 0;overflow-wrap:anywhere;max-height:300px;overflow-y:auto}
+        .wa-vacio{color:#8696a0}
+        .wa-hora{display:block;text-align:right;color:#8696a0;font-size:.68rem;padding:2px 8px 0}
+        .btn-compartir{width:100%;justify-content:center;margin-top:12px;min-height:50px}
+        .canal-acciones{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+        .canal-acciones .btn-mini{flex:1 1 auto;justify-content:center;min-height:40px}
+        .canal-acciones .btn-mini:disabled{opacity:.4;cursor:not-allowed}
+        .btn-borrar{margin-right:auto;color:var(--bad);border-color:rgba(255,92,92,.35)}
+        .btn-borrar:hover{border-color:var(--bad);color:var(--bad)}
+        #cAviso{min-height:1.2em;margin-top:8px;font-size:.8rem}
+        .promo-elegir-lista{display:flex;flex-direction:column;gap:8px;max-height:60vh;overflow-y:auto}
+        .promo-elegir{display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;background:var(--card);
+            border:1px solid var(--line);border-radius:12px;padding:12px 14px;color:var(--text);min-height:48px}
+        .promo-elegir b{color:var(--cream)} .promo-elegir span{color:var(--muted);font-size:.8rem}
+        .promo-elegir:hover{border-color:var(--ember)}
+        .sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+        @media (max-width:760px){
+            .canal-editor{grid-template-columns:1fr}
+            #modalCanalBg{padding:12px}
+            .canal-acciones .btn-mini{flex:1 1 calc(50% - 6px);white-space:normal;text-align:center}
+            #modalCanalBg .modal-foot{flex-wrap:wrap}
+            #modalCanalBg .modal-foot .btn{flex:1 1 auto;justify-content:center}
+            .btn-borrar{order:3;flex-basis:100%!important;margin-right:0}
+            .modal.modal--ancho{padding:20px 16px}
+            .wa-burbuja img{max-height:none}
+        }
+        @media (max-width:560px){
+            .canal-card{flex-direction:row;flex-wrap:wrap;align-items:stretch}
+            .canal-thumb{width:96px;aspect-ratio:4/5;flex-shrink:0}
+            .canal-thumb span{font-size:.62rem;padding:6px}
+            .canal-info{flex:1 1 0;min-width:0;padding:12px 14px 6px}
+            .canal-pub{flex-basis:100%;margin:6px 14px 14px}
+        }
     </style>
 </head>
 <body>
@@ -366,8 +451,37 @@
         </section>
         <!-- ===== VISTA: CLIENTES (reseñas + club) ===== -->
         <section id="vistaClientes" class="hidden">
-            <p class="panel-sub">Reseñas que llegan desde la web y personas que se unieron al Club La Hornilla.</p>
+            <p class="panel-sub">Publica en tu canal de WhatsApp, modera las reseñas y administra el Club La Hornilla.</p>
 
+            <nav class="cli-subnav" id="cliSubnav" role="tablist" aria-label="Secciones de clientes">
+                <button type="button" role="tab" class="cli-subtab active" data-sub="canal" aria-selected="true" aria-controls="subCanal" id="tabCanal">Canal de WhatsApp</button>
+                <button type="button" role="tab" class="cli-subtab" data-sub="resenas" aria-selected="false" aria-controls="subResenas" id="tabResenas">Reseñas <span class="count" id="cntPendienteTab"></span></button>
+                <button type="button" role="tab" class="cli-subtab" data-sub="club" aria-selected="false" aria-controls="subClub" id="tabClub">Club y cupón</button>
+            </nav>
+
+            <!-- ===== CANAL DE WHATSAPP ===== -->
+            <div id="subCanal" role="tabpanel" aria-labelledby="tabCanal">
+                <div class="aviso-regla">
+                    <b>Cómo funciona:</b> toca una plantilla, elige la imagen, revisa el texto y toca <b>Compartir en WhatsApp</b>.
+                    En el celular se abre WhatsApp con la imagen y el texto; elige tu canal y envía. El texto también queda copiado
+                    por si WhatsApp no lo pega. Lo que va entre <b>[corchetes]</b> es para completar antes de publicar.
+                </div>
+                <div class="panel-actions" style="margin-bottom:18px">
+                    <button class="btn btn-primary" id="btnNuevaPub">+ Nueva publicación</button>
+                    <button class="btn btn-ghost" id="btnDesdePromo">Desde una promo del menú</button>
+                    <a class="btn btn-ghost" id="btnAbrirCanal" href="#" target="_blank" rel="noopener">Abrir el canal ↗</a>
+                </div>
+                <p class="loading" id="loadingCanal">Cargando plantillas...</p>
+                <div class="canal-grid" id="listaPlantillas"></div>
+                <div class="empty hidden" id="vacioCanal"><h3>Sin plantillas</h3><p>Crea la primera con “Nueva publicación”.</p></div>
+
+                <h2 class="sub-titulo">Últimas publicaciones</h2>
+                <ul class="canal-hist" id="histCanal"></ul>
+                <p class="campo-ayuda hidden" id="vacioHist" style="margin:0">Todavía no has publicado nada desde aquí.</p>
+            </div>
+
+            <!-- ===== RESEÑAS ===== -->
+            <div id="subResenas" role="tabpanel" aria-labelledby="tabResenas" class="hidden">
             <div class="aviso-regla">
                 <b>Regla de las reseñas:</b> aprueba <b>todas las reseñas reales</b>, aunque sean negativas — respóndelas con amabilidad.
                 Solo rechaza spam, insultos, publicidad o datos personales de otras personas. Nunca publiques reseñas inventadas:
@@ -382,8 +496,11 @@
             <p class="loading" id="loadingResenas">Cargando reseñas...</p>
             <div class="promo-list" id="listaResenas"></div>
             <div class="empty hidden" id="vacioResenas"><h3>Nada por aquí</h3><p>No hay reseñas en este grupo.</p></div>
+            </div>
 
-            <h2 class="sub-titulo">Cupón de bienvenida del club</h2>
+            <!-- ===== CLUB Y CUPÓN ===== -->
+            <div id="subClub" role="tabpanel" aria-labelledby="tabClub" class="hidden">
+            <h2 class="sub-titulo" style="margin-top:0">Cupón de bienvenida del club</h2>
             <div class="club-config">
                 <div class="check-row">
                     <input type="checkbox" id="cfgActivo">
@@ -420,6 +537,7 @@
                 </table>
             </div>
             <div class="empty hidden" id="vacioClub"><h3>Aún no hay miembros</h3><p>Comparte el enlace del club: la página de inicio, sección Club.</p></div>
+            </div>
         </section>
     </main>
 
@@ -466,6 +584,65 @@
                 <button class="btn btn-ghost" id="btnCancelar">Cancelar</button>
                 <button class="btn btn-primary" id="btnGuardar">Guardar</button>
             </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: PUBLICACIÓN PARA EL CANAL ========== -->
+    <div class="modal-bg" id="modalCanalBg">
+        <div class="modal modal--ancho" role="dialog" aria-modal="true" aria-labelledby="canalTitulo">
+            <h2 id="canalTitulo">Publicar en el canal</h2>
+            <div class="canal-editor">
+                <div class="canal-col">
+                    <div class="field">
+                        <label for="cTitulo">Nombre de la plantilla</label>
+                        <input type="text" id="cTitulo" maxlength="60" placeholder="Ej. Precios Charros">
+                    </div>
+                    <div class="field">
+                        <label id="cGaleriaLbl">Imagen</label>
+                        <div class="canal-galeria" id="cGaleria" role="group" aria-labelledby="cGaleriaLbl"></div>
+                        <input type="file" id="cArchivo" accept="image/*" class="sr-only" tabindex="-1" aria-hidden="true">
+                    </div>
+                    <p class="campo-ayuda">Las imágenes fijas están en la carpeta Imagenes/promos. “Del celular” se usa solo esta vez y no se guarda.</p>
+                    <div class="field">
+                        <label for="cTexto">Texto</label>
+                        <div class="canal-chips" id="cChips"></div>
+                        <textarea id="cTexto" rows="11" placeholder="Escribe el texto de la publicación…"></textarea>
+                    </div>
+                    <p class="campo-ayuda">*negrita* · _cursiva_ · ~tachado~. Los botones de arriba insertan el link o el teléfono. <span id="cContador" class="contador"></span></p>
+                </div>
+                <div class="canal-col">
+                    <span class="prev-lbl">Vista previa</span>
+                    <div class="wa-fondo">
+                        <div class="wa-burbuja">
+                            <img id="cPrevImg" class="hidden" alt="Imagen de la publicación">
+                            <div id="cPrevTexto" class="wa-texto"></div>
+                            <span class="wa-hora">ahora</span>
+                        </div>
+                    </div>
+                    <p class="form-msg error" id="cAviso" role="status" aria-live="polite"></p>
+                    <button class="btn btn-primary btn-compartir" id="cCompartir">Compartir en WhatsApp</button>
+                    <div class="canal-acciones">
+                        <button class="btn-mini" id="cCopiarTexto">Copiar texto</button>
+                        <button class="btn-mini" id="cDescargar">Descargar imagen</button>
+                        <button class="btn-mini hidden" id="cCopiarImg">Copiar imagen</button>
+                        <button class="btn-mini ok" id="cMarcar">Marcar como publicada</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn btn-ghost btn-borrar hidden" id="cBorrar">Borrar plantilla</button>
+                <button class="btn btn-ghost" id="cCerrar">Cerrar</button>
+                <button class="btn btn-ghost" id="cGuardar">Guardar plantilla</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL: ELEGIR PROMO DEL MENÚ ========== -->
+    <div class="modal-bg" id="modalPromoCanalBg">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="promoCanalTitulo">
+            <h2 id="promoCanalTitulo">¿De qué promoción?</h2>
+            <div class="promo-elegir-lista" id="listaPromoCanal"></div>
+            <div class="modal-foot"><button class="btn btn-ghost" id="btnCerrarPromoCanal">Cancelar</button></div>
         </div>
     </div>
 

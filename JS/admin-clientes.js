@@ -4,6 +4,7 @@
    • Configura el cupón de bienvenida del club (config/club).
    • Lista miembros del club, exporta CSV y copia los números para
      crear una lista de difusión en WhatsApp Business.
+   • Sub-pestaña "Canal de WhatsApp": ver admin-canal.js.
    Se inicia la primera vez que se abre la pestaña (window.iniciarClientes).
    ===================================================================== */
 
@@ -11,6 +12,7 @@ import { db, COLECCION_RESENAS, COLECCION_CLUB, COLECCION_CONFIG } from './fireb
 import {
     collection, onSnapshot, doc, getDoc, setDoc, updateDoc, deleteDoc, serverTimestamp
 } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
+import { iniciarCanal } from './admin-canal.js';
 
 const $ = id => document.getElementById(id);
 function esc(s = '') { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
@@ -40,6 +42,7 @@ function renderResenas() {
     $('cntPendiente').textContent = cuenta.pendiente;
     $('cntAprobada').textContent = cuenta.aprobada;
     $('cntRechazada').textContent = cuenta.rechazada;
+    $('cntPendienteTab').textContent = cuenta.pendiente || '';
 
     const items = resenas.filter(r => r.estado === filtro);
     $('vacioResenas').classList.toggle('hidden', items.length > 0);
@@ -160,7 +163,34 @@ async function guardarCupon() {
 }
 
 /* ============================ ARRANQUE ============================ */
+/* Sub-pestañas: Canal · Reseñas · Club */
+function iniciarSubnav() {
+    const tabs = [...document.querySelectorAll('#cliSubnav .cli-subtab')];
+    const paneles = { canal: 'subCanal', resenas: 'subResenas', club: 'subClub' };
+    const activar = (tab, enfocar = false) => {
+        tabs.forEach(t => {
+            const on = t === tab;
+            t.classList.toggle('active', on);
+            t.setAttribute('aria-selected', on ? 'true' : 'false');
+            t.tabIndex = on ? 0 : -1;
+            $(paneles[t.dataset.sub]).classList.toggle('hidden', !on);
+        });
+        if (enfocar) tab.focus();
+    };
+    tabs.forEach((t, i) => {
+        t.tabIndex = t.classList.contains('active') ? 0 : -1;
+        t.addEventListener('click', () => activar(t));
+        t.addEventListener('keydown', e => {
+            if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+            const sig = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
+            activar(sig, true);
+        });
+    });
+}
+
 window.iniciarClientes = function iniciarClientes() {
+    iniciarSubnav();
+    iniciarCanal();
     onSnapshot(collection(db, COLECCION_RESENAS), snap => {
         resenas = snap.docs.map(d => ({ id: d.id, ...d.data() }))
             .sort((a, b) => (b.creado?.toMillis?.() || 0) - (a.creado?.toMillis?.() || 0));

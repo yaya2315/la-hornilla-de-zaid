@@ -42,6 +42,14 @@ service cloud.firestore {
       allow read, update, delete: if esAdmin();
     }
 
+    // Canal de WhatsApp: plantillas e historial, solo el admin
+    match /canalPlantillas/{id} {
+      allow read, write: if esAdmin();
+    }
+    match /canalPublicaciones/{id} {
+      allow read, write: if esAdmin();
+    }
+
     // Configuración pública (cupón del club): todos leen, solo el admin edita
     match /config/{docId} {
       allow read: if true;

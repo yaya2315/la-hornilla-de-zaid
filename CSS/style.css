@@ -801,3 +801,23 @@ summary:focus-visible,
 @media (prefers-reduced-motion: reduce) {
     .cookie-banner { transition: none; }
 }
+
+/* ---- Aviso "Únicamente delivery" (menú y pupusas) ---- */
+.solo-delivery {
+    display: flex;
+    width: fit-content;
+    align-items: center;
+    gap: 8px;
+    margin: 14px auto 0;
+    padding: 7px 16px;
+    border-radius: 40px;
+    border: 1px solid var(--ember);
+    color: var(--cream);
+    font-size: 0.74rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    max-width: 100%;
+}
+.solo-delivery svg { color: var(--ember); flex-shrink: 0; }

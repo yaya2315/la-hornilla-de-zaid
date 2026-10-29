@@ -153,3 +153,28 @@
     .hero-eyebrow, .hero-cta { opacity: 1; animation: none; }
     .hero-scroll { animation: none; }
 }
+
+/* Aviso "solo delivery" bajo el eyebrow del hero */
+.hero-delivery {
+    display: flex;
+    width: fit-content;
+    align-items: center;
+    gap: 10px;
+    margin: -14px auto 28px;
+    padding: 9px 18px;
+    border-radius: 40px;
+    background: rgba(10, 3, 0, 0.72);
+    border: 1px solid rgba(255, 133, 51, 0.55);
+    color: #fff;
+    font-size: clamp(0.72rem, 3.2vw, 0.92rem);
+    font-weight: 600;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    max-width: 100%;
+    text-transform: uppercase;
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    animation: heroUp 0.9s var(--ease) 0.3s forwards;
+}
+.hero-delivery svg { color: var(--ember-soft); flex-shrink: 0; }
+@media (prefers-reduced-motion: reduce) { .hero-delivery { opacity: 1; animation: none; } }
