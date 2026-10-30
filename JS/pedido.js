@@ -565,10 +565,10 @@ function inicializarMapaPicker() {
     }
     const centro = (ubicacionLat != null && ubicacionLng != null)
         ? [ubicacionLat, ubicacionLng]
-        : [13.6929, -89.2182]; // San Salvador — centro por defecto
+        : [13.7225, -89.7215]; // Sonsonate centro / Sonzacate — centro por defecto (zona de reparto)
 
     if (!mapaLeaflet) {
-        mapaLeaflet = L.map('mapaPicker').setView(centro, 15);
+        mapaLeaflet = L.map('mapaPicker').setView(centro, ubicacionLat != null ? 16 : 14);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap',
             maxZoom: 19
@@ -576,7 +576,7 @@ function inicializarMapaPicker() {
         mapaMarcador = L.marker(centro, { draggable: true }).addTo(mapaLeaflet);
         mapaLeaflet.on('click', e => mapaMarcador.setLatLng(e.latlng));
     } else {
-        mapaLeaflet.setView(centro, 15);
+        mapaLeaflet.setView(centro, ubicacionLat != null ? 16 : 14);
         mapaMarcador.setLatLng(centro);
         mapaLeaflet.invalidateSize();
     }
@@ -611,7 +611,7 @@ function renderResumenEntrega() {
         <div class="resumen-totales">
             <div class="resumen-fila"><span>Subtotal</span><span>${money(subtotal)}</span></div>
             ${esLocal ? `<div class="resumen-fila"><span>Servicio en el local (5%)</span><span>+${money(servicio)}</span></div>` : ''}
-            <div class="resumen-fila resumen-total"><span>Total estimado</span><span>${money(total)}</span></div>
+            <div class="resumen-fila resumen-total"><span>Total estimado${tipoEntrega === 'delivery' ? ' <small>(sin envío)</small>' : ''}</span><span>${money(total)}</span></div>
         </div>`;
 
     const listo = carrito.length > 0 && !!tipoEntrega && !!nombre && (tipoEntrega !== 'delivery' || !!direccion);
@@ -634,7 +634,7 @@ function construirMensaje() {
         `Subtotal: ${money(subtotal)}`
     ];
     if (esLocal) partes.push(`Servicio en el local (5%): +${money(servicio)}`);
-    partes.push(`Total estimado: ${money(total)}`);
+    partes.push(`Total estimado: ${money(total)}${tipoEntrega === 'delivery' ? ' (sin envío)' : ''}`);
     partes.push('');
     partes.push(`Tipo de pedido: ${ETIQUETAS_ENTREGA[tipoEntrega] || tipoEntrega}`);
     if (tipoEntrega === 'delivery') {

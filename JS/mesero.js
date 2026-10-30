@@ -497,10 +497,10 @@ function inicializarMapaPicker() {
     }
     const centro = (ubicacionLat != null && ubicacionLng != null)
         ? [ubicacionLat, ubicacionLng]
-        : [13.6929, -89.2182]; // San Salvador — centro por defecto
+        : [13.7225, -89.7215]; // Sonsonate centro / Sonzacate — centro por defecto (zona de reparto)
 
     if (!mapaLeaflet) {
-        mapaLeaflet = L.map('mapaPicker').setView(centro, 15);
+        mapaLeaflet = L.map('mapaPicker').setView(centro, ubicacionLat != null ? 16 : 14);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap',
             maxZoom: 19
@@ -508,7 +508,7 @@ function inicializarMapaPicker() {
         mapaMarcador = L.marker(centro, { draggable: true }).addTo(mapaLeaflet);
         mapaLeaflet.on('click', e => mapaMarcador.setLatLng(e.latlng));
     } else {
-        mapaLeaflet.setView(centro, 15);
+        mapaLeaflet.setView(centro, ubicacionLat != null ? 16 : 14);
         mapaMarcador.setLatLng(centro);
         mapaLeaflet.invalidateSize();
     }
