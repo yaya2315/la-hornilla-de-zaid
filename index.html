@@ -133,27 +133,26 @@
     <main id="contenido">
         <section class="hero" id="inicio">
             <!-- FOTOS DE LA PORTADA (se muestran en este orden; JS/portada.js hace la transición)
+                 • Cada foto se ve COMPLETA y centrada, con aire alrededor; el fondo es la misma foto difuminada.
                  • data-foto = ruta de la foto ligera (-web.webp) en Imagenes/fotos-de-platillos/<platillo>/
-                 • --pos     = dónde está la comida en la foto (x% y%), para que no se corte en celular ni en compu
-                 • --origen / --zoom-ini / --zoom-fin (opcionales) = hacia dónde y cuánto hace zoom.
-                   En papa-asada-01 y sopa-y-tacos-01 sirven para que NO se vea la marca "MagicStudio".
-                 • Para agregar una foto: copia una línea, cambia data-foto y --pos.
+                 • --ar      = ancho ÷ alto de la foto (si no lo pones, portada.js lo calcula solo).
+                 • Para agregar una foto: copia una línea y cambia data-foto (y --ar).
                  • Si cambias la PRIMERA foto, cámbiala también en el <link rel="preload"> del <head>. -->
             <div class="hero-slides" id="heroSlides" aria-hidden="true">
-                <div class="hero-slide is-active" data-foto="Imagenes/fotos-de-platillos/tacos/tacos-01-mesa-web.webp" style="--pos: 53% 50%"></div>
-                <div class="hero-slide" data-foto="Imagenes/fotos-de-platillos/burritos/burrito-03-abierto-web.webp" style="--pos: 50% 22%"></div>
-                <div class="hero-slide" data-foto="Imagenes/fotos-de-platillos/tortas/torta-01-cenital-web.webp" style="--pos: 33% 50%"></div>
-                <div class="hero-slide" data-foto="Imagenes/fotos-de-platillos/quesadillas/quesadillas-02-plato-web.webp" style="--pos: 41% 62%"></div>
-                <div class="hero-slide" data-foto="Imagenes/fotos-de-platillos/papa-asada/papa-asada-01-mesa-web.webp" style="--pos: 50% 50%; --origen: 50% 15%; --zoom-ini: 1.15; --zoom-fin: 1.21"></div>
-                <div class="hero-slide" data-foto="Imagenes/fotos-de-platillos/burritos/burrito-01-envuelto-web.webp" style="--pos: 52% 25%; --origen: 50% 30%; --zoom-ini: 1.1; --zoom-fin: 1.18"></div>
-                <div class="hero-slide" data-foto="Imagenes/fotos-de-platillos/tortas/minitorta-01-con-bebida-web.webp" style="--pos: 50% 50%"></div>
-                <div class="hero-slide" data-foto="Imagenes/fotos-de-platillos/tacos/tacos-02-con-pina-web.webp" style="--pos: 50% 28%"></div>
-                <div class="hero-slide" data-foto="Imagenes/fotos-de-platillos/quesadillas/quesadillas-01-para-llevar-web.webp" style="--pos: 49% 50%"></div>
-                <div class="hero-slide" data-foto="Imagenes/fotos-de-platillos/combos/sopa-y-tacos-01-mesa-web.webp" style="--pos: 72% 50%; --origen: 50% 15%; --zoom-ini: 1.15; --zoom-fin: 1.21"></div>
-                <div class="hero-slide" data-foto="Imagenes/fotos-de-platillos/burritos/burrito-02-dorado-web.webp" style="--pos: 50% 20%"></div>
-                <div class="hero-slide" data-foto="Imagenes/fotos-de-platillos/tortas/minitorta-02-mesa-web.webp" style="--pos: 53% 80%"></div>
-                <div class="hero-slide" data-foto="Imagenes/fotos-de-platillos/nachos/nachos-01-para-llevar-web.webp" style="--pos: 45% 46%"></div>
-                <div class="hero-slide" data-foto="Imagenes/fotos-de-platillos/quesadillas/quesadillas-03-cenital-web.webp" style="--pos: 55% 40%"></div>
+                <div class="hero-slide is-active" data-foto="Imagenes/fotos-de-platillos/tacos/tacos-01-mesa-web.webp" style="--ar: 1.793"></div>
+                <div class="hero-slide" data-foto="Imagenes/fotos-de-platillos/burritos/burrito-03-abierto-web.webp" style="--ar: 0.752"></div>
+                <div class="hero-slide" data-foto="Imagenes/fotos-de-platillos/tortas/torta-01-cenital-web.webp" style="--ar: 1.793"></div>
+                <div class="hero-slide" data-foto="Imagenes/fotos-de-platillos/quesadillas/quesadillas-02-plato-web.webp" style="--ar: 0.864"></div>
+                <div class="hero-slide" data-foto="Imagenes/fotos-de-platillos/papa-asada/papa-asada-01-mesa-sin-marca-web.webp" style="--ar: 1.983"></div>
+                <div class="hero-slide" data-foto="Imagenes/fotos-de-platillos/burritos/burrito-01-envuelto-web.webp" style="--ar: 1.218"></div>
+                <div class="hero-slide" data-foto="Imagenes/fotos-de-platillos/tortas/minitorta-01-con-bebida-web.webp" style="--ar: 1.793"></div>
+                <div class="hero-slide" data-foto="Imagenes/fotos-de-platillos/tacos/tacos-02-con-pina-web.webp" style="--ar: 0.839"></div>
+                <div class="hero-slide" data-foto="Imagenes/fotos-de-platillos/quesadillas/quesadillas-01-para-llevar-web.webp" style="--ar: 1.793"></div>
+                <div class="hero-slide" data-foto="Imagenes/fotos-de-platillos/combos/sopa-y-tacos-01-mesa-sin-marca-web.webp" style="--ar: 1.983"></div>
+                <div class="hero-slide" data-foto="Imagenes/fotos-de-platillos/burritos/burrito-02-dorado-web.webp" style="--ar: 1.134"></div>
+                <div class="hero-slide" data-foto="Imagenes/fotos-de-platillos/tortas/minitorta-02-mesa-web.webp" style="--ar: 1.333"></div>
+                <div class="hero-slide" data-foto="Imagenes/fotos-de-platillos/nachos/nachos-01-para-llevar-web.webp" style="--ar: 0.807"></div>
+                <div class="hero-slide" data-foto="Imagenes/fotos-de-platillos/quesadillas/quesadillas-03-cenital-web.webp" style="--ar: 0.75"></div>
             </div>
 
             <div class="hero-content">
@@ -169,15 +168,6 @@
 
             <a class="hero-scroll" href="#opiniones">Opiniones y club<span aria-hidden="true"></span></a>
 
-            <!-- Pausar / reanudar las fotos (lo muestra JS/portada.js). El anillo marca el tiempo de cada foto. -->
-            <button type="button" class="hero-pausa" id="heroPausa" aria-controls="heroSlides" aria-label="Pausar fotos de platillos" hidden>
-                <svg class="hero-pausa-anillo" viewBox="0 0 44 44" aria-hidden="true" focusable="false">
-                    <circle class="pista" cx="22" cy="22" r="21" pathLength="100"/>
-                    <circle class="progreso" cx="22" cy="22" r="21" pathLength="100"/>
-                </svg>
-                <svg class="ico ico-pausa" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg>
-                <svg class="ico ico-play" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.5 5.5v13l10-6.5z"/></svg>
-            </button>
         </section>
 
         <!-- ===== OPINIONES REALES ===== -->

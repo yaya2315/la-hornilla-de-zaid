@@ -15,9 +15,9 @@ Una carpeta por platillo. Dentro de cada una:
 Carpetas
 --------
   burritos/      burrito-01-envuelto, burrito-02-dorado, burrito-03-abierto
-  combos/        sopa-y-tacos-01-mesa
+  combos/        sopa-y-tacos-01-mesa (+ sopa-y-tacos-01-mesa-sin-marca)
   nachos/        nachos-01-para-llevar
-  papa-asada/    papa-asada-01-mesa
+  papa-asada/    papa-asada-01-mesa (+ papa-asada-01-mesa-sin-marca)
   quesadillas/   quesadillas-01-para-llevar, quesadillas-02-plato, quesadillas-03-cenital
   tacos/         tacos-01-mesa, tacos-02-con-pina
   tortas/        minitorta-01-con-bebida, minitorta-02-mesa, torta-01-cenital
@@ -34,18 +34,20 @@ Qué se le hizo a cada foto (sin cambiar su estilo)
     del mantel (burrito-02).
   - papa-asada-01 y sopa-y-tacos-01 venían en 600x334: se ampliaron al doble con IA.
     Traen la marca "MagicStudio"; lo ideal es reemplazarlas por la foto original sin esa marca.
+    Mientras tanto existen las versiones "-sin-marca" (la misma foto con la franja de abajo
+    recortada, donde estaba la marca). Son las que usa la portada y sirven para flyers.
 
 Para agregar una foto nueva
 ---------------------------
   1. La original va en <platillo>/originales/.
   2. La editada sigue el patrón <platillo>-NN-<descripcion>.jpg (minúsculas, sin espacios ni tildes).
   3. Si va a la portada, también su versión -web.webp y se agrega una línea en index.html,
-     en el bloque "FOTOS DE LA PORTADA" (data-foto = ruta, --pos = dónde está la comida).
+     en el bloque "FOTOS DE LA PORTADA" (data-foto = ruta, --ar = ancho ÷ alto).
      JS/portada.js hace la transición solo; CSS/inicio.css ya no lleva rutas de fotos.
 
 Portada (index.html) — 14 fotos, todas las editadas, alternando platillos
 --------------------------------------------------------------------------
   tacos-01 · burrito-03 · torta-01 · quesadillas-02 · papa-asada-01 · burrito-01 · minitorta-01 ·
   tacos-02 · quesadillas-01 · sopa-y-tacos-01 · burrito-02 · minitorta-02 · nachos-01 · quesadillas-03
-  papa-asada-01 y sopa-y-tacos-01 llevan un zoom hacia arriba (--origen / --zoom-ini) para que
-  la marca "MagicStudio" de la esquina nunca se vea. Si se reemplazan por la original, se puede quitar.
+  Cada foto se ve completa y centrada, con aire alrededor y la misma foto difuminada de fondo.
+  papa-asada-01 y sopa-y-tacos-01 usan su versión -sin-marca.
