@@ -7,3 +7,7 @@ Publicaciones La Hornilla/
 
 # Música para los videos (licencia Pixabay: no se puede repartir el audio suelto en un repositorio público)
 Imagenes/audios/
+
+# Cerebro de Obsidian (notas privadas): no se publica en la web
+Cerebro/
+.obsidian/
