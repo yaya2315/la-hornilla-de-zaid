@@ -39,4 +39,13 @@ Para agregar una foto nueva
 ---------------------------
   1. La original va en <platillo>/originales/.
   2. La editada sigue el patrón <platillo>-NN-<descripcion>.jpg (minúsculas, sin espacios ni tildes).
-  3. Si va a la portada, también su versión -web.webp y se cambia en CSS/inicio.css.
+  3. Si va a la portada, también su versión -web.webp y se agrega una línea en index.html,
+     en el bloque "FOTOS DE LA PORTADA" (data-foto = ruta, --pos = dónde está la comida).
+     JS/portada.js hace la transición solo; CSS/inicio.css ya no lleva rutas de fotos.
+
+Portada (index.html) — 14 fotos, todas las editadas, alternando platillos
+--------------------------------------------------------------------------
+  tacos-01 · burrito-03 · torta-01 · quesadillas-02 · papa-asada-01 · burrito-01 · minitorta-01 ·
+  tacos-02 · quesadillas-01 · sopa-y-tacos-01 · burrito-02 · minitorta-02 · nachos-01 · quesadillas-03
+  papa-asada-01 y sopa-y-tacos-01 llevan un zoom hacia arriba (--origen / --zoom-ini) para que
+  la marca "MagicStudio" de la esquina nunca se vea. Si se reemplazan por la original, se puede quitar.

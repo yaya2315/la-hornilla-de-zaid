@@ -13,42 +13,46 @@
     background: var(--char-900);
 }
 
-/* --- Capa de imágenes que transicionan (Ken Burns + fundido) --- */
+/* --- Capa de fotos que transicionan (fundido cruzado + zoom lento "Ken Burns") ---
+   Las fotos y su encuadre están en index.html (data-foto y --pos en cada .hero-slide).
+   JS/portada.js decide cuál se ve:
+     .is-active → la foto nueva: aparece ENCIMA con un fundido.
+     .is-prev   → la foto anterior: se queda visible DEBAJO hasta que la nueva
+                  termina de aparecer. Así nunca se ve el fondo oscuro entre fotos.
+   Tiempos (los pone portada.js): --hero-tiempo = cuánto dura cada foto,
+   --hero-fundido = cuánto tarda en aparecer. */
 .hero-slides { position: absolute; inset: 0; z-index: 1; }
 .hero-slide {
     position: absolute;
     inset: 0;
-    background-position: center;
+    z-index: 0;
     background-size: cover;
+    background-repeat: no-repeat;
+    background-position: var(--pos, 50% 50%);
+    transform-origin: var(--origen, var(--pos, 50% 50%));
+    transform: scale(var(--zoom-ini, 1.04));
     opacity: 0;
-    transform: scale(1.05);
-    animation: heroKen 49.5s infinite;
-    will-change: opacity, transform;
 }
-
-/* 11 imágenes distintas — desfase de 4.5s entre cada una.
-   Fotos editadas y ligeras (-web.webp) de Imagenes/fotos-de-platillos/<platillo>/
-   ➜ Para añadir/quitar fotos: agrega o quita un .hero-slide en el HTML
-     y su regla nth-child aquí (mantén el delay = índice × 4.5s).
-   ➜ background-position (el % horizontal) centra la comida en pantallas verticales (celular). */
-.hero-slide:nth-child(1)  { background-image: url('../Imagenes/fotos-de-platillos/tacos/tacos-01-mesa-web.webp');                    animation-delay: 0s;    }
-.hero-slide:nth-child(2)  { background-image: url('../Imagenes/fotos-de-platillos/burritos/burrito-03-abierto-web.webp');            animation-delay: 4.5s;  }
-.hero-slide:nth-child(3)  { background-image: url('../Imagenes/fotos-de-platillos/tortas/torta-01-cenital-web.webp');                background-position: 23% 50%; animation-delay: 9s;    }
-.hero-slide:nth-child(4)  { background-image: url('../Imagenes/fotos-de-platillos/quesadillas/quesadillas-02-plato-web.webp');       animation-delay: 13.5s; }
-.hero-slide:nth-child(5)  { background-image: url('../Imagenes/fotos-de-platillos/papa-asada/papa-asada-01-mesa-web.webp');          animation-delay: 18s;   }
-.hero-slide:nth-child(6)  { background-image: url('../Imagenes/fotos-de-platillos/tortas/minitorta-01-con-bebida-web.webp');         background-position: 31% 50%; animation-delay: 22.5s; }
-.hero-slide:nth-child(7)  { background-image: url('../Imagenes/fotos-de-platillos/tacos/tacos-02-con-pina-web.webp');                animation-delay: 27s;   }
-.hero-slide:nth-child(8)  { background-image: url('../Imagenes/fotos-de-platillos/quesadillas/quesadillas-01-para-llevar-web.webp'); background-position: 46% 50%; animation-delay: 31.5s; }
-.hero-slide:nth-child(9)  { background-image: url('../Imagenes/fotos-de-platillos/nachos/nachos-01-para-llevar-web.webp');           animation-delay: 36s;   }
-.hero-slide:nth-child(10) { background-image: url('../Imagenes/fotos-de-platillos/burritos/burrito-02-dorado-web.webp');             animation-delay: 40.5s; }
-.hero-slide:nth-child(11) { background-image: url('../Imagenes/fotos-de-platillos/quesadillas/quesadillas-03-cenital-web.webp');     animation-delay: 45s;   }
+.hero-slide.is-prev {
+    z-index: 1;
+    opacity: 1;
+}
+.hero-slide.is-active {
+    z-index: 2;
+    opacity: 1;
+    transition: opacity var(--hero-fundido, 1.4s) cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* El zoom sigue corriendo mientras la foto pasa de "activa" a "anterior" (no da saltos) */
+.hero-slide.is-active,
+.hero-slide.is-prev {
+    animation: heroKen calc(var(--hero-tiempo, 5.2s) + var(--hero-fundido, 1.4s)) linear forwards;
+    will-change: opacity, transform;   /* solo en las 2 fotos visibles: ahorra memoria en el celular */
+}
+.hero.is-paused .hero-slide { animation-play-state: paused; }
 
 @keyframes heroKen {
-    0%   { opacity: 0; transform: scale(1.05); }
-    2%   { opacity: 1; }
-    8%   { opacity: 1; transform: scale(1.11); }
-    10%  { opacity: 0; transform: scale(1.12); }
-    100% { opacity: 0; transform: scale(1.05); }
+    from { transform: scale(var(--zoom-ini, 1.04)); }
+    to   { transform: scale(var(--zoom-fin, 1.12)); }
 }
 
 /* --- Velo / degradado para legibilidad y atmósfera de brasa --- */
@@ -148,9 +152,66 @@
     50%      { transform: translate(-50%, 8px); }
 }
 
+/* --- Botón pausar / reanudar fotos (con anillo de tiempo) --- */
+.hero-pausa {
+    position: absolute;
+    right: clamp(16px, 4vw, 44px);
+    bottom: max(22px, env(safe-area-inset-bottom));
+    z-index: 6;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(10, 3, 0, 0.55);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    color: var(--cream);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.25s var(--ease), color 0.25s var(--ease), transform 0.25s var(--ease);
+}
+.hero-pausa[hidden] { display: none; }
+.hero-pausa:hover { background: rgba(10, 3, 0, 0.78); color: var(--ember-soft); transform: scale(1.06); }
+.hero-pausa:active { transform: scale(0.95); }
+.hero-pausa:focus-visible { border-radius: 50%; }
+
+.hero-pausa .ico { width: 16px; height: 16px; fill: currentColor; grid-area: 1 / 1; }
+.hero-pausa .ico-play { display: none; }
+.hero.is-stopped .hero-pausa .ico-pausa { display: none; }
+.hero.is-stopped .hero-pausa .ico-play  { display: block; }
+
+.hero-pausa-anillo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+    pointer-events: none;
+}
+.hero-pausa-anillo circle { fill: none; stroke-width: 1.5; }
+.hero-pausa-anillo .pista { stroke: rgba(243, 233, 221, 0.22); }
+.hero-pausa-anillo .progreso {
+    stroke: var(--ember-soft);
+    stroke-linecap: round;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+}
+.hero-pausa.is-run .progreso { animation: heroAnillo var(--hero-tiempo, 5.2s) linear forwards; }
+.hero.is-paused .hero-pausa .progreso { animation-play-state: paused; }
+
+@keyframes heroAnillo {
+    from { stroke-dashoffset: 100; }
+    to   { stroke-dashoffset: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-    .hero-slide { animation: none; }
-    .hero-slide:nth-child(1) { opacity: 1; transform: none; }
+    /* Sin zoom (la foto queda quieta con su encuadre; portada.js arranca en pausa) */
+    .hero-slide.is-active,
+    .hero-slide.is-prev { animation: none !important; }
+    .hero-pausa-anillo .progreso { display: none; }
     .hero-eyebrow, .hero-cta { opacity: 1; animation: none; }
     .hero-scroll { animation: none; }
 }
