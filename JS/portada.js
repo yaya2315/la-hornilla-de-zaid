@@ -1,23 +1,23 @@
 /* =====================================================================
    PORTADA.JS — Transición de fotos de platillos en el hero (index.html)
    ---------------------------------------------------------------------
-   • Cada foto se ve completa y centrada, con aire alrededor; detrás va
-     la misma foto difuminada (lo dibuja CSS/inicio.css).
    • Fundido cruzado real: la foto nueva aparece ENCIMA de la anterior,
      que se queda visible debajo hasta que la nueva está completa.
-     Así no hay "parpadeo" oscuro entre una foto y otra.
+     Así ya no hay "parpadeo" oscuro entre una foto y otra.
    • Cada foto se descarga justo antes de mostrarse (mientras se ve una,
-     se va bajando la siguiente): la página carga más rápido y gasta
+     se va bajando la siguiente). La página carga más rápido y gasta
      menos datos en el celular.
    • Si una foto no existe o no carga, se salta (no deja la pantalla negra).
    • Se pausa sola cuando la pestaña está oculta o el hero no se ve.
-     Con "reducir movimiento" activado en el teléfono, queda fija la primera.
-   • Las fotos se definen en index.html: data-foto (y --ar) de cada
+   • Botón para pausar / reanudar (accesibilidad WCAG 2.2.2).
+     Con "reducir movimiento" activado en el teléfono, arranca en pausa.
+   • Las fotos se definen en index.html: data-foto y --pos de cada
      .hero-slide. Aquí no hay que tocar nada para agregar fotos.
    ===================================================================== */
 (() => {
-    const hero  = document.getElementById('inicio');
-    const marco = document.getElementById('heroSlides');
+    const hero   = document.getElementById('inicio');
+    const marco  = document.getElementById('heroSlides');
+    const boton  = document.getElementById('heroPausa');
     if (!hero || !marco) return;
 
     const slides = Array.from(marco.querySelectorAll('.hero-slide[data-foto]'));
@@ -30,23 +30,20 @@
     hero.style.setProperty('--hero-tiempo', TIEMPO + 'ms');
     hero.style.setProperty('--hero-fundido', FUNDIDO + 'ms');
 
-    const fija = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const reducirMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     let actual = Math.max(0, slides.findIndex(s => s.classList.contains('is-active')));
     let timer = null;            // cambio a la siguiente foto
     let timerLimpiar = null;     // quita .is-prev cuando termina el fundido
     let avanzando = false;       // hay un cambio en curso (esperando que cargue la foto)
     let iniciado = false;        // ya terminó de cargar la página
+    let pausadaPorUsuario = reducirMovimiento;
     let enPantalla = true;
     let restante = TIEMPO;       // lo que le falta a la foto actual
     let inicioConteo = 0;
 
-    /* ── Fotos ── */
-    // Ruta completa (así la entiende igual el HTML que el CSS)
-    const pintar = (slide) => {
-        const url = new URL(slide.dataset.foto, document.baseURI).href;
-        slide.style.setProperty('--foto', `url("${url}")`);
-    };
+    /* ── Carga de fotos ── */
+    const pintar = (slide) => { slide.style.backgroundImage = `url("${slide.dataset.foto}")`; };
 
     const cargar = (slide) => {
         if (slide._carga) return slide._carga;
@@ -54,10 +51,6 @@
             const img = new Image();
             img.decoding = 'async';
             img.onload = () => {
-                // Si en index.html no viene --ar, se calcula con el tamaño real de la foto
-                if (!slide.style.getPropertyValue('--ar') && img.naturalHeight) {
-                    slide.style.setProperty('--ar', (img.naturalWidth / img.naturalHeight).toFixed(3));
-                }
                 const listo = () => { pintar(slide); slide.dataset.estado = 'lista'; resolve(true); };
                 (img.decode ? img.decode() : Promise.resolve()).then(listo, listo);
             };
@@ -83,11 +76,16 @@
         return i;
     };
 
-    /* Reinicia el movimiento suave de una foto */
-    const reiniciarMovimiento = (slide) => {
-        slide.classList.add('reinicio');
-        void slide.offsetWidth;       // fuerza al navegador a "olvidar" la animación anterior
-        slide.classList.remove('reinicio');
+    /* Reinicia una animación CSS (zoom de la foto o anillo del botón) */
+    const reiniciar = (el, clase) => {
+        el.classList.remove(clase);
+        void el.offsetWidth;          // fuerza al navegador a "olvidar" la animación anterior
+        el.classList.add(clase);
+    };
+    const reiniciarZoom = (slide) => {
+        slide.style.animation = 'none';
+        void slide.offsetWidth;
+        slide.style.animation = '';
     };
 
     /* ── Cambio de foto ── */
@@ -105,18 +103,19 @@
         slides.forEach(s => { if (s !== anterior && s !== nueva) s.classList.remove('is-active', 'is-prev'); });
         anterior.classList.remove('is-active');
         anterior.classList.add('is-prev');
-        reiniciarMovimiento(nueva);
+        reiniciarZoom(nueva);
         nueva.classList.add('is-active');
         actual = indice;
 
         clearTimeout(timerLimpiar);
         timerLimpiar = setTimeout(() => anterior.classList.remove('is-prev'), FUNDIDO + 150);
 
+        if (boton) reiniciar(boton, 'is-run');
         cargar(slides[siguienteDe(actual)]);   // va bajando la que sigue
     };
 
     /* ── Reloj: correr, pausar y reanudar ── */
-    const debeCorrer = () => iniciado && !fija && enPantalla && !document.hidden;
+    const debeCorrer = () => iniciado && !pausadaPorUsuario && enPantalla && !document.hidden;
 
     const avanzar = async () => {
         timer = null;
@@ -130,6 +129,7 @@
     const actualizar = () => {
         const corre = debeCorrer();
         hero.classList.toggle('is-paused', !corre);
+        hero.classList.toggle('is-stopped', pausadaPorUsuario);
         if (avanzando) return;
         if (corre && !timer) {
             inicioConteo = performance.now();
@@ -140,6 +140,20 @@
             restante = Math.max(0, restante - (performance.now() - inicioConteo));
         }
     };
+
+    /* ── Botón pausar / reanudar ── */
+    if (boton) {
+        boton.hidden = false;
+        const etiquetar = () => {
+            boton.setAttribute('aria-label', pausadaPorUsuario ? 'Reanudar fotos de platillos' : 'Pausar fotos de platillos');
+        };
+        etiquetar();
+        boton.addEventListener('click', () => {
+            pausadaPorUsuario = !pausadaPorUsuario;
+            etiquetar();
+            actualizar();
+        });
+    }
 
     /* ── Pausa automática: pestaña oculta o hero fuera de la pantalla ── */
     document.addEventListener('visibilitychange', actualizar);
@@ -154,15 +168,16 @@
     const arrancar = () => {
         if (iniciado) return;
         iniciado = true;
-        reiniciarMovimiento(slides[actual]);    // el movimiento de la 1.ª foto empieza cuando ya se ve
+        reiniciarZoom(slides[actual]);          // el zoom de la 1.ª foto empieza cuando ya se ve
+        if (boton) reiniciar(boton, 'is-run');
         restante = TIEMPO;
         actualizar();
-        cargar(slides[actual]);                 // confirma la 1.ª (y su proporción si faltaba --ar)
-        if (slides.length > 1 && !fija) cargar(slides[siguienteDe(actual)]);
+        if (slides.length > 1) cargar(slides[siguienteDe(actual)]);
     };
     // Espera lo mismo que la pantalla de carga (loader.js deja ver la llama ~1.25 s)
-    const arrancarTrasCarga = () => setTimeout(arrancar, fija ? 0 : Math.max(0, 1300 - performance.now()));
+    const arrancarTrasCarga = () => setTimeout(arrancar, reducirMovimiento ? 0 : Math.max(0, 1300 - performance.now()));
     hero.classList.add('is-paused');
+    hero.classList.toggle('is-stopped', pausadaPorUsuario);
     if (document.readyState === 'complete') arrancarTrasCarga();
     else window.addEventListener('load', arrancarTrasCarga, { once: true });
 })();

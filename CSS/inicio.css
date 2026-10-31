@@ -13,57 +13,25 @@
     background: var(--char-900);
 }
 
-/* --- Fotos de platillos (fundido cruzado) ---
-   Cada .hero-slide tiene 2 capas:
-     ::before → "ambiente": la misma foto difuminada y oscura, llenando la pantalla
-                (así no quedan franjas negras alrededor de la foto).
-     ::after  → la foto COMPLETA y centrada, con aire alrededor (sin acercarla a la cara).
-   La foto llega en --foto (la pone portada.js) y su proporción en --ar (index.html).
+/* --- Capa de fotos que transicionan (fundido cruzado + zoom lento "Ken Burns") ---
+   Las fotos y su encuadre están en index.html (data-foto y --pos en cada .hero-slide).
    JS/portada.js decide cuál se ve:
      .is-active → la foto nueva: aparece ENCIMA con un fundido.
-     .is-prev   → la anterior: se queda DEBAJO hasta que la nueva termina de aparecer
-                  (así nunca se ve el fondo oscuro entre fotos).
-   Tiempos (los pone portada.js): --hero-tiempo y --hero-fundido. */
-.hero-slides {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    container-type: size;   /* permite medir el hero con cqw / cqh */
-}
+     .is-prev   → la foto anterior: se queda visible DEBAJO hasta que la nueva
+                  termina de aparecer. Así nunca se ve el fondo oscuro entre fotos.
+   Tiempos (los pone portada.js): --hero-tiempo = cuánto dura cada foto,
+   --hero-fundido = cuánto tarda en aparecer. */
+.hero-slides { position: absolute; inset: 0; z-index: 1; }
 .hero-slide {
     position: absolute;
     inset: 0;
     z-index: 0;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: var(--pos, 50% 50%);
+    transform-origin: var(--origen, var(--pos, 50% 50%));
+    transform: scale(var(--zoom-ini, 1.04));
     opacity: 0;
-
-    /* Tamaño de la foto: entra completa en la "caja" que deja aire a los lados y
-       arriba/abajo. En celular, las fotos horizontales no bajan de --alto-min
-       (se recortan un poco a los lados, siempre centradas) para que no queden diminutas. */
-    --aire-x:   clamp(16px, 5cqw, 96px);
-    --aire-y:   clamp(84px, 13cqh, 132px);
-    --caja-w:   calc(100cqw - 2 * var(--aire-x));
-    --caja-h:   calc(100cqh - 2 * var(--aire-y));
-    --alto-min: min(var(--caja-h), 44cqh);
-    --alto:     clamp(var(--alto-min), calc(var(--caja-w) / var(--ar, 1.5)), var(--caja-h));
-    --ancho:    min(var(--caja-w), calc(var(--alto) * var(--ar, 1.5)));
-}
-.hero-slide::before {
-    content: "";
-    position: absolute;
-    inset: -10%;
-    background: var(--foto) center / cover no-repeat;
-    filter: blur(38px) saturate(1.15) brightness(0.5);
-}
-.hero-slide::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    margin: auto;
-    width: var(--ancho);
-    height: var(--alto);
-    background: var(--foto) center / cover no-repeat;
-    border-radius: var(--radius-lg);
-    box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(243, 233, 221, 0.08);
 }
 .hero-slide.is-prev {
     z-index: 1;
@@ -74,21 +42,17 @@
     opacity: 1;
     transition: opacity var(--hero-fundido, 1.4s) cubic-bezier(0.4, 0, 0.2, 1);
 }
+/* El zoom sigue corriendo mientras la foto pasa de "activa" a "anterior" (no da saltos) */
 .hero-slide.is-active,
-.hero-slide.is-prev { will-change: opacity; }   /* solo las 2 visibles: ahorra memoria en el celular */
-
-/* Al aparecer, la foto se "acomoda" muy suave hacia atrás (respira, no se acerca) */
-.hero-slide.is-active::after,
-.hero-slide.is-prev::after {
-    animation: heroRespira calc(var(--hero-tiempo, 5.2s) + var(--hero-fundido, 1.4s)) cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    will-change: transform;
+.hero-slide.is-prev {
+    animation: heroKen calc(var(--hero-tiempo, 5.2s) + var(--hero-fundido, 1.4s)) linear forwards;
+    will-change: opacity, transform;   /* solo en las 2 fotos visibles: ahorra memoria en el celular */
 }
-.hero-slide.reinicio::after { animation: none !important; }
-.hero.is-paused .hero-slide::after { animation-play-state: paused; }
+.hero.is-paused .hero-slide { animation-play-state: paused; }
 
-@keyframes heroRespira {
-    from { transform: scale(1.03); }
-    to   { transform: scale(1); }
+@keyframes heroKen {
+    from { transform: scale(var(--zoom-ini, 1.04)); }
+    to   { transform: scale(var(--zoom-fin, 1.12)); }
 }
 
 /* --- Velo / degradado para legibilidad y atmósfera de brasa --- */
@@ -188,9 +152,66 @@
     50%      { transform: translate(-50%, 8px); }
 }
 
+/* --- Botón pausar / reanudar fotos (con anillo de tiempo) --- */
+.hero-pausa {
+    position: absolute;
+    right: clamp(16px, 4vw, 44px);
+    bottom: max(22px, env(safe-area-inset-bottom));
+    z-index: 6;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(10, 3, 0, 0.55);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    color: var(--cream);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.25s var(--ease), color 0.25s var(--ease), transform 0.25s var(--ease);
+}
+.hero-pausa[hidden] { display: none; }
+.hero-pausa:hover { background: rgba(10, 3, 0, 0.78); color: var(--ember-soft); transform: scale(1.06); }
+.hero-pausa:active { transform: scale(0.95); }
+.hero-pausa:focus-visible { border-radius: 50%; }
+
+.hero-pausa .ico { width: 16px; height: 16px; fill: currentColor; grid-area: 1 / 1; }
+.hero-pausa .ico-play { display: none; }
+.hero.is-stopped .hero-pausa .ico-pausa { display: none; }
+.hero.is-stopped .hero-pausa .ico-play  { display: block; }
+
+.hero-pausa-anillo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+    pointer-events: none;
+}
+.hero-pausa-anillo circle { fill: none; stroke-width: 1.5; }
+.hero-pausa-anillo .pista { stroke: rgba(243, 233, 221, 0.22); }
+.hero-pausa-anillo .progreso {
+    stroke: var(--ember-soft);
+    stroke-linecap: round;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+}
+.hero-pausa.is-run .progreso { animation: heroAnillo var(--hero-tiempo, 5.2s) linear forwards; }
+.hero.is-paused .hero-pausa .progreso { animation-play-state: paused; }
+
+@keyframes heroAnillo {
+    from { stroke-dashoffset: 100; }
+    to   { stroke-dashoffset: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-    /* Foto quieta (portada.js deja la primera fija, sin cambiar) */
-    .hero-slide::after { animation: none !important; }
+    /* Sin zoom (la foto queda quieta con su encuadre; portada.js arranca en pausa) */
+    .hero-slide.is-active,
+    .hero-slide.is-prev { animation: none !important; }
+    .hero-pausa-anillo .progreso { display: none; }
     .hero-eyebrow, .hero-cta { opacity: 1; animation: none; }
     .hero-scroll { animation: none; }
 }
