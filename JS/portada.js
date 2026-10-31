@@ -1,27 +1,29 @@
 /* =====================================================================
    PORTADA.JS — Transición de fotos de platillos en el hero (index.html)
    ---------------------------------------------------------------------
+   • Cada pantalla usa las fotos que le quedan: en pantallas ANCHAS
+     (compu, tablet acostada, celular acostado) las horizontales
+     (data-vista="ancha"); en pantallas ALTAS (celular, tablet parada)
+     las verticales (data-vista="alta"). Así la foto cubre toda la
+     pantalla sin acercarse de más ni verse pixeleada.
+     Si giras el celular o cambias el tamaño de la ventana, cambia solo.
    • Fundido cruzado real: la foto nueva aparece ENCIMA de la anterior,
      que se queda visible debajo hasta que la nueva está completa.
-     Así ya no hay "parpadeo" oscuro entre una foto y otra.
    • Cada foto se descarga justo antes de mostrarse (mientras se ve una,
-     se va bajando la siguiente). La página carga más rápido y gasta
-     menos datos en el celular.
-   • Si una foto no existe o no carga, se salta (no deja la pantalla negra).
+     se va bajando la siguiente). Si una foto no carga, se salta.
    • Se pausa sola cuando la pestaña está oculta o el hero no se ve.
-   • Botón para pausar / reanudar (accesibilidad WCAG 2.2.2).
-     Con "reducir movimiento" activado en el teléfono, arranca en pausa.
-   • Las fotos se definen en index.html: data-foto y --pos de cada
-     .hero-slide. Aquí no hay que tocar nada para agregar fotos.
+     Con "reducir movimiento" activado en el teléfono, se queda quieta
+     en la primera foto.
+   • Las fotos se definen en index.html (data-foto, data-vista y --pos).
+     Aquí no hay que tocar nada para agregar fotos.
    ===================================================================== */
 (() => {
-    const hero   = document.getElementById('inicio');
-    const marco  = document.getElementById('heroSlides');
-    const boton  = document.getElementById('heroPausa');
+    const hero  = document.getElementById('inicio');
+    const marco = document.getElementById('heroSlides');
     if (!hero || !marco) return;
 
-    const slides = Array.from(marco.querySelectorAll('.hero-slide[data-foto]'));
-    if (!slides.length) return;
+    const todas = Array.from(marco.querySelectorAll('.hero-slide[data-foto]'));
+    if (!todas.length) return;
 
     /* ── Tiempos (ms) ── */
     const TIEMPO  = 5200;   // cuánto dura cada foto en pantalla (incluye el fundido)
@@ -31,16 +33,24 @@
     hero.style.setProperty('--hero-fundido', FUNDIDO + 'ms');
 
     const reducirMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const pantallaAncha = window.matchMedia('(min-aspect-ratio: 1/1)');
 
-    let actual = Math.max(0, slides.findIndex(s => s.classList.contains('is-active')));
+    let slides = [];             // fotos de la vista actual (ancha o alta)
+    let actual = 0;
     let timer = null;            // cambio a la siguiente foto
     let timerLimpiar = null;     // quita .is-prev cuando termina el fundido
     let avanzando = false;       // hay un cambio en curso (esperando que cargue la foto)
     let iniciado = false;        // ya terminó de cargar la página
-    let pausadaPorUsuario = reducirMovimiento;
     let enPantalla = true;
     let restante = TIEMPO;       // lo que le falta a la foto actual
     let inicioConteo = 0;
+    let turno = 0;               // sube cada vez que cambia la vista (cancela cambios viejos)
+
+    const elegirSlides = () => {
+        const vista = pantallaAncha.matches ? 'ancha' : 'alta';
+        const propias = todas.filter(s => s.dataset.vista === vista || s.dataset.vista === 'ambas' || !s.dataset.vista);
+        return propias.length ? propias : todas;
+    };
 
     /* ── Carga de fotos ── */
     const pintar = (slide) => { slide.style.backgroundImage = `url("${slide.dataset.foto}")`; };
@@ -64,10 +74,6 @@
         return slide._carga;
     };
 
-    // La primera se pinta de inmediato (ya viene con <link rel="preload"> en el <head>)
-    pintar(slides[actual]);
-    slides[actual].classList.add('is-active');
-
     const siguienteDe = (i) => {
         for (let paso = 1; paso <= slides.length; paso++) {
             const j = (i + paso) % slides.length;
@@ -76,31 +82,29 @@
         return i;
     };
 
-    /* Reinicia una animación CSS (zoom de la foto o anillo del botón) */
-    const reiniciar = (el, clase) => {
-        el.classList.remove(clase);
-        void el.offsetWidth;          // fuerza al navegador a "olvidar" la animación anterior
-        el.classList.add(clase);
-    };
+    /* Reinicia el zoom lento de una foto */
     const reiniciarZoom = (slide) => {
         slide.style.animation = 'none';
-        void slide.offsetWidth;
+        void slide.offsetWidth;          // fuerza al navegador a "olvidar" la animación anterior
         slide.style.animation = '';
     };
 
     /* ── Cambio de foto ── */
     const mostrar = async (indice) => {
+        const miTurno = turno;
         let intentos = slides.length;
         let nueva = slides[indice];
         // Si la foto no carga, se prueba con la siguiente
         while (!(await cargar(nueva)) && --intentos > 0) {
+            if (miTurno !== turno) return;
             indice = siguienteDe(indice);
             nueva = slides[indice];
         }
+        if (miTurno !== turno) return;   // mientras cargaba, se giró la pantalla
         const anterior = slides[actual];
         if (nueva === anterior || nueva.dataset.estado === 'error') return;
 
-        slides.forEach(s => { if (s !== anterior && s !== nueva) s.classList.remove('is-active', 'is-prev'); });
+        todas.forEach(s => { if (s !== anterior && s !== nueva) s.classList.remove('is-active', 'is-prev'); });
         anterior.classList.remove('is-active');
         anterior.classList.add('is-prev');
         reiniciarZoom(nueva);
@@ -110,12 +114,11 @@
         clearTimeout(timerLimpiar);
         timerLimpiar = setTimeout(() => anterior.classList.remove('is-prev'), FUNDIDO + 150);
 
-        if (boton) reiniciar(boton, 'is-run');
         cargar(slides[siguienteDe(actual)]);   // va bajando la que sigue
     };
 
     /* ── Reloj: correr, pausar y reanudar ── */
-    const debeCorrer = () => iniciado && !pausadaPorUsuario && enPantalla && !document.hidden;
+    const debeCorrer = () => iniciado && !reducirMovimiento && enPantalla && !document.hidden && slides.length > 1;
 
     const avanzar = async () => {
         timer = null;
@@ -129,7 +132,6 @@
     const actualizar = () => {
         const corre = debeCorrer();
         hero.classList.toggle('is-paused', !corre);
-        hero.classList.toggle('is-stopped', pausadaPorUsuario);
         if (avanzando) return;
         if (corre && !timer) {
             inicioConteo = performance.now();
@@ -141,19 +143,32 @@
         }
     };
 
-    /* ── Botón pausar / reanudar ── */
-    if (boton) {
-        boton.hidden = false;
-        const etiquetar = () => {
-            boton.setAttribute('aria-label', pausadaPorUsuario ? 'Reanudar fotos de platillos' : 'Pausar fotos de platillos');
-        };
-        etiquetar();
-        boton.addEventListener('click', () => {
-            pausadaPorUsuario = !pausadaPorUsuario;
-            etiquetar();
-            actualizar();
-        });
-    }
+    /* ── Poner la primera foto de la vista actual ── */
+    const empezarVista = () => {
+        turno++;
+        clearTimeout(timer); timer = null;
+        clearTimeout(timerLimpiar);
+        avanzando = false;
+        todas.forEach(s => s.classList.remove('is-active', 'is-prev'));
+        slides = elegirSlides();
+        actual = 0;
+        const primera = slides[0];
+        // La primera ya viene con <link rel="preload"> en el <head>: se pinta de una vez
+        pintar(primera);
+        cargar(primera);
+        reiniciarZoom(primera);
+        primera.classList.add('is-active');
+        restante = TIEMPO;
+        actualizar();
+        if (iniciado && slides.length > 1) cargar(slides[siguienteDe(actual)]);
+    };
+
+    empezarVista();
+
+    /* Al girar el celular o cambiar el tamaño de la ventana */
+    const alCambiarVista = () => empezarVista();
+    if (pantallaAncha.addEventListener) pantallaAncha.addEventListener('change', alCambiarVista);
+    else if (pantallaAncha.addListener) pantallaAncha.addListener(alCambiarVista);
 
     /* ── Pausa automática: pestaña oculta o hero fuera de la pantalla ── */
     document.addEventListener('visibilitychange', actualizar);
@@ -169,7 +184,6 @@
         if (iniciado) return;
         iniciado = true;
         reiniciarZoom(slides[actual]);          // el zoom de la 1.ª foto empieza cuando ya se ve
-        if (boton) reiniciar(boton, 'is-run');
         restante = TIEMPO;
         actualizar();
         if (slides.length > 1) cargar(slides[siguienteDe(actual)]);
@@ -177,7 +191,6 @@
     // Espera lo mismo que la pantalla de carga (loader.js deja ver la llama ~1.25 s)
     const arrancarTrasCarga = () => setTimeout(arrancar, reducirMovimiento ? 0 : Math.max(0, 1300 - performance.now()));
     hero.classList.add('is-paused');
-    hero.classList.toggle('is-stopped', pausadaPorUsuario);
     if (document.readyState === 'complete') arrancarTrasCarga();
     else window.addEventListener('load', arrancarTrasCarga, { once: true });
 })();
