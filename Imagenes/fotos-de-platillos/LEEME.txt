@@ -1,0 +1,42 @@
+FOTOS DE PLATILLOS — LA HORNILLA DE ZAID
+=========================================
+
+Una carpeta por platillo. Dentro de cada una:
+
+  <platillo>-NN-<descripcion>.jpg       Foto editada en alta calidad (JPG 92).
+                                        Úsala para flyers, promos, canal de WhatsApp e Instagram.
+
+  <platillo>-NN-<descripcion>-web.webp  La misma foto, ligera para la página web
+                                        (la portada de index.html usa estas).
+
+  originales/                           Las fotos tal como llegaron, sin tocar.
+                                        Si se necesita volver a editar, se parte de aquí.
+
+Carpetas
+--------
+  burritos/      burrito-01-envuelto, burrito-02-dorado, burrito-03-abierto
+  combos/        sopa-y-tacos-01-mesa
+  nachos/        nachos-01-para-llevar
+  papa-asada/    papa-asada-01-mesa
+  quesadillas/   quesadillas-01-para-llevar, quesadillas-02-plato, quesadillas-03-cenital
+  tacos/         tacos-01-mesa, tacos-02-con-pina
+  tortas/        minitorta-01-con-bebida, minitorta-02-mesa, torta-01-cenital
+
+Qué se le hizo a cada foto (sin cambiar su estilo)
+--------------------------------------------------
+  - Balance de blancos: se quitó el tono azul de la luz (unicel y platos blancos de verdad).
+  - Luz y contraste: blancos sin quemar, sombras con detalle.
+  - Color apetitoso: tortilla dorada, carne, salsas, cilantro y tomate con más vida,
+    sin exagerar y conservando la textura real.
+  - Nitidez suave y una viñeta ligera para que la vista vaya a la comida.
+  - Limpieza: letras de plumón en las tapitas de salsa (H, C, J, 4), la mano debajo del plato
+    (quesadillas-02), el piso y la orilla de la mesa (burrito-01, nachos-01) y el reflejo azul
+    del mantel (burrito-02).
+  - papa-asada-01 y sopa-y-tacos-01 venían en 600x334: se ampliaron al doble con IA.
+    Traen la marca "MagicStudio"; lo ideal es reemplazarlas por la foto original sin esa marca.
+
+Para agregar una foto nueva
+---------------------------
+  1. La original va en <platillo>/originales/.
+  2. La editada sigue el patrón <platillo>-NN-<descripcion>.jpg (minúsculas, sin espacios ni tildes).
+  3. Si va a la portada, también su versión -web.webp y se cambia en CSS/inicio.css.

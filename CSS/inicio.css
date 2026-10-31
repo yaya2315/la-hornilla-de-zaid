@@ -26,21 +26,22 @@
     will-change: opacity, transform;
 }
 
-/* 11 imágenes — desfase de 4.5s entre cada una.
+/* 11 imágenes distintas — desfase de 4.5s entre cada una.
+   Fotos editadas y ligeras (-web.webp) de Imagenes/fotos-de-platillos/<platillo>/
    ➜ Para añadir/quitar fotos: agrega o quita un .hero-slide en el HTML
-     y su regla nth-child aquí (mantén el delay = índice × 4.5s). */
-.hero-slide:nth-child(1)  { background-image: url('../Imagenes/Quesadilla.jpg');   animation-delay: 0s;    }
-.hero-slide:nth-child(2)  { background-image: url('../Imagenes/Tacos 1.jpg');     animation-delay: 4.5s;  }
-.hero-slide:nth-child(3)  { background-image: url('../Imagenes/Torta\ 1.jpg');     animation-delay: 9s;    }
-.hero-slide:nth-child(4)  { background-image: url('../Imagenes/papa\ asada.jpeg'); animation-delay: 13.5s; }
-.hero-slide:nth-child(5)  { background-image: url('../Imagenes/Minitorta.jpg');   animation-delay: 18s;   }
-.hero-slide:nth-child(6)  { background-image: url('../Imagenes/Tacos\ 1.jpg');   animation-delay: 22.5s; }
-.hero-slide:nth-child(7)  { background-image: url('../Imagenes/Quesadilla.jpg'); animation-delay: 27s;   }
-.hero-slide:nth-child(8)  { background-image: url('../Imagenes/Torta\ 1.jpg');   animation-delay: 31.5s; }
-/* --- 3 espacios nuevos: coloca aquí tus nuevas fotos --- */
-.hero-slide:nth-child(9)  { background-image: url('../Imagenes/Tacos.png');   animation-delay: 36s;   }
-.hero-slide:nth-child(10) { background-image: url('../Imagenes/Minitorta.jpg'); animation-delay: 40.5s; }
-.hero-slide:nth-child(11) { background-image: url('../Imagenes/papa\ asada.jpeg');   animation-delay: 45s;   }
+     y su regla nth-child aquí (mantén el delay = índice × 4.5s).
+   ➜ background-position (el % horizontal) centra la comida en pantallas verticales (celular). */
+.hero-slide:nth-child(1)  { background-image: url('../Imagenes/fotos-de-platillos/tacos/tacos-01-mesa-web.webp');                    animation-delay: 0s;    }
+.hero-slide:nth-child(2)  { background-image: url('../Imagenes/fotos-de-platillos/burritos/burrito-03-abierto-web.webp');            animation-delay: 4.5s;  }
+.hero-slide:nth-child(3)  { background-image: url('../Imagenes/fotos-de-platillos/tortas/torta-01-cenital-web.webp');                background-position: 23% 50%; animation-delay: 9s;    }
+.hero-slide:nth-child(4)  { background-image: url('../Imagenes/fotos-de-platillos/quesadillas/quesadillas-02-plato-web.webp');       animation-delay: 13.5s; }
+.hero-slide:nth-child(5)  { background-image: url('../Imagenes/fotos-de-platillos/papa-asada/papa-asada-01-mesa-web.webp');          animation-delay: 18s;   }
+.hero-slide:nth-child(6)  { background-image: url('../Imagenes/fotos-de-platillos/tortas/minitorta-01-con-bebida-web.webp');         background-position: 31% 50%; animation-delay: 22.5s; }
+.hero-slide:nth-child(7)  { background-image: url('../Imagenes/fotos-de-platillos/tacos/tacos-02-con-pina-web.webp');                animation-delay: 27s;   }
+.hero-slide:nth-child(8)  { background-image: url('../Imagenes/fotos-de-platillos/quesadillas/quesadillas-01-para-llevar-web.webp'); background-position: 46% 50%; animation-delay: 31.5s; }
+.hero-slide:nth-child(9)  { background-image: url('../Imagenes/fotos-de-platillos/nachos/nachos-01-para-llevar-web.webp');           animation-delay: 36s;   }
+.hero-slide:nth-child(10) { background-image: url('../Imagenes/fotos-de-platillos/burritos/burrito-02-dorado-web.webp');             animation-delay: 40.5s; }
+.hero-slide:nth-child(11) { background-image: url('../Imagenes/fotos-de-platillos/quesadillas/quesadillas-03-cenital-web.webp');     animation-delay: 45s;   }
 
 @keyframes heroKen {
     0%   { opacity: 0; transform: scale(1.05); }
