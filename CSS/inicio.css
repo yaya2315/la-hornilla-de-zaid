@@ -59,26 +59,36 @@
     to   { transform: scale(var(--zoom-fin, 1.05)); }
 }
 
-/* --- Velo / degradado para legibilidad y atmósfera de brasa --- */
+/* --- Velo verde noche para que el texto se lea sobre cualquier foto --- */
 .hero::before {
     content: "";
     position: absolute;
     inset: 0;
     z-index: 2;
     background:
-        radial-gradient(120% 90% at 50% 35%, transparent 35%, rgba(10,3,0,0.55) 100%),
-        linear-gradient(180deg, rgba(10,3,0,0.55) 0%, rgba(10,3,0,0.2) 35%, rgba(10,3,0,0.85) 100%);
+        radial-gradient(120% 90% at 50% 40%, transparent 30%, rgba(7, 26, 5, 0.6) 100%),
+        linear-gradient(180deg, rgba(7, 26, 5, 0.7) 0%, rgba(7, 26, 5, 0.28) 30%, rgba(7, 26, 5, 0.35) 62%, rgba(7, 26, 5, 0.92) 100%);
 }
-/* Resplandor de brasa inferior */
+/* Borde de papel rasgado al final del hero (pasa a la sección de opiniones) */
 .hero::after {
     content: "";
     position: absolute;
-    left: 50%; bottom: -30%;
-    width: 120%; height: 60%;
-    transform: translateX(-50%);
-    z-index: 2;
-    background: radial-gradient(closest-side, rgba(255,102,0,0.22), transparent 70%);
+    left: 0; right: 0; bottom: -1px;
+    height: 20px;
+    z-index: 4;
+    background: var(--noche-700);
+    -webkit-mask: var(--rasgado-a) 0 0 / 320px 100% repeat-x;
+            mask: var(--rasgado-a) 0 0 / 320px 100% repeat-x;
+    filter: drop-shadow(0 -2px 0 rgba(246, 236, 210, 0.85));
     pointer-events: none;
+}
+
+/* --- Papel picado bajo el header --- */
+.hero-picado {
+    position: absolute;
+    top: clamp(84px, 11vw, 104px);
+    left: 0; right: 0;
+    z-index: 4;
 }
 
 /* --- Contenido central --- */
@@ -93,22 +103,42 @@
     display: inline-flex;
     align-items: center;
     gap: 12px;
-    font-size: clamp(0.82rem, 2.4vw, 1rem);
-    letter-spacing: 5px;
+    font-family: var(--f-ui);
+    font-size: clamp(0.8rem, 2.6vw, 1rem);
+    letter-spacing: clamp(2px, 0.8vw, 5px);
+    white-space: nowrap;
     text-transform: uppercase;
-    color: var(--ember-soft);
+    color: var(--lima);
     font-weight: 600;
-    margin-bottom: 34px;
-    text-shadow: 0 2px 18px rgba(0,0,0,0.7);
+    margin-bottom: 6px;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
     opacity: 0;
     animation: heroUp 0.9s var(--ease) 0.2s forwards;
 }
 .hero-eyebrow::before,
 .hero-eyebrow::after {
     content: "";
-    width: 32px; height: 1px;
-    background: var(--ember-soft);
-    opacity: 0.6;
+    width: clamp(18px, 5vw, 36px); height: 2px;
+    background: var(--lima);
+    opacity: 0.7;
+}
+
+/* Titular de marca "¡A la Hornilla!" (Smokum con sombra, como los flyers) */
+.hero-titulo {
+    font-family: var(--f-titulo);
+    font-size: clamp(2.2rem, 6.5vw, 4.2rem);
+    line-height: 0.95;
+    color: var(--crema);
+    text-shadow: 3px 3px 0 var(--rojo);
+    margin: 4px 0 22px;
+    opacity: 0;
+    animation: heroUp 0.9s var(--ease) 0.25s forwards;
+}
+.hero-titulo span {
+    display: block;
+    font-size: 1.55em;
+    color: var(--amarillo);
+    text-shadow: 4px 4px 0 var(--rojo-sombra), 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 /* Título oculto a la vista pero presente para SEO y lectores de pantalla */
 .sr-only {
@@ -136,11 +166,13 @@
     left: 50%; bottom: 26px;
     transform: translateX(-50%);
     z-index: 5;
-    color: var(--cream);
-    font-size: 0.7rem;
-    letter-spacing: 2px;
+    color: var(--crema);
+    font-family: var(--f-ui);
+    font-size: 0.72rem;
+    letter-spacing: 2.5px;
     text-transform: uppercase;
-    opacity: 0.7;
+    text-decoration: none;
+    opacity: 0.85;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -149,7 +181,7 @@
 }
 .hero-scroll span {
     width: 1px; height: 34px;
-    background: linear-gradient(var(--ember), transparent);
+    background: linear-gradient(var(--lima), transparent);
 }
 @keyframes bob {
     0%, 100% { transform: translate(-50%, 0); }
@@ -160,7 +192,7 @@
     /* Sin zoom (la foto queda quieta con su encuadre; portada.js no cambia de foto) */
     .hero-slide.is-active,
     .hero-slide.is-prev { animation: none !important; }
-    .hero-eyebrow, .hero-cta { opacity: 1; animation: none; }
+    .hero-eyebrow, .hero-titulo, .hero-cta { opacity: 1; animation: none; }
     .hero-scroll { animation: none; }
 }
 
@@ -170,21 +202,22 @@
     width: fit-content;
     align-items: center;
     gap: 10px;
-    margin: -14px auto 28px;
-    padding: 9px 18px;
-    border-radius: 40px;
-    background: rgba(10, 3, 0, 0.72);
-    border: 1px solid rgba(255, 133, 51, 0.55);
-    color: #fff;
-    font-size: clamp(0.72rem, 3.2vw, 0.92rem);
+    margin: 0 auto 26px;
+    padding: 8px 18px;
+    border-radius: 999px;
+    background: var(--crema);
+    border: 0;
+    color: var(--tinta);
+    font-family: var(--f-ui);
+    font-size: clamp(0.74rem, 3.2vw, 0.92rem);
     font-weight: 600;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.4);
     white-space: nowrap;
     max-width: 100%;
     text-transform: uppercase;
-    backdrop-filter: blur(4px);
     opacity: 0;
     animation: heroUp 0.9s var(--ease) 0.3s forwards;
 }
-.hero-delivery svg { color: var(--ember-soft); flex-shrink: 0; }
+.hero-delivery svg { color: var(--rojo); flex-shrink: 0; }
 @media (prefers-reduced-motion: reduce) { .hero-delivery { opacity: 1; animation: none; } }

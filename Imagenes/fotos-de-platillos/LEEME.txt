@@ -51,3 +51,15 @@ Portada (index.html) — 14 fotos, todas las editadas, alternando platillos
   tacos-02 · quesadillas-01 · sopa-y-tacos-01 · burrito-02 · minitorta-02 · nachos-01 · quesadillas-03
   Cada foto se ve completa y centrada, con aire alrededor y la misma foto difuminada de fondo.
   papa-asada-01 y sopa-y-tacos-01 usan su versión -sin-marca.
+
+Tarjetas del menú (HTML/menu.html) — fotos "-tarjeta.webp"
+------------------------------------------------------------
+  Recorte 720x450 (16:10) de la foto editada, ligero para las tarjetas de la carta.
+  JS/cartas.js elige la foto por el nombre del platillo (o su categoría):
+    tacos-01-mesa · burrito-03-abierto · torta-01-cenital · nachos-01-para-llevar ·
+    quesadillas-01-para-llevar · sopa-de-tortilla-01-tazon (solo la sopa, sacada de
+    sopa-y-tacos-01-mesa-sin-marca) · papa-asada-01-mesa-sin-marca
+  Ley del consumidor: la foto no muestra más de lo que trae la orden
+  (tacos: 4, quesadillas: 3). Por eso quesadillas usa la de "para llevar" y no la cenital (trae 4).
+  Para cambiar una foto: haz su "-tarjeta.webp" en la carpeta del platillo y cambia la ruta
+  en FOTOS (JS/cartas.js), o pon el campo "foto" al platillo en Firebase.

@@ -264,15 +264,15 @@ function renderCardHTML(key, plato, tipo, tipoColeccion, opcionesPrecio, necesit
         <div class="pedido-controles">
             ${mostrarSelectPrecio ? `
             <div class="campo-mini">
-                <label>${etiquetaSelectPrecio}</label>
-                <select class="sel-precio" data-key="${key}">
+                <label for="sel-precio-${key}">${etiquetaSelectPrecio}</label>
+                <select class="sel-precio" id="sel-precio-${key}" data-key="${key}">
                     ${opcionesPrecio.map((o, i) => `<option value="${i}">${esc(o.texto)} — ${money(o.precio)}</option>`).join('')}
                 </select>
             </div>` : ''}
             ${necesitaCarne ? `
             <div class="campo-mini">
-                <label>Carne</label>
-                <select class="sel-carne" data-key="${key}"></select>
+                <label for="sel-carne-${key}">Carne</label>
+                <select class="sel-carne" id="sel-carne-${key}" data-key="${key}"></select>
             </div>
             <label class="chk-piña hidden" data-key="${key}">
                 <input type="checkbox" class="chk-piña-input"> Con piña 🍍
@@ -320,8 +320,8 @@ function renderCombos(combos) {
             <div class="pedido-controles combo-controles">
                 ${pideCarne ? `
                 <div class="campo-mini campo-mini--combo">
-                    <label>Carne</label>
-                    <select class="sel-carne" data-key="${key}"></select>
+                    <label for="sel-carne-${key}">Carne</label>
+                    <select class="sel-carne" id="sel-carne-${key}" data-key="${key}"></select>
                 </div>
                 <label class="chk-piña hidden" data-key="${key}">
                     <input type="checkbox" class="chk-piña-input"> Con piña 🍍

@@ -6,14 +6,17 @@
 
 .page-hero .horario {
     display: inline-block;
-    margin-top: 24px;
-    background: linear-gradient(135deg, var(--ember-fill), var(--ember-fill-deep));
-    color: #fff;
-    padding: 11px 26px;
-    border-radius: 40px;
-    font-size: 0.86rem;
-    letter-spacing: 1px;
-    box-shadow: 0 8px 24px var(--glow);
+    margin-top: 22px;
+    background: var(--papel-verde);
+    color: var(--tinta);
+    padding: 10px 22px;
+    border-radius: 8px;
+    border: 2px dashed rgba(24, 66, 15, 0.45);
+    box-shadow: 0 0 0 4px var(--papel-verde), 0 7px 0 rgba(0, 0, 0, 0.35);
+    font-family: var(--f-ui);
+    font-weight: 500;
+    font-size: 0.92rem;
+    letter-spacing: 0.6px;
     line-height: 1.5;
 }
 
@@ -22,80 +25,75 @@
 .menu-section.dark { max-width: 100%; background: var(--char-800); }
 .menu-section.dark > .inner { max-width: var(--maxw); margin: 0 auto; }
 
-/* ===== ⭐ COMBO DE LA SEMANA (elemento estrella) ========== */
+/* ===== ⭐ PROMOS DEL DÍA ================================= */
+.combos-wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 clamp(20px, 5vw, 60px); }
+.combos-wrap.has-combos { margin-top: clamp(34px, 5vw, 52px); margin-bottom: clamp(30px, 5vw, 44px); display: flex; flex-direction: column; gap: 22px; }
+.combos-wrap .combo-week { margin: 0; }
+
+/* ===== ⭐ COMBO DE LA SEMANA — banda verde con etiqueta roja (estilo flyer) ===== */
 .combo-week {
     position: relative;
-    max-width: var(--maxw);
-    margin: clamp(-32px, -4vw, -48px) auto 0;
-    padding: clamp(24px, 4vw, 40px) clamp(22px, 4vw, 48px);
-    border-radius: var(--radius-lg);
-    background:
-        radial-gradient(120% 140% at 0% 0%, rgba(255,102,0,0.18), transparent 55%),
-        linear-gradient(145deg, #2a1305, #160800);
-    border: 1px solid rgba(255,102,0,0.35);
-    box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,102,0,0.08);
+    padding: clamp(26px, 4vw, 40px) clamp(22px, 4vw, 44px);
+    border-radius: 18px;
+    background-color: var(--verde-banda);
+    background-image:
+        radial-gradient(80% 120% at 0% 0%, rgba(214, 231, 166, 0.2), transparent 60%),
+        radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1.7px);
+    background-size: 100% 100%, 16px 16px;
+    border: 0;
+    box-shadow: 0 5px 0 var(--verde-noche), var(--sombra-tarjeta);
     overflow: hidden;
     isolation: isolate;
 }
-/* Borde con resplandor pulsante de brasa */
+.combo-week + .combo-week { margin-top: 22px; }
+/* Esquina de papel picado (decorativa) */
 .combo-week::before {
     content: "";
     position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1px;
-    background: linear-gradient(120deg, var(--ember), transparent 40%, transparent 60%, var(--ember-soft));
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-            mask-composite: exclude;
-    opacity: 0.7;
-    animation: comboGlow 3.5s ease-in-out infinite;
-    pointer-events: none;
-}
-@keyframes comboGlow { 0%,100% { opacity: 0.35; } 50% { opacity: 0.9; } }
-
-/* Brillo que recorre la tarjeta */
-.combo-week::after {
-    content: "";
-    position: absolute;
-    top: 0; left: -60%;
-    width: 50%; height: 100%;
-    background: linear-gradient(100deg, transparent, rgba(255,255,255,0.07), transparent);
-    transform: skewX(-18deg);
-    animation: comboShine 6s ease-in-out infinite;
+    top: 0; right: 0;
+    width: 150px; height: 46px;
+    background: var(--papel-picado) 0 0 / auto 46px repeat-x;
+    opacity: 0.9;
     pointer-events: none;
     z-index: -1;
 }
-@keyframes comboShine { 0% { left: -60%; } 35%, 100% { left: 130%; } }
 
+/* Cinta roja "Combo de la semana" */
 .combo-badge {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: var(--ember-fill);
+    background: var(--rojo);
     color: #fff;
-    font-family: 'Oswald', sans-serif;
+    font-family: var(--f-ui);
     font-weight: 700;
-    font-size: 0.72rem;
+    font-size: 0.74rem;
     letter-spacing: 2.5px;
     text-transform: uppercase;
-    padding: 7px 16px;
-    border-radius: 30px;
-    margin-bottom: 18px;
+    padding: 7px 16px 7px 14px;
+    border-radius: 4px;
+    box-shadow: 0 3px 0 var(--rojo-sombra);
+    margin-bottom: 14px;
 }
 .combo-badge .dot {
     width: 7px; height: 7px; border-radius: 50%;
     background: #fff;
     box-shadow: 0 0 0 0 rgba(255,255,255,0.7);
-    animation: pulse 1.8s infinite;
+    animation: comboPulso 1.8s infinite;
 }
-@keyframes pulse {
+@keyframes comboPulso {
     0%   { box-shadow: 0 0 0 0 rgba(255,255,255,0.7); }
     70%  { box-shadow: 0 0 0 9px rgba(255,255,255,0); }
     100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
 }
-
+.combo-vigencia {
+    color: var(--crema);
+    font-family: var(--f-ui);
+    font-size: 0.82rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
 .combo-grid {
     display: grid;
     grid-template-columns: 1fr auto;
@@ -103,84 +101,134 @@
     align-items: center;
 }
 .combo-name {
-    font-size: clamp(1.8rem, 5vw, 2.8rem);
-    color: #fff;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    line-height: 1.05;
-}
-.combo-desc { color: var(--text); margin-top: 10px; max-width: 44ch; }
-.combo-price {
-    font-family: 'Oswald', sans-serif;
-    font-weight: 700;
-    font-size: clamp(2.4rem, 7vw, 4rem);
-    color: var(--ember);
+    font-family: var(--f-titulo);
+    font-weight: 400;
+    font-size: clamp(2rem, 6vw, 3rem);
+    color: var(--crema);
+    text-transform: none;
+    letter-spacing: 0.5px;
     line-height: 1;
-    text-shadow: 0 6px 30px var(--glow);
+    text-shadow: 3px 3px 0 var(--verde-noche);
+}
+.combo-desc { color: #fff; margin-top: 10px; max-width: 46ch; }
+
+/* Precio en etiqueta roja con esquina doblada (Rye amarillo, como en los flyers) */
+.combo-price {
+    position: relative;
+    justify-self: end;
+    background: var(--rojo);
+    color: var(--amarillo);
+    font-family: var(--f-precio);
+    font-weight: 400;
+    font-size: clamp(2.3rem, 6vw, 3.2rem);
+    line-height: 1;
+    padding: 12px 24px 14px 18px;
+    text-shadow: 2px 2px 0 var(--rojo-sombra);
+    clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+    transform: rotate(-2deg);
     white-space: nowrap;
+}
+.combo-price::after {
+    content: "";
+    position: absolute;
+    top: 0; right: 0;
+    width: 16px; height: 16px;
+    background: var(--rojo-sombra);
+    clip-path: polygon(0 0, 100% 100%, 0 100%);
 }
 .combo-price small {
     display: block;
-    font-size: 0.72rem;
-    letter-spacing: 2px;
-    color: var(--muted);
+    font-family: var(--f-ui);
+    font-weight: 600;
+    font-size: 0.7rem;
+    letter-spacing: 2.5px;
+    color: #fff;
+    text-shadow: none;
     text-transform: uppercase;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
 }
 
 /* ===== GRID DE PLATILLOS ================================== */
 .platillos-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 22px;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+    gap: 24px;
 }
+/* Tarjeta: foto real arriba con borde de papel rasgado, y la carta abajo */
 .platillo-card {
-    background: var(--card);
+    display: flex;
+    flex-direction: column;
+    background: var(--noche-600);
     border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 26px;
-    transition: transform 0.35s var(--ease), border-color 0.35s var(--ease),
-                box-shadow 0.35s var(--ease);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--sombra-tarjeta);
+    transition: transform 0.35s var(--ease), border-color 0.35s var(--ease), box-shadow 0.35s var(--ease);
 }
 .platillo-card:hover {
-    transform: translateY(-5px);
-    border-color: var(--ember);
-    box-shadow: 0 18px 40px rgba(0,0,0,0.4);
+    transform: translateY(-4px);
+    border-color: rgba(246, 236, 210, 0.35);
+    box-shadow: 0 22px 44px rgba(0, 0, 0, 0.45);
 }
+.platillo-foto {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    background: var(--noche-800);
+}
+.platillo-foto img { width: 100%; height: 100%; object-fit: cover; }
+.platillo-foto::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: -1px;
+    height: 16px;
+    background: var(--noche-600);
+    -webkit-mask: var(--rasgado-b) 0 0 / 260px 100% repeat-x;
+            mask: var(--rasgado-b) 0 0 / 260px 100% repeat-x;
+}
+.platillo-cuerpo { padding: 14px 22px 22px; flex: 1; }
 .platillo-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 .platillo-head h3 {
-    font-size: 1.5rem;
-    color: var(--ember);
+    font-family: var(--f-ui);
+    font-weight: 700;
+    font-size: 1.55rem;
+    color: var(--crema);
     text-transform: uppercase;
     letter-spacing: 1.5px;
 }
 .platillo-nota {
-    font-size: 0.72rem;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    font-family: var(--f-texto);
+    font-style: italic;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--lima);
     white-space: nowrap;
 }
 .platillo-rows {
     display: flex;
     flex-direction: column;
-    gap: 11px;
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid var(--line);
+    gap: 10px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px dashed rgba(246, 236, 210, 0.22);
 }
 .row {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: baseline;
     gap: 14px;
-    color: var(--text);
+    color: var(--texto-claro);
+    font-family: var(--f-ui);
+    font-weight: 500;
     font-size: 0.95rem;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
 }
 .row .precio {
-    font-family: 'Oswald', sans-serif;
-    font-weight: 700;
-    color: var(--ember);
+    font-family: var(--f-precio);
+    font-weight: 400;
+    font-size: 1.2rem;
+    color: var(--amarillo);
+    letter-spacing: 0;
     white-space: nowrap;
 }
 
@@ -188,27 +236,59 @@
 .nuevo-card {
     grid-column: 1 / -1;
     display: grid;
-    grid-template-columns: auto 1fr auto;
-    gap: clamp(16px, 3vw, 32px);
-    align-items: center;
-    background: linear-gradient(135deg, rgba(255,102,0,0.10), var(--card));
-    border: 1px solid rgba(255,102,0,0.4);
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    align-items: stretch;
+    background: var(--noche-600);
+    border: 2px solid var(--amarillo);
 }
+.nuevo-card .platillo-foto { aspect-ratio: auto; min-height: 240px; }
+.nuevo-card .platillo-foto::after { content: none; }
+.nuevo-card .platillo-cuerpo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    padding: clamp(22px, 4vw, 36px);
+}
+/* "Lo nuevo": etiqueta roja con esquina doblada sobre la foto */
 .nuevo-tag {
-    background: var(--ember-fill);
+    position: absolute;
+    top: 16px; left: 16px;
+    z-index: 2;
+    background: var(--rojo);
     color: #fff;
-    font-family: 'Oswald', sans-serif;
+    font-family: var(--f-ui);
     font-weight: 700;
-    font-size: 0.7rem;
-    letter-spacing: 2px;
+    font-size: 0.78rem;
+    letter-spacing: 2.5px;
     text-transform: uppercase;
-    padding: 6px 12px;
-    border-radius: 8px;
-    align-self: flex-start;
+    padding: 8px 18px 8px 14px;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
 }
-.nuevo-card h3 { font-size: 1.6rem; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
-.nuevo-card p { color: var(--muted); font-size: 0.9rem; margin-top: 6px; max-width: 52ch; }
-.nuevo-card .precio { font-size: 2rem; }
+.nuevo-card h3 {
+    font-family: var(--f-titulo);
+    font-weight: 400;
+    font-size: clamp(2.2rem, 6vw, 3rem);
+    line-height: 1;
+    color: var(--crema);
+    text-transform: none;
+    letter-spacing: 0.5px;
+    text-shadow: 3px 3px 0 var(--rojo);
+}
+.nuevo-card p { color: var(--texto-claro); font-size: 0.95rem; max-width: 46ch; }
+.nuevo-card .precio {
+    align-self: flex-start;
+    margin-top: 6px;
+    font-family: var(--f-precio);
+    font-size: 2.2rem;
+    line-height: 1;
+    color: var(--amarillo);
+    background: var(--rojo);
+    padding: 10px 22px 12px 16px;
+    text-shadow: 2px 2px 0 var(--rojo-sombra);
+    clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+    transform: rotate(-2deg);
+}
 
 /* ===== PUPUSAS ============================================ */
 .pupusas-grid { display: grid; gap: 14px; max-width: 760px; margin: 0 auto; }
@@ -222,13 +302,13 @@
 .pupusa-row:hover { border-color: var(--ember); transform: translateX(4px); }
 .pupusa-top { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; }
 .pupusa-top h4 { font-size: 1.15rem; color: var(--cream); text-transform: uppercase; letter-spacing: 0.5px; }
-.pupusa-top .precio { font-family: 'Oswald'; font-weight: 700; color: var(--ember); font-size: 1.1rem; }
+.pupusa-top .precio { font-family: var(--f-precio); font-weight: 400; color: var(--amarillo); font-size: 1.15rem; }
 .pupusa-row small { color: var(--muted); font-size: 0.82rem; }
 
 /* ===== EXTRAS ============================================= */
 .extras-box {
-    background: var(--card);
-    border: 1px solid var(--line);
+    background: var(--noche-600);
+    border: 2px dashed rgba(246, 236, 210, 0.25);
     border-radius: var(--radius);
     padding: 30px clamp(22px, 4vw, 38px);
     max-width: 640px;
@@ -236,25 +316,30 @@
 }
 .extras-box h3 {
     text-align: center;
-    font-size: 1.5rem;
-    color: var(--ember);
-    text-transform: uppercase;
-    letter-spacing: 3px;
+    font-family: var(--f-titulo);
+    font-weight: 400;
+    font-size: 2.2rem;
+    color: var(--crema);
+    text-transform: none;
+    letter-spacing: 0.5px;
+    text-shadow: 3px 3px 0 var(--rojo);
     margin-bottom: 22px;
 }
 .extras-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 32px; }
 .extra-row {
     display: flex; justify-content: space-between;
-    color: var(--text); font-size: 0.92rem;
+    align-items: baseline;
+    color: var(--text); font-size: 0.95rem;
     padding-bottom: 9px;
-    border-bottom: 1px solid var(--line);
+    border-bottom: 1px dashed rgba(246, 236, 210, 0.2);
 }
-.extra-row .precio { font-family: 'Oswald'; font-weight: 700; color: var(--ember); }
+.extra-row .precio { font-family: var(--f-precio); font-weight: 400; color: var(--amarillo); }
 
 .propina {
     text-align: center;
     color: var(--muted);
-    font-size: 0.82rem;
+    font-family: var(--f-ui);
+    font-size: 0.85rem;
     letter-spacing: 2px;
     text-transform: uppercase;
     margin-top: 28px;
@@ -262,8 +347,9 @@
 
 /* ===== BEBIDAS =========================================== */
 .bebidas-generales {
-    background: var(--card);
+    background: var(--noche-600);
     border: 1px solid var(--line);
+    box-shadow: var(--sombra-tarjeta);
     border-radius: var(--radius);
     padding: 22px clamp(22px, 4vw, 34px);
     margin-bottom: 30px;
@@ -271,11 +357,12 @@
 .bebida-row {
     display: flex; justify-content: space-between; align-items: center;
     color: var(--text); font-size: 0.95rem;
+    gap: 14px;
     padding: 11px 0;
-    border-bottom: 1px solid var(--line);
+    border-bottom: 1px dashed rgba(246, 236, 210, 0.2);
 }
 .bebida-row:last-child { border-bottom: none; }
-.bebida-row .precio { font-family: 'Oswald'; font-weight: 700; color: var(--ember); }
+.bebida-row .precio { font-family: var(--f-precio); font-weight: 400; color: var(--amarillo); white-space: nowrap; }
 
 .bebidas-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 .bebidas-cols.single-col {
@@ -284,17 +371,18 @@
     margin: 0 auto;
 }
 .bebidas-grupo {
-    background: var(--card);
+    background: var(--noche-600);
     border: 1px solid var(--line);
+    box-shadow: var(--sombra-tarjeta);
     border-radius: var(--radius);
     padding: 24px clamp(20px, 3vw, 30px);
 }
 .bebidas-grupo h3,
 .bebidas-grupo .sub {
-    font-family: 'Oswald', sans-serif;
+    font-family: var(--f-ui);
     font-weight: 700;
     font-size: 1.05rem;
-    color: var(--ember);
+    color: var(--lima);
     text-transform: uppercase;
     letter-spacing: 2px;
     margin-bottom: 14px;
@@ -309,11 +397,17 @@
     .extras-grid { grid-template-columns: 1fr; }
     .combo-grid { grid-template-columns: 1fr; text-align: center; }
     .combo-desc { margin-inline: auto; }
+    .combo-price { justify-self: center; }
     .nuevo-card { grid-template-columns: 1fr; text-align: center; }
-    .nuevo-tag { justify-self: center; }
+    .nuevo-card .platillo-foto { aspect-ratio: 16 / 10; min-height: 0; }
     .nuevo-card p { margin-inline: auto; }
+    .nuevo-card .precio { align-self: center; }
 }
 @media (max-width: 480px) {
     .platillo-head h3 { font-size: 1.25rem; }
     .row, .bebida-row, .extra-row { font-size: 0.88rem; flex-wrap: wrap; }
 }
+/* Tarjeta destacada sin foto (por si un platillo nuevo aún no tiene) */
+.nuevo-card { position: relative; }
+.nuevo-card.sin-foto { grid-template-columns: 1fr; }
+.nuevo-card.sin-foto .nuevo-tag { position: static; justify-self: start; margin: 22px 0 0 22px; }

@@ -8,7 +8,7 @@
     <link rel="apple-touch-icon" href="Imagenes/apple-touch-icon.png">
     <title>La Hornilla de Zaid — Comida mexicana a domicilio en Sonsonate</title>
     <meta name="description" content="Tacos, burritos, birria, quesadillas y más comida mexicana en Sonsonate. Pide en línea por WhatsApp y te lo llevamos a domicilio.">
-    <meta name="theme-color" content="#120600">
+    <meta name="theme-color" content="#0b2408">
     <meta name="google-site-verification" content="vCjEv9wg-Ccp55yqrC1kZFFWl-jEAKFChwEftCZ6eZU" />
     <link rel="canonical" href="https://yaya2315.github.io/la-hornilla-de-zaid/">
 
@@ -68,7 +68,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,600&family=Rye&family=Smokum&display=swap" rel="stylesheet">
 
     <!-- Primera foto de la portada: se descarga antes que todo lo demás.
          Una para pantallas anchas (1.ª foto data-vista="ancha") y otra para altas (1.ª data-vista="alta"). -->
@@ -76,6 +76,7 @@
     <link rel="preload" as="image" type="image/webp" href="Imagenes/fotos-de-platillos/tacos/tacos-02-con-pina-portada.webp" media="(max-aspect-ratio: 999/1000)" fetchpriority="high">
 
     <link rel="stylesheet" href="CSS/style.css">
+    <link rel="stylesheet" href="CSS/marca.css">
     <link rel="stylesheet" href="CSS/inicio.css">
     <link rel="stylesheet" href="CSS/captacion.css">
 
@@ -89,9 +90,9 @@
         }
         .hero-cta .btn-primary,
         .hero-cta .btn-ghost { min-width: 250px; justify-content: center; }
-        /* El botón "fantasma" se ve mejor sobre el hero oscuro con un velo */
+        /* El botón "fantasma" se ve mejor sobre la foto con un velo verde */
         .hero-cta .btn-ghost {
-            background: rgba(10, 3, 0, 0.35);
+            background: rgba(7, 26, 5, 0.45);
             backdrop-filter: blur(4px);
         }
     </style>
@@ -161,9 +162,13 @@
                 <div class="hero-slide" data-vista="alta" data-foto="Imagenes/fotos-de-platillos/quesadillas/quesadillas-02-plato-portada.webp" style="--pos: 41% 50%"></div>
             </div>
 
+            <!-- Papel picado colgando bajo el header (decorativo) -->
+            <span class="papel-picado hero-picado" aria-hidden="true"></span>
+
             <div class="hero-content">
                 <h1 class="sr-only">La Hornilla de Zaid — Cocina mexicana hecha a la hornilla en Sonsonate</h1>
                 <span class="hero-eyebrow">DOS CULTURAS | UN SABOR</span>
+                <p class="hero-titulo">¡A la <span>Hornilla!</span></p>
                 <p class="hero-delivery"><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 7c0-1.1-.9-2-2-2h-3v2h3v2.65L13.52 14H10V9H6c-2.21 0-4 1.79-4 4v3h2c0 1.66 1.34 3 3 3s3-1.34 3-3h4.48L19 10.35V7zM7 17c-.55 0-1-.45-1-1h2c0 .55-.45 1-1 1zm-1-5c0-.55.45-1 1-1h1v1H6zm13-1c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3zm0 4c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zM5 6h5v2H5z"/></svg><span>Únicamente delivery en Sonsonate</span></p>
                 <div class="hero-cta">
                     <a href="HTML/pedido.html" class="btn-primary">Pedir en línea <span class="arrow">→</span></a>

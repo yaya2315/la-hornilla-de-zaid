@@ -1,0 +1,529 @@
+/* =====================================================================
+   LA HORNILLA DE ZAID — Capa de marca "Noche de feria"
+   ---------------------------------------------------------------------
+   Solo para las páginas PÚBLICAS (inicio, menú, pedir, ubicación y
+   legales). Se carga DESPUÉS de style.css y ANTES del CSS de cada página.
+   Admin, mesero, cocina e historial no la cargan: se quedan como están.
+
+   Qué trae:
+   • La paleta de los flyers (verde, rojo etiqueta, amarillo, lima,
+     crema) sobre un fondo verde noche que no cansa la vista.
+   • Tipografías de marca: Smokum (títulos), Rye (precios),
+     Oswald (etiquetas y botones) y Poppins (texto).
+   • Piezas de los flyers hechas en CSS: papel picado, bordes de papel
+     rasgado, textura de papel, etiqueta roja y píldora lima.
+   • Header, menú lateral, footer, botones, encabezados, aviso de
+     cookies y pantalla de carga con el nuevo estilo.
+
+   Los nombres viejos (--ember, --char-800, --card…) apuntan a la
+   paleta nueva, así cada página toma los colores sin reescribirla.
+   ===================================================================== */
+
+:root {
+    /* ── Paleta de marca (la de los flyers) ── */
+    --verde-banda:  #2f7424;
+    --verde-hoja:   #1f5a17;
+    --verde-oscuro: #18420f;
+    --verde-noche:  #0f2a0b;
+    --papel-verde:  #d6e7a6;
+    --rojo:         #d9201f;
+    --rojo-sombra:  #8f1210;
+    --rojo-texto:   #ff6b5e;   /* rojo legible como TEXTO sobre fondo oscuro (AA) */
+    --amarillo:     #ffd21f;
+    --lima:         #d6e22b;
+    --crema:        #f6ecd2;
+    --tinta:        #141414;
+
+    /* ── Superficies "noche de feria" (de más oscuro a más claro) ── */
+    --noche-900: #071a05;
+    --noche-800: #0b2408;
+    --noche-700: #0f2a0b;
+    --noche-600: #15380f;
+    --noche-500: #1c4614;
+
+    /* ── Texto ── */
+    --texto-claro: #ecead6;
+    --texto-suave: #b9c4a0;
+
+    /* ── Tipografías ── */
+    --f-titulo: 'Smokum', 'Rye', Georgia, serif;
+    --f-precio: 'Rye', Georgia, serif;
+    --f-ui:     'Oswald', 'Arial Narrow', Arial, sans-serif;
+    --f-texto:  'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+    /* ── Sombras "de papel" (duras, como en los flyers) ── */
+    --sombra-boton: 0 4px 0 var(--rojo-sombra), 0 12px 24px rgba(0, 0, 0, 0.35);
+    --sombra-tarjeta: 0 14px 34px rgba(0, 0, 0, 0.35);
+    --sombra-titulo: 3px 3px 0 var(--rojo-sombra);
+
+    /* ── Los nombres de siempre, ahora con la paleta nueva ── */
+    --char-900:        var(--noche-900);
+    --char-800:        var(--noche-800);
+    --char-700:        var(--noche-700);
+    --card:            rgba(21, 56, 15, 0.96);
+    --card-soft:       rgba(15, 42, 11, 0.72);
+    --ember:           var(--amarillo);     /* acentos: precios, títulos de tarjeta */
+    --ember-deep:      #e0b400;
+    --ember-soft:      var(--amarillo);     /* anillo de foco */
+    --ember-fill:      var(--rojo);         /* rellenos con texto blanco (5:1) */
+    --ember-fill-deep: var(--rojo-sombra);
+    --glow:            rgba(0, 0, 0, 0.35);
+    --line:            rgba(246, 236, 210, 0.14);
+    --cream:           var(--crema);
+    --text:            var(--texto-claro);
+    --muted:           var(--texto-suave);
+
+    /* ── Piezas de papel (SVG en línea, sin peticiones extra) ── */
+    --rasgado-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 480 20' preserveAspectRatio='none'%3E%3Cpath d='M0 20 L0 8 L7.6 4.9 L13.2 8.3 L18.6 11.8 L24.2 4.3 L35.8 4.6 L45.8 12.0 L54.0 17 L61.3 8.0 L72.8 5.1 L83.0 6.9 L88.5 4.0 L98.9 7.3 L108.6 7.6 L119.9 9.8 L129.5 8.2 L140.4 6.1 L146.3 7.3 L152.5 12.6 L163.7 8.7 L171.2 9.8 L180.8 7.6 L193.4 7.8 L198.8 9.8 L211.8 10.9 L219.9 13.4 L226.2 9.6 L232.3 5.7 L244.2 4.2 L253.6 11.5 L265.5 6.0 L273.4 11.5 L279.6 5.1 L286.5 7.9 L293.6 3.5 L301.5 8.6 L312.1 8.1 L322.5 4.0 L333.7 11.4 L341.8 11.6 L347.3 4.1 L353.6 8.6 L359.9 4.4 L365.1 11.4 L371.2 5.8 L379.2 4.6 L392.1 7.7 L397.8 4.4 L404.9 13.1 L417.5 12.4 L422.7 8.3 L434.6 9.8 L442.6 5.0 L451.8 10.5 L458.6 10.8 L470.4 10.8 L480 8 L480 20 Z'/%3E%3C/svg%3E");
+    --rasgado-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 480 20' preserveAspectRatio='none'%3E%3Cpath d='M0 20 L0 10 L6.3 12.1 L15.2 6.9 L26.6 10.1 L33.5 4.5 L43.2 5.3 L50.0 14.4 L61.0 14.1 L66.2 8.1 L72.2 15.0 L78.4 17 L87.0 10.6 L95.9 13.2 L102.8 13.1 L115.5 14.3 L126.6 10.9 L132.6 9.7 L139.2 14.7 L147.5 8.5 L155.6 15.4 L160.8 5.5 L173.7 10.0 L183.1 12.7 L193.0 10.6 L199.5 6.4 L211.9 8.3 L219.3 12.0 L230.5 8.6 L240.9 14.4 L249.2 15.4 L258.9 14.2 L266.9 7.2 L273.2 5.3 L284.4 9.8 L289.8 7.3 L298.2 10.2 L310.4 15.3 L319.2 7.3 L328.4 15.6 L340.1 13.2 L349.9 9.2 L361.7 7.9 L368.9 17 L381.6 4.8 L391.7 13.9 L398.8 9.0 L411.0 8.5 L416.2 16.0 L426.5 5.9 L434.1 9.9 L440.4 6.5 L451.1 16.3 L463.1 13.0 L468.1 15.7 L474.5 12.3 L480 10 L480 20 Z'/%3E%3C/svg%3E");
+    --rasgado-abajo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 480 20' preserveAspectRatio='none'%3E%3Cpath d='M0 0 L0 12 L9.6 13.2 L16.8 13.4 L29.1 9.2 L39.0 12.0 L48.2 11.5 L58.3 10.2 L67.3 8.0 L78.2 11.3 L90.6 12.5 L96.5 8.0 L103.8 9.4 L114.8 8.6 L121.7 5.9 L129.2 11.0 L135.0 7.8 L146.0 9.9 L152.0 7.2 L158.6 9.2 L167.3 11.8 L176.6 14.6 L182.1 11.8 L193.4 8.5 L198.5 12.4 L206.0 15.5 L212.3 12.0 L217.6 8.3 L228.4 11.7 L237.5 9.8 L250.2 8.2 L261.6 7.7 L272.3 13.1 L282.3 14.3 L293.9 11.4 L306.3 15.3 L316.0 12.1 L326.0 14.0 L331.8 9.9 L341.4 9.3 L354.0 8.1 L365.1 12.7 L375.6 7.6 L383.9 15.7 L390.0 3 L401.3 6.1 L412.7 14.2 L425.5 14.3 L430.6 7.6 L440.5 7.1 L448.3 12.0 L454.9 8.2 L460.9 8.4 L466.9 14.7 L475.6 13.3 L480 12 L480 0 Z'/%3E%3C/svg%3E");
+    --papel-picado: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='276' height='46' viewBox='0 0 276 46'%3E%3Cpath d='M0 7 Q23.0 11 46 7 T92 7 T138 7 T184 7 T230 7 T276 7' stroke='%23f6ecd2' stroke-opacity='.55' stroke-width='1.1' fill='none'/%3E%3Cpath fill='%23d9201f' fill-rule='evenodd' transform='rotate%283 23.0 9%29' d='M6 9 L40 9 L40.0 39.0 L34.3 35.0 L28.7 39.0 L23.0 35.0 L17.3 39.0 L11.7 35.0 L6.0 39.0 Z M23.0 15.600000000000001 L28.0 21.6 L23.0 27.6 L18.0 21.6 Z M11.1 14.600000000000001 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M31.1 14.600000000000001 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M11.1 28.6 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M31.1 28.6 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M9.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M17.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M25.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M33.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z'/%3E%3Cpath fill='%23f6ecd2' fill-rule='evenodd' transform='rotate%28-4 69.0 9%29' d='M52 9 L86 9 L86.0 39.0 L80.3 35.0 L74.7 39.0 L69.0 35.0 L63.3 39.0 L57.7 35.0 L52.0 39.0 Z M69.0 15.600000000000001 L74.0 21.6 L69.0 27.6 L64.0 21.6 Z M57.1 14.600000000000001 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M77.1 14.600000000000001 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M57.1 28.6 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M77.1 28.6 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M55.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M63.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M71.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M79.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z'/%3E%3Cpath fill='%23ffd21f' fill-rule='evenodd' transform='rotate%283 115.0 9%29' d='M98 9 L132 9 L132.0 39.0 L126.3 35.0 L120.7 39.0 L115.0 35.0 L109.3 39.0 L103.7 35.0 L98.0 39.0 Z M115.0 15.600000000000001 L120.0 21.6 L115.0 27.6 L110.0 21.6 Z M103.1 14.600000000000001 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M123.1 14.600000000000001 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M103.1 28.6 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M123.1 28.6 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M101.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M109.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M117.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M125.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z'/%3E%3Cpath fill='%23ff7a1a' fill-rule='evenodd' transform='rotate%28-4 161.0 9%29' d='M144 9 L178 9 L178.0 39.0 L172.3 35.0 L166.7 39.0 L161.0 35.0 L155.3 39.0 L149.7 35.0 L144.0 39.0 Z M161.0 15.600000000000001 L166.0 21.6 L161.0 27.6 L156.0 21.6 Z M149.1 14.600000000000001 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M169.1 14.600000000000001 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M149.1 28.6 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M169.1 28.6 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M147.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M155.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M163.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M171.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z'/%3E%3Cpath fill='%23d6e22b' fill-rule='evenodd' transform='rotate%283 207.0 9%29' d='M190 9 L224 9 L224.0 39.0 L218.3 35.0 L212.7 39.0 L207.0 35.0 L201.3 39.0 L195.7 35.0 L190.0 39.0 Z M207.0 15.600000000000001 L212.0 21.6 L207.0 27.6 L202.0 21.6 Z M195.1 14.600000000000001 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M215.1 14.600000000000001 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M195.1 28.6 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M215.1 28.6 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M193.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M201.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M209.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M217.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z'/%3E%3Cpath fill='%23e4007c' fill-rule='evenodd' transform='rotate%28-4 253.0 9%29' d='M236 9 L270 9 L270.0 39.0 L264.3 35.0 L258.7 39.0 L253.0 35.0 L247.3 39.0 L241.7 35.0 L236.0 39.0 Z M253.0 15.600000000000001 L258.0 21.6 L253.0 27.6 L248.0 21.6 Z M241.1 14.600000000000001 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M261.1 14.600000000000001 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M241.1 28.6 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M261.1 28.6 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M239.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M247.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M255.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M263.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z'/%3E%3C/svg%3E");
+    --ruido-papel: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 .9  0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23n%29'/%3E%3C/svg%3E");
+}
+
+/* ===== BASE ============================================================ */
+/* Fondo verde noche con textura de papel muy suave (semitono + grano) */
+body {
+    font-family: var(--f-texto);
+    color: var(--texto-claro);
+    background-color: var(--noche-700);
+    background-image:
+        radial-gradient(circle, rgba(214, 231, 166, 0.05) 1px, transparent 1.6px),
+        var(--ruido-papel);
+    background-size: 18px 18px, 160px 160px;
+}
+.page-main { background: transparent; }
+input, select, textarea, button { font-family: inherit; }
+::selection { background: var(--amarillo); color: var(--tinta); }
+
+h1, h2, h3, h4, .display { font-family: var(--f-ui); }
+
+/* Foco visible en amarillo (se ve sobre verde, rojo y fotos) */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+    outline: 3px solid var(--amarillo);
+    outline-offset: 3px;
+}
+
+/* ===== PIEZAS DE MARCA REUTILIZABLES ================================== */
+
+/* Guirnalda de papel picado: <span class="papel-picado" aria-hidden="true"></span> */
+.papel-picado {
+    display: block;
+    height: 46px;
+    background: var(--papel-picado) 0 0 / auto 46px repeat-x;
+    pointer-events: none;
+}
+
+/* Etiqueta roja con esquina doblada (precios y avisos) */
+.etiqueta-roja {
+    position: relative;
+    display: inline-block;
+    background: var(--rojo);
+    color: #fff;
+    padding: 8px 18px 8px 16px;
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+    filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.35));
+}
+.etiqueta-roja::after {
+    content: "";
+    position: absolute;
+    top: 0; right: 0;
+    width: 12px; height: 12px;
+    background: var(--rojo-sombra);
+    clip-path: polygon(0 0, 100% 100%, 0 100%);
+}
+
+/* Píldora lima del teléfono */
+.pildora-lima {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--lima);
+    color: var(--tinta);
+    border-radius: 999px;
+    padding: 6px 20px 6px 6px;
+    font: 700 1.35rem/1 var(--f-ui);
+    letter-spacing: 1px;
+    text-decoration: none;
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.35);
+    transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+.pildora-lima .ico {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--tinta);
+    color: var(--lima);
+    display: grid;
+    place-items: center;
+}
+.pildora-lima .ico svg { width: 17px; height: 17px; fill: currentColor; }
+.pildora-lima:hover { transform: translateY(-2px); box-shadow: 0 5px 0 rgba(0, 0, 0, 0.35); }
+
+/* Borde de papel rasgado ARRIBA de una sección (con su fibra crema).
+   Uso: class="… con-rasgado" — la sección necesita position: relative. */
+.con-rasgado { position: relative; }
+.con-rasgado::before,
+.con-rasgado::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0;
+    height: 20px;
+    pointer-events: none;
+    z-index: 3;
+    -webkit-mask: var(--rasgado-a) 0 0 / 320px 100% repeat-x;
+            mask: var(--rasgado-a) 0 0 / 320px 100% repeat-x;
+}
+.con-rasgado::before { top: -15px; background: var(--crema); opacity: 0.9; }
+.con-rasgado::after {
+    top: -11px;
+    background: var(--fondo-seccion, var(--noche-700));
+    -webkit-mask-image: var(--rasgado-b);
+            mask-image: var(--rasgado-b);
+    -webkit-mask-size: 280px 100%;
+            mask-size: 280px 100%;
+}
+
+/* ===== HEADER ========================================================== */
+.logo-box {
+    background: transparent;
+    border: 0;
+    padding: 6px 4px;
+    backdrop-filter: none;
+}
+.main-logo { filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.55)); }
+
+.menu-toggle {
+    background: var(--verde-banda);
+    border: 0;
+    backdrop-filter: none;
+    box-shadow: 0 4px 0 var(--noche-900), 0 10px 22px rgba(0, 0, 0, 0.35);
+    transition: transform 0.25s var(--ease), background 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+.menu-toggle:hover { background: var(--verde-hoja); transform: translateY(-1px); }
+.menu-toggle:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--noche-900); }
+.menu-toggle span { background: var(--crema); }
+
+/* Al bajar: banda verde con borde rasgado, como la banda de los flyers */
+.main-header.scrolled {
+    background: rgba(11, 36, 8, 0.94);
+    backdrop-filter: blur(10px);
+    box-shadow: none;
+}
+.main-header::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: -12px;
+    height: 14px;
+    background: rgba(11, 36, 8, 0.94);
+    -webkit-mask: var(--rasgado-b) 0 0 / 280px 100% repeat-x;
+            mask: var(--rasgado-b) 0 0 / 280px 100% repeat-x;
+    transform: scaleY(-1);
+    opacity: 0;
+    transition: opacity 0.4s var(--ease);
+    pointer-events: none;
+}
+.main-header.scrolled::after { opacity: 1; }
+
+/* ===== MENÚ LATERAL ==================================================== */
+.backdrop { background: rgba(4, 14, 3, 0.6); }
+.sidebar {
+    background: var(--noche-800);
+    background-image:
+        radial-gradient(circle, rgba(214, 231, 166, 0.05) 1px, transparent 1.6px),
+        linear-gradient(180deg, var(--noche-700), var(--noche-900));
+    background-size: 18px 18px, 100% 100%;
+    border-left: 0;
+    box-shadow: -18px 0 40px rgba(0, 0, 0, 0.45);
+}
+.sidebar { padding-top: 150px; }
+/* Papel picado arriba del menú (debajo del header) */
+.sidebar::before {
+    content: "";
+    position: absolute;
+    top: calc(clamp(42px, 5.5vw, 58px) + 46px); left: 0; right: 0;
+    height: 46px;
+    background: var(--papel-picado) 0 0 / auto 46px repeat-x;
+    pointer-events: none;
+}
+.nav-menu li a {
+    font-family: var(--f-titulo);
+    font-weight: 400;
+    font-size: clamp(2.2rem, 8vw, 2.9rem);
+    letter-spacing: 0.5px;
+    color: var(--crema);
+    text-shadow: var(--sombra-titulo);
+}
+.nav-menu li a::before { background: var(--amarillo); height: 3px; }
+.nav-menu li a:hover,
+.nav-menu li a[aria-current="page"] { color: var(--amarillo); }
+.nav-menu li a.is-cta { color: var(--crema); }
+.nav-menu li a.is-cta::after {
+    width: auto; height: auto;
+    content: "¡Ya!";
+    font: 700 0.8rem/1 var(--f-ui);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #fff;
+    background: var(--rojo);
+    border-radius: 6px;
+    padding: 5px 8px;
+    margin-left: 12px;
+    vertical-align: 0.6em;
+    text-shadow: none;
+    box-shadow: 0 3px 0 var(--rojo-sombra);
+}
+.sidebar-contact { border-top: 1px dashed rgba(246, 236, 210, 0.25); }
+.sidebar-contact .eyebrow { font-family: var(--f-ui); color: var(--lima); }
+.sidebar-direct .lbl { font-family: var(--f-ui); color: var(--texto-suave); }
+.sidebar-direct a { color: var(--crema); font-weight: 500; }
+.sidebar-direct a:hover { color: var(--amarillo); }
+
+/* Iconos sociales: fichas verdes con sombra de papel */
+.social-link {
+    border-radius: 50%;
+    background: var(--verde-banda);
+    border: 0;
+    color: var(--crema);
+    box-shadow: 0 3px 0 var(--noche-900);
+}
+.social-link:hover {
+    transform: translateY(-3px);
+    background: var(--rojo);
+    color: #fff;
+    box-shadow: 0 5px 0 var(--rojo-sombra);
+}
+
+/* ===== BOTONES ========================================================= */
+.btn-primary,
+.btn-ghost {
+    font-family: var(--f-ui);
+    border-radius: 10px;
+    letter-spacing: 2px;
+}
+.btn-primary {
+    background: var(--rojo);
+    color: #fff;
+    box-shadow: var(--sombra-boton);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 0 var(--rojo-sombra), 0 16px 28px rgba(0, 0, 0, 0.35); }
+.btn-primary:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--rojo-sombra), 0 6px 12px rgba(0, 0, 0, 0.3); }
+
+.btn-ghost {
+    border: 2px solid var(--crema);
+    color: var(--crema);
+    background: rgba(7, 26, 5, 0.35);
+}
+.btn-ghost:hover { background: var(--crema); border-color: var(--crema); color: var(--tinta); transform: translateY(-2px); }
+.btn-ghost:active { transform: translateY(1px); }
+
+.btn-pedir {
+    background: var(--rojo);
+    border-radius: 10px;
+    font-family: var(--f-ui);
+    box-shadow: 0 3px 0 var(--rojo-sombra), 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+.btn-pedir:hover { transform: translateY(-2px); box-shadow: 0 5px 0 var(--rojo-sombra), 0 14px 26px rgba(0, 0, 0, 0.3); }
+.btn-share {
+    border-radius: 10px;
+    border: 2px solid rgba(246, 236, 210, 0.5);
+    background: transparent;
+    color: var(--crema);
+}
+.btn-share:hover { border-color: var(--crema); color: var(--tinta); background: var(--crema); }
+
+/* ===== ENCABEZADO DE PÁGINAS INTERNAS ================================== */
+.page-main { padding-top: 0; }
+.page-hero {
+    position: relative;
+    padding: calc(108px + clamp(36px, 6vw, 64px)) 20px clamp(52px, 7vw, 76px);
+    background-color: var(--noche-800);
+    background-image:
+        radial-gradient(70% 90% at 50% 0%, rgba(47, 116, 36, 0.45), transparent 70%),
+        radial-gradient(circle, rgba(214, 231, 166, 0.06) 1px, transparent 1.6px);
+    background-size: 100% 100%, 18px 18px;
+    border-bottom: 0;
+}
+/* Papel picado colgando bajo el header */
+.page-hero::before {
+    content: "";
+    position: absolute;
+    top: 92px; left: 0; right: 0;
+    height: 46px;
+    background: var(--papel-picado) 0 0 / auto 46px repeat-x;
+    opacity: 0.95;
+    pointer-events: none;
+}
+/* Borde rasgado hacia el contenido */
+.page-hero::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: -1px;
+    height: 20px;
+    background: var(--fondo-siguiente, var(--noche-700));
+    -webkit-mask: var(--rasgado-a) 0 0 / 320px 100% repeat-x;
+            mask: var(--rasgado-a) 0 0 / 320px 100% repeat-x;
+    filter: drop-shadow(0 -2px 0 rgba(246, 236, 210, 0.85));
+    pointer-events: none;
+}
+.page-hero .eyebrow,
+.section-header .eyebrow {
+    font-family: var(--f-ui);
+    font-weight: 600;
+    color: var(--lima);
+    letter-spacing: 3.5px;
+}
+.page-hero h1 {
+    font-family: var(--f-titulo);
+    font-weight: 400;
+    font-size: clamp(3.2rem, 13vw, 6rem);
+    line-height: 0.95;
+    letter-spacing: 1px;
+    color: var(--crema);
+    text-shadow: 4px 4px 0 var(--rojo);
+}
+.page-hero p { color: var(--texto-suave); }
+
+/* ===== ENCABEZADO DE SECCIÓN =========================================== */
+.section-header h2 {
+    font-family: var(--f-titulo);
+    font-weight: 400;
+    font-size: clamp(2.5rem, 8vw, 3.8rem);
+    line-height: 1;
+    letter-spacing: 0.5px;
+    text-transform: none;
+    color: var(--crema);
+    text-shadow: 3px 3px 0 var(--rojo);
+}
+.section-header p { color: var(--texto-suave); }
+
+/* ===== AVISO "ÚNICAMENTE DELIVERY" ===================================== */
+.solo-delivery,
+.page-hero .solo-delivery {
+    border: 0;
+    background: var(--crema);
+    color: var(--tinta);
+    font-family: var(--f-ui);
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    padding: 8px 16px;
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.35);
+}
+.solo-delivery svg { color: var(--rojo); }
+
+/* ===== FOOTER ========================================================== */
+.main-footer {
+    position: relative;
+    background-color: var(--noche-900);
+    background-image: radial-gradient(circle, rgba(214, 231, 166, 0.05) 1px, transparent 1.6px);
+    background-size: 18px 18px;
+    border-top: 0;
+    padding-top: 92px;
+}
+/* Borde rasgado arriba + papel picado */
+.main-footer::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; top: -12px;
+    height: 20px;
+    background: var(--noche-900);
+    -webkit-mask: var(--rasgado-b) 0 0 / 280px 100% repeat-x;
+            mask: var(--rasgado-b) 0 0 / 280px 100% repeat-x;
+    filter: drop-shadow(0 -2px 0 rgba(246, 236, 210, 0.75));
+    pointer-events: none;
+}
+.main-footer::after {
+    content: "";
+    position: absolute;
+    top: 18px; left: 0; right: 0;
+    height: 46px;
+    background: var(--papel-picado) 0 0 / auto 46px repeat-x;
+    pointer-events: none;
+}
+.footer-logo-img { height: 56px; opacity: 1; filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.5)); }
+.footer-links a {
+    font-family: var(--f-ui);
+    font-weight: 600;
+    color: var(--crema);
+    letter-spacing: 2px;
+}
+.footer-links a:hover { color: var(--amarillo); }
+.footer-legal a,
+.footer-legal button {
+    color: var(--texto-suave);
+    text-decoration-color: rgba(185, 196, 160, 0.45);
+}
+.footer-legal a:hover,
+.footer-legal button:hover { color: var(--amarillo); }
+.footer-copy { color: var(--texto-suave); }
+
+/* ===== BUSCADOR Y FILTROS DE LA CARTA ================================== */
+/* Queda justo debajo del header (su alto depende del tamaño del logo) */
+.carta-toolbar {
+    top: calc(clamp(42px, 5.5vw, 58px) + 36px);
+    background: rgba(11, 36, 8, 0.94);
+    border-bottom: 1px dashed rgba(246, 236, 210, 0.22);
+}
+.carta-search input {
+    background: rgba(246, 236, 210, 0.06);
+    border: 2px solid rgba(246, 236, 210, 0.16);
+    font-family: var(--f-texto);
+}
+.carta-search input:focus { border-color: var(--amarillo); background: rgba(246, 236, 210, 0.1); }
+.carta-cat-pill {
+    font-family: var(--f-ui);
+    border: 2px solid rgba(246, 236, 210, 0.18);
+    background: transparent;
+    color: var(--crema);
+}
+.carta-cat-pill:hover { border-color: var(--crema); color: var(--crema); }
+.carta-cat-pill.is-active {
+    background: var(--rojo);
+    border-color: var(--rojo);
+    box-shadow: 0 3px 0 var(--rojo-sombra);
+}
+mark.carta-match { background: rgba(255, 210, 31, 0.35); }
+
+/* ===== AVISO DE COOKIES ================================================ */
+.cookie-banner {
+    background: var(--noche-800);
+    border: 2px solid rgba(246, 236, 210, 0.18);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+}
+.cookie-banner h2 { font-family: var(--f-ui); color: var(--crema); }
+.cookie-banner p a { color: var(--amarillo); }
+.cookie-btn {
+    font-family: var(--f-ui);
+    border: 2px solid rgba(246, 236, 210, 0.3);
+    background: transparent;
+    color: var(--crema);
+}
+.cookie-btn:hover { border-color: var(--crema); }
+.cookie-btn--fuerte { background: var(--rojo); border-color: var(--rojo); color: #fff; box-shadow: 0 3px 0 var(--rojo-sombra); }
+.cookie-btn--fuerte:hover { background: #c41b1a; border-color: #c41b1a; }
+.cookie-opcion { border-color: rgba(246, 236, 210, 0.16); background: rgba(246, 236, 210, 0.04); }
+.cookie-opcion input { accent-color: var(--rojo); }
+
+/* ===== ENLACE "SALTAR AL CONTENIDO" ==================================== */
+.skip-link { background: var(--rojo); font-family: var(--f-ui); box-shadow: 0 3px 0 var(--rojo-sombra); }
+
+/* ===== PANTALLA DE CARGA (fueguito en verde noche) ===================== */
+.pageload { background: var(--noche-900); }
+.pageload::before { background: radial-gradient(circle, rgba(255, 210, 31, 0.12), transparent 68%); }
+.pageload-word { font-family: var(--f-titulo); font-weight: 400; font-size: 1.15rem; letter-spacing: 1px; text-transform: none; color: var(--crema); }
+.flame-base { stroke: rgba(255, 210, 31, 0.3); }
+#flameGrad stop:nth-child(1) { stop-color: #ffe27a; }
+#flameGrad stop:nth-child(2) { stop-color: var(--amarillo); }
+#flameGrad stop:nth-child(3) { stop-color: var(--rojo); }
+.pageload-embers span { background: var(--amarillo); box-shadow: 0 0 6px 1px rgba(255, 210, 31, 0.5); }
+
+/* ===== MOVIMIENTO REDUCIDO ============================================= */
+@media (prefers-reduced-motion: reduce) {
+    .btn-primary:hover, .btn-ghost:hover, .btn-pedir:hover,
+    .social-link:hover, .pildora-lima:hover, .menu-toggle:hover { transform: none; }
+}

@@ -21,23 +21,26 @@
 
 /* Resumen en lenguaje sencillo al inicio de cada página */
 .legal-resumen {
-    background: rgba(255, 102, 0, 0.07);
-    border: 1px solid var(--line);
-    border-left: 3px solid var(--ember);
-    border-radius: var(--radius);
+    background: var(--papel-verde);
+    border: 0;
+    border-radius: 12px;
     padding: 20px 22px;
     margin-bottom: 40px;
+    box-shadow: 0 5px 0 rgba(0, 0, 0, 0.3);
 }
 .legal-resumen h2 {
-    font-family: 'Oswald', sans-serif;
-    font-size: 1rem;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--ember-soft);
+    font-family: var(--f-titulo);
+    font-weight: 400;
+    font-size: 1.7rem;
+    letter-spacing: 0.5px;
+    text-transform: none;
+    color: var(--tinta);
+    text-shadow: 2px 2px 0 var(--amarillo);
     margin-bottom: 10px;
 }
 .legal-resumen ul { padding-left: 18px; display: grid; gap: 6px; }
-.legal-resumen li { color: var(--text); font-size: 0.94rem; line-height: 1.55; }
+.legal-resumen li { color: #1e2a14; font-size: 0.95rem; line-height: 1.55; }
+.legal-resumen a { color: var(--verde-oscuro); }
 
 /* Índice */
 .legal-indice {
@@ -45,10 +48,11 @@
     border-radius: var(--radius);
     padding: 18px 22px;
     margin-bottom: 44px;
-    background: var(--char-800);
+    background: var(--noche-800);
 }
 .legal-indice p {
-    font-size: 0.74rem;
+    font-family: var(--f-ui);
+    font-size: 0.78rem;
     letter-spacing: 2px;
     text-transform: uppercase;
     color: var(--muted);
@@ -56,26 +60,26 @@
 }
 .legal-indice ol { padding-left: 20px; display: grid; gap: 4px; }
 .legal-indice a { color: var(--text); text-decoration: none; font-size: 0.92rem; }
-.legal-indice a:hover { color: var(--ember); text-decoration: underline; }
+.legal-indice a:hover { color: var(--amarillo); text-decoration: underline; }
 
 /* Contenido */
 .legal-cuerpo section { margin-bottom: 40px; scroll-margin-top: 96px; }
 .legal-cuerpo h2 {
-    font-family: 'Oswald', sans-serif;
+    font-family: var(--f-ui);
     font-weight: 700;
-    font-size: clamp(1.15rem, 3vw, 1.35rem);
-    letter-spacing: 0.5px;
+    font-size: clamp(1.2rem, 3vw, 1.45rem);
+    letter-spacing: 0.8px;
     text-transform: uppercase;
-    color: var(--cream);
+    color: var(--amarillo);
     margin-bottom: 14px;
     line-height: 1.2;
 }
 .legal-cuerpo h3 {
-    font-family: 'Oswald', sans-serif;
+    font-family: var(--f-ui);
     font-weight: 600;
     font-size: 1rem;
     letter-spacing: 0.5px;
-    color: var(--ember-soft);
+    color: var(--lima);
     margin: 22px 0 8px;
 }
 .legal-cuerpo p,
@@ -87,7 +91,7 @@
 .legal-cuerpo p + p { margin-top: 12px; }
 .legal-cuerpo ul,
 .legal-cuerpo ol { padding-left: 22px; display: grid; gap: 6px; margin-top: 10px; }
-.legal-cuerpo a { color: var(--ember-soft); text-underline-offset: 3px; }
+.legal-cuerpo a { color: var(--amarillo); text-underline-offset: 3px; }
 .legal-cuerpo strong { color: var(--cream); }
 
 /* Tablas: se desplazan solas en pantallas pequeñas */
@@ -119,13 +123,13 @@
     line-height: 1.5;
 }
 .legal-tabla th {
-    font-family: 'Oswald', sans-serif;
+    font-family: var(--f-ui);
     font-weight: 600;
     letter-spacing: 1px;
     text-transform: uppercase;
     font-size: 0.74rem;
     color: var(--muted);
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(246, 236, 210, 0.05);
 }
 .legal-tabla tr:last-child td { border-bottom: none; }
 .legal-tabla code {
@@ -157,11 +161,12 @@
     align-items: center;
     min-height: 44px;
     padding: 10px 18px;
-    border: 1.5px solid var(--line);
-    border-radius: 30px;
-    color: var(--cream);
+    border: 2px solid rgba(246, 236, 210, 0.3);
+    border-radius: 999px;
+    color: var(--crema);
     text-decoration: none;
     font-size: 0.9rem;
     transition: border-color 0.2s var(--ease), color 0.2s var(--ease);
 }
-.legal-contacto a:hover { border-color: var(--ember); color: var(--ember); }
+.legal-contacto a:hover { border-color: var(--crema); color: var(--tinta); background: var(--crema); }
+.legal-resumen strong, .legal-resumen b { color: var(--tinta); }

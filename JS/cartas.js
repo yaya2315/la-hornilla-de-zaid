@@ -56,6 +56,39 @@ const RESPALDO = {
     }
 };
 
+/* ── Fotos de las tarjetas ─────────────────────────────────────────────
+   Fotos reales recortadas para tarjeta (720×450) en Imagenes/fotos-de-platillos/.
+   Se busca por el nombre del platillo y, si no, por su categoría.
+   Si un platillo trae el campo "foto" en Firebase (ruta desde la raíz del
+   sitio), se usa esa. Sin foto, la tarjeta se ve igual pero sin imagen.
+   Ojo (ley del consumidor): la foto no puede mostrar más de lo que trae la
+   orden (tacos: 4, quesadillas: 3). */
+const FOTOS = {
+    'tacos':            'tacos/tacos-01-mesa-tarjeta.webp',
+    'burrito':          'burritos/burrito-03-abierto-tarjeta.webp',
+    'burritos':         'burritos/burrito-03-abierto-tarjeta.webp',
+    'torta':            'tortas/torta-01-cenital-tarjeta.webp',
+    'tortas':           'tortas/torta-01-cenital-tarjeta.webp',
+    'nachos':           'nachos/nachos-01-para-llevar-tarjeta.webp',
+    'quesadillas':      'quesadillas/quesadillas-01-para-llevar-tarjeta.webp',
+    'sopa de tortilla': 'combos/sopa-de-tortilla-01-tazon-tarjeta.webp',
+    'papa asada':       'papa-asada/papa-asada-01-mesa-sin-marca-tarjeta.webp'
+};
+const RAIZ = new URL('../', import.meta.url).href;   // raíz del sitio (este archivo vive en JS/)
+const normal = t => String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+
+function fotoDe(p) {
+    if (p.foto) return new URL(p.foto, RAIZ).href;
+    const f = FOTOS[normal(p.nombre)] || FOTOS[normal(p.categoria)];
+    return f ? RAIZ + 'Imagenes/fotos-de-platillos/' + f : '';
+}
+
+function fotoHTML(p) {
+    const src = fotoDe(p);
+    if (!src) return '';
+    return `<div class="platillo-foto"><img src="${esc(src)}" alt="${esc(p.nombre)} de La Hornilla de Zaid" width="720" height="450" loading="lazy" decoding="async"></div>`;
+}
+
 const CLAVE_MENU = { menu: 'principal', pupusas: 'pupusas' };
 const COLECCION = { menu: COLECCION_MENU, pupusas: COLECCION_PUPUSAS };
 
@@ -108,14 +141,15 @@ function tarjetaPlato(p, termino) {
     const nombreHtml = resaltar(esc(p.nombre), termino);
     if (p.destacado) {
         const descHtml = resaltar(esc(p.descripcion || ''), termino);
+        const foto = fotoHTML(p);
         return `
-            <article class="platillo-card nuevo-card carta-item">
-                <span class="nuevo-tag">${esc(p.etiqueta || 'Destacado')}</span>
-                <div>
+            <article class="platillo-card nuevo-card carta-item${foto ? '' : ' sin-foto'}">
+                ${foto ? foto.replace('<div class="platillo-foto">', `<div class="platillo-foto"><span class="nuevo-tag">${esc(p.etiqueta || 'Destacado')}</span>`) : `<span class="nuevo-tag">${esc(p.etiqueta || 'Destacado')}</span>`}
+                <div class="platillo-cuerpo">
                     <h3>${nombreHtml}</h3>
                     <p>${descHtml}</p>
+                    <span class="precio">${esc(p.precioUnico || '')}</span>
                 </div>
-                <span class="precio">${esc(p.precioUnico || '')}</span>
             </article>`;
     }
     const filas = (p.variantes || []).map(v => `
@@ -123,11 +157,14 @@ function tarjetaPlato(p, termino) {
     `).join('');
     return `
         <article class="platillo-card carta-item">
-            <div class="platillo-head">
-                <h3>${nombreHtml}</h3>
-                ${p.nota ? `<span class="platillo-nota">${esc(p.nota)}</span>` : ''}
+            ${fotoHTML(p)}
+            <div class="platillo-cuerpo">
+                <div class="platillo-head">
+                    <h3>${nombreHtml}</h3>
+                    ${p.nota ? `<span class="platillo-nota">${esc(p.nota)}</span>` : ''}
+                </div>
+                <div class="platillo-rows">${filas}</div>
             </div>
-            <div class="platillo-rows">${filas}</div>
         </article>`;
 }
 
