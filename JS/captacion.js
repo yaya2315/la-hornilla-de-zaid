@@ -308,6 +308,11 @@ function iniciarClub() {
 document.addEventListener('DOMContentLoaded', async () => {
     if (!$('opiniones')) return;
     iniciarFormResena();
+    /* Sección del canal de WhatsApp (reemplazó al formulario del club). */
+    $('canalBoton')?.addEventListener('click', () => track('canal_click', { origen: 'inicio' }));
+    /* El formulario del club ya no está en la página; este código queda
+       guardado por si se vuelve a usar. */
+    if (!$('formClub')) { await cargarResenas(); return; }
     iniciarClub();
     await Promise.all([cargarResenas(), cargarCupon()]);
     /* Si esta persona ya se unió desde este navegador, se le muestra su

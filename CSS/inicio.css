@@ -10,6 +10,8 @@
     overflow: hidden;
     display: grid;
     place-items: center;
+    /* Espacio arriba (header) y abajo ("Opiniones y canal") para que el contenido nunca los tape */
+    padding: clamp(96px, 13vh, 130px) 0 clamp(110px, 15vh, 150px);
     background: var(--char-900);
 }
 
@@ -222,3 +224,10 @@
 }
 .hero-delivery svg { color: var(--rojo); flex-shrink: 0; }
 @media (prefers-reduced-motion: reduce) { .hero-delivery { opacity: 1; animation: none; } }
+
+/* Pantallas bajitas (compus de poca altura): todo un poco más compacto */
+@media (max-height: 820px) {
+    .hero-titulo { font-size: clamp(2.2rem, 6vw, 3.4rem); margin: 10px 0 18px; }
+    .hero-delivery { margin-bottom: 18px; }
+    .hero-cta { gap: 10px !important; }
+}
