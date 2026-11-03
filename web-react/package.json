@@ -1,0 +1,39 @@
+{
+  "name": "la-hornilla-de-zaid-web",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Web pública de La Hornilla de Zaid en React + Tailwind v4 + componentes de Cult UI. El build se escribe en la raíz del sitio (index.html, HTML/menu.html, HTML/pedido.html, HTML/ubicacion.html y la carpeta app/).",
+  "scripts": {
+    "dev": "vite",
+    "build": "node scripts/limpiar-app.mjs && tsc --noEmit && vite build",
+    "preview": "node scripts/servir-sitio.mjs"
+  },
+  "dependencies": {
+    "@fontsource/oswald": "5.2.6",
+    "@fontsource/poppins": "5.2.6",
+    "@fontsource/rye": "5.2.6",
+    "@fontsource/smokum": "5.2.6",
+    "@radix-ui/react-slot": "1.2.3",
+    "class-variance-authority": "0.7.1",
+    "clsx": "2.1.1",
+    "firebase": "12.14.0",
+    "leaflet": "1.9.4",
+    "lucide-react": "0.525.0",
+    "motion": "12.23.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-use-measure": "2.1.7",
+    "tailwind-merge": "3.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "4.1.11",
+    "@types/leaflet": "1.9.20",
+    "@types/react": "19.1.8",
+    "@types/react-dom": "19.1.6",
+    "@vitejs/plugin-react": "4.5.2",
+    "tailwindcss": "4.1.11",
+    "typescript": "5.8.3",
+    "vite": "6.3.5"
+  }
+}

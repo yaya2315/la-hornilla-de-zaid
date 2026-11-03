@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<!-- =====================================================================
+     Esta página la arma web-react/ (React + Tailwind v4 + Cult UI).
+     Fuente: web-react/HTML/menu.html y web-react/src/.  Para publicar un cambio:
+     en web-react/ corre  npm run build  y sube con git (ver web-react/LEEME.md).
+     Si editas la copia que queda en la carpeta del sitio, se pierde en el
+     próximo build.
+     ===================================================================== -->
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" sizes="32x32" href="../Imagenes/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="../Imagenes/icon-192.png">
+    <link rel="apple-touch-icon" href="../Imagenes/apple-touch-icon.png">
+    <title>Menú mexicano — La Hornilla de Zaid, Sonsonate</title>
+    <meta name="description" content="Menú completo con precios: tacos, burritos, tortas, nachos, quesadillas, sopa de tortilla, papa asada, combos y bebidas. Pide en línea por WhatsApp.">
+    <meta name="theme-color" content="#0b2408">
+    <link rel="canonical" href="https://yaya2315.github.io/la-hornilla-de-zaid/HTML/menu.html">
+    <!-- Vista previa al compartir (WhatsApp, Facebook, Instagram, X) -->
+    <meta property="og:site_name" content="La Hornilla de Zaid">
+    <meta property="og:locale" content="es_SV">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Menú mexicano — La Hornilla de Zaid, Sonsonate">
+    <meta property="og:description" content="Menú completo con precios: tacos, burritos, tortas, nachos, quesadillas, sopa de tortilla, papa asada, combos y bebidas. Pide en línea por WhatsApp.">
+    <meta property="og:url" content="https://yaya2315.github.io/la-hornilla-de-zaid/HTML/menu.html">
+    <meta property="og:image" content="https://yaya2315.github.io/la-hornilla-de-zaid/Imagenes/og-hornilla.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Tacos de La Hornilla de Zaid servidos en una bandeja sobre mesa de madera">
+    <meta name="twitter:card" content="summary_large_image">
+    <script src="../JS/consentimiento.js" defer></script>
+</head>
+<body>
+    <!-- Pantalla de carga "fueguito" (se esconde al cargar) -->
+    <div class="pageload" id="pageload" role="status" aria-live="polite" aria-label="Cargando La Hornilla de Zaid">
+        <div class="pageload-flame">
+            <svg viewBox="0 0 24 28" aria-hidden="true" focusable="false"><path fill="none" stroke="rgba(255,210,31,.35)" stroke-width=".6" d="M12 1C12 1 5 9 5 17C5 22 8.1 26 12 26C15.9 26 19 22 19 17C19 13.7 17 11 15 9C15.6 11.7 14.6 13.6 13 14.6C13.8 12 13 9.4 11 7.6C10.6 10 9.4 11.8 9.4 14C9.4 11 10.4 7.8 12 4.6C12 3.4 12 2.1 12 1Z"/></svg>
+            <svg class="llena" viewBox="0 0 24 28" aria-hidden="true" focusable="false"><defs><linearGradient id="llamaGrad" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#ffe27a"/><stop offset="50%" stop-color="#ffd21f"/><stop offset="100%" stop-color="#d9201f"/></linearGradient></defs><path fill="url(#llamaGrad)" d="M12 1C12 1 5 9 5 17C5 22 8.1 26 12 26C15.9 26 19 22 19 17C19 13.7 17 11 15 9C15.6 11.7 14.6 13.6 13 14.6C13.8 12 13 9.4 11 7.6C10.6 10 9.4 11.8 9.4 14C9.4 11 10.4 7.8 12 4.6C12 3.4 12 2.1 12 1Z"/></svg>
+        </div>
+        <p class="pageload-word">La Hornilla de Zaid</p>
+    </div>
+    <div id="app"></div>
+    <noscript>
+        <div style="padding:120px 24px;text-align:center;font-family:system-ui,sans-serif;color:#ecead6;background:#0f2a0b;min-height:100vh">
+            <p style="font-size:1.1rem">Para ver el menú y hacer tu pedido, activa JavaScript.</p>
+            <p>O escríbenos por WhatsApp: <a style="color:#ffd21f" href="https://wa.me/50370991660">7099-1660</a></p>
+            <style>.pageload{display:none}</style>
+        </div>
+    </noscript>
+    <script type="module" src="/src/entradas/menu.tsx"></script>
+</body>
+</html>

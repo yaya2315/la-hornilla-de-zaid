@@ -1,0 +1,234 @@
+/* =====================================================================
+   LA HORNILLA DE ZAID — Sistema de diseño "Noche de feria" sobre Tailwind v4
+   ---------------------------------------------------------------------
+   1. Tokens de marca (los colores de los flyers).
+   2. Tokens semánticos de shadcn/ui, que usan los componentes de Cult UI
+      (background, card, primary, ring…) apuntando a la marca.
+   3. Piezas de papel (bordes rasgados, papel picado, grano) en SVG en línea.
+   4. Base: tipografía, foco visible, movimiento reducido, pupusas apagadas.
+   Contraste revisado (WCAG AA): texto-claro/noche-700 12.8:1,
+   texto-suave/noche-700 8.5:1, blanco/rojo 5:1, tinta/lima 13:1,
+   amarillo/noche-600 9:1, crema/verde-banda 4.9:1.
+   ===================================================================== */
+@import "tailwindcss" source("..");
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* ── Marca ── */
+  --color-verde-banda: #2f7424;
+  --color-verde-hoja: #1f5a17;
+  --color-verde-oscuro: #18420f;
+  --color-papel: #d6e7a6;
+  --color-rojo: #d9201f;
+  --color-rojo-hover: #c41b1a;
+  --color-rojo-sombra: #8f1210;
+  --color-rojo-texto: #ff6b5e;
+  --color-amarillo: #ffd21f;
+  --color-lima: #d6e22b;
+  --color-crema: #f6ecd2;
+  --color-tinta: #141414;
+
+  /* ── Superficies "noche de feria" ── */
+  --color-noche-950: #041103;
+  --color-noche-900: #071a05;
+  --color-noche-800: #0b2408;
+  --color-noche-700: #0f2a0b;
+  --color-noche-600: #15380f;
+  --color-noche-500: #1c4614;
+
+  /* ── Texto ── */
+  --color-texto: #ecead6;
+  --color-texto-suave: #b9c4a0;
+
+  /* ── Tipografía ── */
+  --font-titulo: "Smokum", "Rye", Georgia, serif;
+  --font-precio: "Rye", Georgia, serif;
+  --font-ui: "Oswald", "Arial Narrow", Arial, sans-serif;
+  --font-sans: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* ── Escala de 4 px y medidas ── */
+  --spacing: 0.25rem;
+  --container-sitio: 74rem;
+
+  /* ── Sombras "de papel" (duras, como los flyers) ── */
+  --shadow-boton: 0 4px 0 var(--color-rojo-sombra), 0 12px 24px rgb(0 0 0 / 0.35);
+  --shadow-tarjeta: 0 14px 34px rgb(0 0 0 / 0.35);
+  --shadow-dura: 0 3px 0 rgb(0 0 0 / 0.35);
+
+  --ease-marca: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-subir: subir 0.8s var(--ease-marca) both;
+  @keyframes subir {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: none; }
+  }
+}
+
+/* ── Tokens de shadcn/ui → marca (los leen los componentes de Cult UI) ── */
+:root {
+  color-scheme: dark;
+  --radius: 1rem;
+  --background: var(--color-noche-700);
+  --foreground: var(--color-texto);
+  --card: var(--color-noche-600);
+  --card-foreground: var(--color-texto);
+  --popover: var(--color-noche-800);
+  --popover-foreground: var(--color-texto);
+  --primary: var(--color-rojo);
+  --primary-foreground: #ffffff;
+  --secondary: var(--color-verde-banda);
+  --secondary-foreground: #ffffff;
+  --muted: var(--color-noche-800);
+  --muted-foreground: var(--color-texto-suave);
+  --accent: var(--color-amarillo);
+  --accent-foreground: var(--color-tinta);
+  --destructive: var(--color-rojo-texto);
+  --border: rgb(246 236 210 / 0.14);
+  --input: rgb(246 236 210 / 0.18);
+  --ring: var(--color-amarillo);
+
+  /* Piezas de papel (las mismas de los flyers y de CSS/marca.css) */
+    --rasgado-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 480 20' preserveAspectRatio='none'%3E%3Cpath d='M0 20 L0 8 L7.6 4.9 L13.2 8.3 L18.6 11.8 L24.2 4.3 L35.8 4.6 L45.8 12.0 L54.0 17 L61.3 8.0 L72.8 5.1 L83.0 6.9 L88.5 4.0 L98.9 7.3 L108.6 7.6 L119.9 9.8 L129.5 8.2 L140.4 6.1 L146.3 7.3 L152.5 12.6 L163.7 8.7 L171.2 9.8 L180.8 7.6 L193.4 7.8 L198.8 9.8 L211.8 10.9 L219.9 13.4 L226.2 9.6 L232.3 5.7 L244.2 4.2 L253.6 11.5 L265.5 6.0 L273.4 11.5 L279.6 5.1 L286.5 7.9 L293.6 3.5 L301.5 8.6 L312.1 8.1 L322.5 4.0 L333.7 11.4 L341.8 11.6 L347.3 4.1 L353.6 8.6 L359.9 4.4 L365.1 11.4 L371.2 5.8 L379.2 4.6 L392.1 7.7 L397.8 4.4 L404.9 13.1 L417.5 12.4 L422.7 8.3 L434.6 9.8 L442.6 5.0 L451.8 10.5 L458.6 10.8 L470.4 10.8 L480 8 L480 20 Z'/%3E%3C/svg%3E");
+    --rasgado-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 480 20' preserveAspectRatio='none'%3E%3Cpath d='M0 20 L0 10 L6.3 12.1 L15.2 6.9 L26.6 10.1 L33.5 4.5 L43.2 5.3 L50.0 14.4 L61.0 14.1 L66.2 8.1 L72.2 15.0 L78.4 17 L87.0 10.6 L95.9 13.2 L102.8 13.1 L115.5 14.3 L126.6 10.9 L132.6 9.7 L139.2 14.7 L147.5 8.5 L155.6 15.4 L160.8 5.5 L173.7 10.0 L183.1 12.7 L193.0 10.6 L199.5 6.4 L211.9 8.3 L219.3 12.0 L230.5 8.6 L240.9 14.4 L249.2 15.4 L258.9 14.2 L266.9 7.2 L273.2 5.3 L284.4 9.8 L289.8 7.3 L298.2 10.2 L310.4 15.3 L319.2 7.3 L328.4 15.6 L340.1 13.2 L349.9 9.2 L361.7 7.9 L368.9 17 L381.6 4.8 L391.7 13.9 L398.8 9.0 L411.0 8.5 L416.2 16.0 L426.5 5.9 L434.1 9.9 L440.4 6.5 L451.1 16.3 L463.1 13.0 L468.1 15.7 L474.5 12.3 L480 10 L480 20 Z'/%3E%3C/svg%3E");
+    --rasgado-abajo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 480 20' preserveAspectRatio='none'%3E%3Cpath d='M0 0 L0 12 L9.6 13.2 L16.8 13.4 L29.1 9.2 L39.0 12.0 L48.2 11.5 L58.3 10.2 L67.3 8.0 L78.2 11.3 L90.6 12.5 L96.5 8.0 L103.8 9.4 L114.8 8.6 L121.7 5.9 L129.2 11.0 L135.0 7.8 L146.0 9.9 L152.0 7.2 L158.6 9.2 L167.3 11.8 L176.6 14.6 L182.1 11.8 L193.4 8.5 L198.5 12.4 L206.0 15.5 L212.3 12.0 L217.6 8.3 L228.4 11.7 L237.5 9.8 L250.2 8.2 L261.6 7.7 L272.3 13.1 L282.3 14.3 L293.9 11.4 L306.3 15.3 L316.0 12.1 L326.0 14.0 L331.8 9.9 L341.4 9.3 L354.0 8.1 L365.1 12.7 L375.6 7.6 L383.9 15.7 L390.0 3 L401.3 6.1 L412.7 14.2 L425.5 14.3 L430.6 7.6 L440.5 7.1 L448.3 12.0 L454.9 8.2 L460.9 8.4 L466.9 14.7 L475.6 13.3 L480 12 L480 0 Z'/%3E%3C/svg%3E");
+    --papel-picado: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='276' height='46' viewBox='0 0 276 46'%3E%3Cpath d='M0 7 Q23.0 11 46 7 T92 7 T138 7 T184 7 T230 7 T276 7' stroke='%23f6ecd2' stroke-opacity='.55' stroke-width='1.1' fill='none'/%3E%3Cpath fill='%23d9201f' fill-rule='evenodd' transform='rotate%283 23.0 9%29' d='M6 9 L40 9 L40.0 39.0 L34.3 35.0 L28.7 39.0 L23.0 35.0 L17.3 39.0 L11.7 35.0 L6.0 39.0 Z M23.0 15.600000000000001 L28.0 21.6 L23.0 27.6 L18.0 21.6 Z M11.1 14.600000000000001 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M31.1 14.600000000000001 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M11.1 28.6 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M31.1 28.6 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M9.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M17.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M25.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M33.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z'/%3E%3Cpath fill='%23f6ecd2' fill-rule='evenodd' transform='rotate%28-4 69.0 9%29' d='M52 9 L86 9 L86.0 39.0 L80.3 35.0 L74.7 39.0 L69.0 35.0 L63.3 39.0 L57.7 35.0 L52.0 39.0 Z M69.0 15.600000000000001 L74.0 21.6 L69.0 27.6 L64.0 21.6 Z M57.1 14.600000000000001 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M77.1 14.600000000000001 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M57.1 28.6 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M77.1 28.6 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M55.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M63.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M71.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M79.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z'/%3E%3Cpath fill='%23ffd21f' fill-rule='evenodd' transform='rotate%283 115.0 9%29' d='M98 9 L132 9 L132.0 39.0 L126.3 35.0 L120.7 39.0 L115.0 35.0 L109.3 39.0 L103.7 35.0 L98.0 39.0 Z M115.0 15.600000000000001 L120.0 21.6 L115.0 27.6 L110.0 21.6 Z M103.1 14.600000000000001 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M123.1 14.600000000000001 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M103.1 28.6 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M123.1 28.6 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M101.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M109.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M117.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M125.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z'/%3E%3Cpath fill='%23ff7a1a' fill-rule='evenodd' transform='rotate%28-4 161.0 9%29' d='M144 9 L178 9 L178.0 39.0 L172.3 35.0 L166.7 39.0 L161.0 35.0 L155.3 39.0 L149.7 35.0 L144.0 39.0 Z M161.0 15.600000000000001 L166.0 21.6 L161.0 27.6 L156.0 21.6 Z M149.1 14.600000000000001 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M169.1 14.600000000000001 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M149.1 28.6 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M169.1 28.6 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M147.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M155.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M163.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M171.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z'/%3E%3Cpath fill='%23d6e22b' fill-rule='evenodd' transform='rotate%283 207.0 9%29' d='M190 9 L224 9 L224.0 39.0 L218.3 35.0 L212.7 39.0 L207.0 35.0 L201.3 39.0 L195.7 35.0 L190.0 39.0 Z M207.0 15.600000000000001 L212.0 21.6 L207.0 27.6 L202.0 21.6 Z M195.1 14.600000000000001 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M215.1 14.600000000000001 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M195.1 28.6 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M215.1 28.6 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M193.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M201.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M209.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M217.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z'/%3E%3Cpath fill='%23e4007c' fill-rule='evenodd' transform='rotate%28-4 253.0 9%29' d='M236 9 L270 9 L270.0 39.0 L264.3 35.0 L258.7 39.0 L253.0 35.0 L247.3 39.0 L241.7 35.0 L236.0 39.0 Z M253.0 15.600000000000001 L258.0 21.6 L253.0 27.6 L248.0 21.6 Z M241.1 14.600000000000001 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M261.1 14.600000000000001 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M241.1 28.6 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M261.1 28.6 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 Z M239.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M247.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M255.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z M263.8 30.5 a1.2 1.2 0 1 0 2.4 0 a1.2 1.2 0 1 0 -2.4 0 Z'/%3E%3C/svg%3E");
+    --ruido-papel: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 .9  0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23n%29'/%3E%3C/svg%3E");
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 4px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 6px);
+}
+
+/* ===== BASE ============================================================ */
+@layer base {
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    line-height: 1.6;
+    /* Textura de papel muy suave: semitono + grano */
+    background-image:
+      radial-gradient(circle, rgb(214 231 166 / 0.05) 1px, transparent 1.6px),
+      var(--ruido-papel);
+    background-size: 18px 18px, 160px 160px;
+  }
+  * { border-color: var(--border); }
+  ::selection { background: var(--color-amarillo); color: var(--color-tinta); }
+  img { max-width: 100%; height: auto; display: block; }
+
+  /* Foco visible en amarillo: se ve sobre verde, rojo y fotos */
+  :focus-visible { outline: 3px solid var(--color-amarillo); outline-offset: 3px; border-radius: 6px; }
+
+  /* Pupusas apagadas en el admin → sus enlaces no se ven */
+  html:not(.pupusas-on) [data-pupusas] { display: none !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ===== UTILIDADES DE MARCA ============================================= */
+/* Borde de papel rasgado arriba de una sección (con su fibra crema) */
+@utility rasgado-arriba {
+  position: relative;
+  &::before, &::after {
+    content: ""; position: absolute; left: 0; right: 0; height: 20px; pointer-events: none; z-index: 3;
+    -webkit-mask: var(--rasgado-a) 0 0 / 320px 100% repeat-x; mask: var(--rasgado-a) 0 0 / 320px 100% repeat-x;
+  }
+  &::before { top: -15px; background: var(--color-crema); opacity: 0.9; }
+  &::after {
+    top: -11px; background: var(--fondo-rasgado, var(--color-noche-700));
+    -webkit-mask-image: var(--rasgado-b); mask-image: var(--rasgado-b);
+    -webkit-mask-size: 280px 100%; mask-size: 280px 100%;
+  }
+}
+/* Banda verde con bordes rasgados arriba y abajo (como las bandas de los flyers) */
+@utility banda-rasgada {
+  -webkit-mask:
+    var(--rasgado-a) top / 320px 20px repeat-x,
+    linear-gradient(#000, #000) center / 100% calc(100% - 38px) no-repeat,
+    var(--rasgado-abajo) bottom / 300px 20px repeat-x;
+  mask:
+    var(--rasgado-a) top / 320px 20px repeat-x,
+    linear-gradient(#000, #000) center / 100% calc(100% - 38px) no-repeat,
+    var(--rasgado-abajo) bottom / 300px 20px repeat-x;
+}
+@utility papel-picado {
+  display: block; height: 46px; pointer-events: none;
+  background: var(--papel-picado) 0 0 / auto 46px repeat-x;
+}
+@utility semitono {
+  background-image: radial-gradient(circle, rgb(255 255 255 / 0.1) 1px, transparent 1.7px);
+  background-size: 16px 16px;
+}
+/* Etiqueta con esquina doblada (precio y "Lo nuevo") */
+@utility esquina-doblada {
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+}
+
+/* ===== AVISO DE COOKIES (lo crea JS/consentimiento.js) ================ */
+.cookie-banner {
+  position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 2800; max-width: 560px; margin: 0 auto;
+  background: var(--color-noche-800); border: 2px solid rgb(246 236 210 / 0.18); border-radius: 22px;
+  box-shadow: 0 24px 60px rgb(0 0 0 / 0.6); padding: 22px 22px 20px; color: var(--color-texto);
+  transform: translateY(16px); opacity: 0; transition: transform .4s var(--ease-marca), opacity .4s var(--ease-marca);
+}
+.cookie-banner.is-visible { transform: none; opacity: 1; }
+.cookie-banner h2 { font-family: var(--font-ui); font-weight: 700; font-size: 1.05rem; letter-spacing: 1px; text-transform: uppercase; color: var(--color-crema); margin-bottom: 8px; }
+.cookie-banner p { font-size: .86rem; line-height: 1.55; }
+.cookie-banner p a { color: var(--color-amarillo); text-decoration: underline; }
+.cookie-acciones { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 16px; }
+.cookie-btn {
+  min-height: 44px; padding: 10px 12px; border-radius: 10px; font-family: var(--font-ui); font-weight: 600; font-size: .82rem;
+  letter-spacing: 1px; text-transform: uppercase; cursor: pointer; border: 2px solid rgb(246 236 210 / 0.3); background: transparent; color: var(--color-crema);
+}
+.cookie-btn:hover { border-color: var(--color-crema); }
+.cookie-btn--fuerte { background: var(--color-rojo); border-color: var(--color-rojo); color: #fff; box-shadow: 0 3px 0 var(--color-rojo-sombra); }
+.cookie-btn--fuerte:hover { background: var(--color-rojo-hover); border-color: var(--color-rojo-hover); }
+.cookie-opciones { margin-top: 14px; display: grid; gap: 10px; }
+.cookie-opcion { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; padding: 12px 14px; border: 1px solid rgb(246 236 210 / 0.16); border-radius: 12px; background: rgb(246 236 210 / 0.04); }
+.cookie-opcion strong { display: block; color: var(--color-crema); font-size: .88rem; }
+.cookie-opcion span { display: block; color: var(--color-texto-suave); font-size: .78rem; line-height: 1.45; }
+.cookie-opcion input { width: 22px; height: 22px; accent-color: var(--color-rojo); }
+@media (max-width: 480px) { .cookie-acciones { grid-template-columns: 1fr; } }
+
+/* ===== PANTALLA DE CARGA "fueguito" =================================== */
+.pageload {
+  position: fixed; inset: 0; z-index: 4000; display: grid; place-content: center; justify-items: center; gap: 18px;
+  background: var(--color-noche-900); transition: opacity .5s var(--ease-marca), visibility .5s var(--ease-marca);
+  animation: pageloadSeguro 0s linear 4s forwards;
+}
+.pageload.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+@keyframes pageloadSeguro { to { opacity: 0; visibility: hidden; pointer-events: none; } }
+.pageload-flame { width: 58px; position: relative; filter: drop-shadow(0 0 14px rgb(255 210 31 / 0.35)); }
+.pageload-flame svg { display: block; width: 100%; height: auto; }
+.pageload-flame .llena { position: absolute; inset: 0; clip-path: inset(100% 0 0 0); animation: llamaLlena 1s var(--ease-marca) .1s forwards; }
+@keyframes llamaLlena { to { clip-path: inset(0 0 0 0); } }
+.pageload-word { font-family: var(--font-ui); font-weight: 600; font-size: .78rem; letter-spacing: 4px; text-transform: uppercase; color: var(--color-texto-suave); }
+@media (prefers-reduced-motion: reduce) { .pageload { animation-delay: .3s; } .pageload-flame .llena { animation: none; clip-path: none; } }
