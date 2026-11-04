@@ -76,7 +76,7 @@ function DirectionAwareTabs({ tabs, className, activo, alCambiar, etiqueta, enci
           role="tablist"
           aria-label={etiqueta}
           className={cn(
-            'mx-auto flex w-max gap-1 rounded-full border border-crema/12 bg-noche-900/85 p-1 shadow-[inset_0_2px_6px_rgb(0_0_0/0.45)]',
+            'flex w-max gap-1.5',
             className,
           )}
         >
@@ -95,15 +95,15 @@ function DirectionAwareTabs({ tabs, className, activo, alCambiar, etiqueta, enci
                 onClick={() => ir(tab.id)}
                 onKeyDown={(e) => teclas(e, i)}
                 className={cn(
-                  'relative min-h-10 whitespace-nowrap rounded-full px-4 font-ui text-[0.8rem] font-semibold uppercase tracking-[0.12em] transition-colors',
-                  sel ? 'text-white' : 'text-texto-suave hover:text-crema',
+                  'relative min-h-11 whitespace-nowrap rounded-[8px] border-2 border-crema/18 px-4 font-ui text-[0.8rem] font-semibold uppercase tracking-[0.12em] transition-colors',
+                  sel ? 'border-transparent text-white' : 'text-texto-suave hover:border-crema/40 hover:text-crema',
                 )}
                 style={{ WebkitTapHighlightColor: 'transparent' }}
               >
                 {sel && (
                   <motion.span
                     layoutId={`${base}-burbuja`}
-                    className="absolute inset-0 z-0 rounded-full border border-white/15 bg-gradient-to-b from-[#e6332c] to-rojo shadow-[0_2px_0_var(--color-rojo-sombra)]"
+                    className="absolute -inset-[2px] z-0 rounded-[8px] bg-rojo shadow-[0_3px_0_var(--color-rojo-sombra)]"
                     transition={reducir ? { duration: 0 } : { type: 'spring', bounce: 0.19, duration: 0.4 }}
                   />
                 )}

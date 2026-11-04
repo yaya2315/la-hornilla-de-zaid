@@ -11,10 +11,8 @@ import { useEffect, useId, useState, type FormEvent, type ReactNode } from 'reac
 import { motion } from 'motion/react'
 import { ArrowRight, Check, Copy, Flame, Gift } from 'lucide-react'
 import { Sitio } from '@/components/marca/Sitio'
-import { PaginaHero } from '@/components/marca/Piezas'
+import { Boton, Hoja, Portadilla } from '@/components/marca/Hecho'
 import { IconoWhatsApp } from '@/components/marca/Iconos'
-import { TextureButton } from '@/components/ui/texture-button'
-import { TextureCard } from '@/components/ui/texture-card'
 import {
   cargarReglasTarjeta, cargarTarjeta, CODIGO_TARJETA, normalizarCodigo,
   type DatosTarjeta, type ReglasTarjeta,
@@ -46,7 +44,7 @@ function Sello({ n, lleno, ultimo, demora }: { n: number; lleno: boolean; ultimo
         className={cn(
           'grid size-[clamp(3.6rem,17vw,4.6rem)] place-items-center rounded-full',
           lleno
-            ? 'bg-gradient-to-b from-[#e6332c] to-rojo text-white shadow-[0_3px_0_var(--color-rojo-sombra),inset_0_0_0_3px_rgb(255_255_255/0.22)]'
+            ? 'bg-rojo text-white shadow-[0_3px_0_var(--color-rojo-sombra),inset_0_0_0_3px_rgb(255_255_255/0.22)]'
             : 'border-2 border-dashed border-tinta/40 text-tinta/60',
         )}
       >
@@ -66,9 +64,9 @@ function TarjetaPapel({ t, r, children }: { t: DatosTarjeta; r: ReglasTarjeta; c
   const sellos = Math.min(t.sellos, meta)
   const faltan = meta - sellos
   return (
-    <div className="drop-shadow-[0_24px_40px_rgb(0_0_0/0.45)]">
-      <article className="overflow-hidden rounded-[22px] bg-crema text-tinta" aria-label={`Tarjeta Hornilla de ${t.nombre}`}>
-        <header className="semitono relative bg-verde-banda px-5 pt-12 pb-6 text-center [background-image:radial-gradient(80%_120%_at_0%_0%,rgb(214_231_166/0.22),transparent_60%),radial-gradient(circle,rgb(255_255_255/0.1)_1px,transparent_1.7px)] [background-size:100%_100%,16px_16px]">
+    <div className="drop-shadow-[8px_8px_0_var(--color-noche-950)]">
+      <article className="overflow-hidden rounded-[8px] bg-crema text-tinta" aria-label={`Tarjeta Hornilla de ${t.nombre}`}>
+        <header className="semitono relative bg-verde-banda px-5 pt-14 pb-6 text-center">
           <span aria-hidden="true" className="papel-picado absolute inset-x-0 top-2.5" />
           <p className="font-ui text-xs font-semibold tracking-[0.25em] text-crema uppercase">La Hornilla de Zaid</p>
           <h2 className="mt-1 font-titulo text-[clamp(2.4rem,9vw,3.4rem)] leading-none text-crema [text-shadow:3px_3px_0_var(--color-noche-700)]">Tarjeta Hornilla</h2>
@@ -92,7 +90,7 @@ function TarjetaPapel({ t, r, children }: { t: DatosTarjeta; r: ReglasTarjeta; c
           </p>
 
           {r.premio && (
-            <p className="mt-5 rounded-xl border-2 border-dashed border-verde-banda/55 bg-verde-banda/8 px-4 py-3 text-center text-[0.95rem]">
+            <p className="mt-5 rounded-[8px] border-2 border-dashed border-verde-banda/55 bg-verde-banda/8 px-4 py-3 text-center text-[0.95rem]">
               <span className="font-ui text-xs font-semibold tracking-[0.2em] text-verde-oscuro uppercase">Tu premio</span><br />
               <strong className="text-lg">{r.premio}</strong>
             </p>
@@ -115,7 +113,7 @@ function Paso({ n, children }: { n: number; children: ReactNode }) {
 
 function ComoFunciona({ r }: { r: ReglasTarjeta | null }) {
   return (
-    <TextureCard as="section" aria-labelledby="tituloComo">
+    <Hoja as="section" aria-labelledby="tituloComo">
       <div className="p-[clamp(1.25rem,4vw,1.75rem)]">
         <h2 id="tituloComo" className="mb-4 font-ui text-[1.1rem] font-bold tracking-[0.12em] text-amarillo uppercase">Cómo funciona</h2>
         <ol className="grid gap-3.5 text-[0.95rem]">
@@ -134,16 +132,16 @@ function ComoFunciona({ r }: { r: ReglasTarjeta | null }) {
           Guardamos tu nombre y WhatsApp solo para llevar tu tarjeta. Mira la <a className="underline underline-offset-2 hover:text-amarillo" href={PAGINAS.privacidad}>política de privacidad</a>; si quieres que borremos tus datos, escríbenos.
         </p>
       </div>
-    </TextureCard>
+    </Hoja>
   )
 }
 
 function BotonPedirTarjeta({ className }: { className?: string }) {
   const texto = '¡Hola! 🤠 Quiero mi Tarjeta Hornilla.\nMi nombre es: \nAcepto que guarden mi nombre y WhatsApp solo para llevar mi tarjeta.'
   return (
-    <TextureButton asChild variant="rojo" size="lg" className={className}>
+    <Boton asChild variant="rojo" size="lg" className={className}>
       <a href={wa(texto)} target="_blank" rel="noopener"><IconoWhatsApp className="size-5" /> Pedir mi tarjeta por WhatsApp</a>
-    </TextureButton>
+    </Boton>
   )
 }
 
@@ -202,14 +200,16 @@ export function Tarjeta() {
 
   return (
     <Sitio pagina="tarjeta">
-      <PaginaHero eyebrow="Tarjeta de sellos" titulo="Tarjeta Hornilla" />
+      <Portadilla lema="Tarjeta de sellos" titulo={<>Tarjeta <span className="text-amarillo [text-shadow:4px_4px_0_var(--color-rojo-sombra)]">Hornilla</span></>}>
+        <p className="mt-4 max-w-[44ch] text-[1.02rem] text-texto-suave">Junta sellos con tus pedidos y gana tu premio.</p>
+      </Portadilla>
       <section aria-live="polite" className="mx-auto grid max-w-3xl gap-6 px-5 py-[clamp(3rem,8vw,5rem)]">
         {estado === 'cargando' && <p role="status" className="text-center text-texto-suave">Buscando tu tarjeta…</p>}
 
         {estado === 'lista' && tarjeta && (
           <>
             {apagada && (
-              <p className="rounded-2xl border-2 border-dashed border-amarillo/50 bg-amarillo/8 px-5 py-3.5 text-center text-[0.92rem]">
+              <p className="rounded-[8px] border-2 border-dashed border-amarillo/50 bg-amarillo/8 px-5 py-3.5 text-center text-[0.92rem]">
                 La Tarjeta Hornilla empieza muy pronto: tus sellos se suman cuando el programa esté activo.
               </p>
             )}
@@ -229,7 +229,7 @@ export function Tarjeta() {
             </TarjetaPapel>
 
             {tarjeta.premios > 0 && (
-              <TextureCard tono="banda">
+              <Hoja tono="banda">
                 <div className="flex flex-col items-center gap-4 p-6 text-center">
                   <Gift aria-hidden="true" className="size-9 text-amarillo" />
                   <h2 className="font-titulo text-[clamp(2rem,7vw,2.6rem)] leading-none text-crema [text-shadow:3px_3px_0_var(--color-noche-700)]">
@@ -237,31 +237,31 @@ export function Tarjeta() {
                   </h2>
                   {reglasOk.premio && <p className="text-white">{reglasOk.premio}</p>}
                   <div className="flex flex-wrap justify-center gap-3">
-                    <TextureButton asChild variant="rojo">
+                    <Boton asChild variant="rojo">
                       <a href={wa(`¡Hola! Quiero canjear mi premio de la Tarjeta Hornilla.\nMi código: ${tarjeta.codigo}`)} target="_blank" rel="noopener"><IconoWhatsApp className="size-5" /> Canjear por WhatsApp</a>
-                    </TextureButton>
-                    <TextureButton asChild variant="crema">
+                    </Boton>
+                    <Boton asChild variant="crema">
                       <a href={PAGINAS.pedido}>Pedir ahora <ArrowRight aria-hidden="true" className="size-4" /></a>
-                    </TextureButton>
+                    </Boton>
                   </div>
                   <p className="text-xs text-white/85">Lo confirmamos por WhatsApp antes de aplicarlo en tu pedido.</p>
                 </div>
-              </TextureCard>
+              </Hoja>
             )}
 
             <div className="flex flex-wrap justify-center gap-3">
-              <TextureButton asChild variant="crema"><a href={PAGINAS.pedido}>Pedir con mi código <ArrowRight aria-hidden="true" className="size-4" /></a></TextureButton>
-              <TextureButton variant="fantasma" onClick={otraTarjeta}>Ver otra tarjeta</TextureButton>
+              <Boton asChild variant="crema"><a href={PAGINAS.pedido}>Pedir con mi código <ArrowRight aria-hidden="true" className="size-4" /></a></Boton>
+              <Boton variant="linea" onClick={otraTarjeta}>Ver otra tarjeta</Boton>
             </div>
           </>
         )}
 
         {(estado === 'inicio' || estado === 'no-existe' || estado === 'error') && (
-          <TextureCard as="section" aria-labelledby="tituloCodigo">
+          <Hoja as="section" aria-labelledby="tituloCodigo">
             <div className="grid gap-5 p-[clamp(1.25rem,4vw,1.75rem)]">
               <h2 id="tituloCodigo" className="font-ui text-[1.1rem] font-bold tracking-[0.12em] text-amarillo uppercase">Ver mi tarjeta</h2>
-              {estado === 'no-existe' && <p role="alert" className="rounded-xl bg-rojo/20 px-4 py-3 text-[0.92rem] text-rojo-texto">No encontramos una tarjeta con el código <strong>{codigo}</strong>. Revisa que esté bien escrito.</p>}
-              {estado === 'error' && <p role="alert" className="rounded-xl bg-rojo/20 px-4 py-3 text-[0.92rem] text-rojo-texto">No pudimos conectar para buscar tu tarjeta. Revisa tu internet e inténtalo otra vez.</p>}
+              {estado === 'no-existe' && <p role="alert" className="rounded-[8px] border-2 border-rojo/50 bg-rojo/15 px-4 py-3 text-[0.92rem] text-rojo-texto">No encontramos una tarjeta con el código <strong>{codigo}</strong>. Revisa que esté bien escrito.</p>}
+              {estado === 'error' && <p role="alert" className="rounded-[8px] border-2 border-rojo/50 bg-rojo/15 px-4 py-3 text-[0.92rem] text-rojo-texto">No pudimos conectar para buscar tu tarjeta. Revisa tu internet e inténtalo otra vez.</p>}
               <form onSubmit={ver} noValidate className="grid gap-3">
                 <label htmlFor={idCodigo} className="font-ui text-xs font-semibold tracking-[0.18em] text-texto-suave uppercase">Tu código</label>
                 <input
@@ -272,17 +272,17 @@ export function Tarjeta() {
                   autoComplete="off" autoCapitalize="characters" spellCheck={false} maxLength={12}
                   aria-invalid={!!errorForm}
                   aria-describedby={errorForm ? `${idCodigo}-error` : undefined}
-                  className="min-h-12 w-full rounded-xl border-2 border-crema/20 bg-noche-800 px-4 font-precio text-lg tracking-wider text-crema uppercase placeholder:text-texto-suave/60 focus:border-amarillo focus:outline-none"
+                  className="min-h-12 w-full rounded-[8px] border-2 border-crema/22 bg-noche-900 px-4 font-precio text-lg tracking-wider text-crema uppercase placeholder:text-texto-suave/60 focus:border-amarillo focus:outline-none"
                 />
                 {errorForm && <p id={`${idCodigo}-error`} role="alert" className="text-sm text-rojo-texto">{errorForm}</p>}
-                <TextureButton type="submit" variant="rojo" size="lg" ancho="completo">Ver mi tarjeta <ArrowRight aria-hidden="true" className="size-4" /></TextureButton>
+                <Boton type="submit" variant="rojo" size="lg" ancho="completo">Ver mi tarjeta <ArrowRight aria-hidden="true" className="size-4" /></Boton>
               </form>
               <div className="border-t border-dashed border-crema/25 pt-5">
                 <p className="mb-3 text-[0.95rem]">¿Aún no tienes tarjeta? Pídela por WhatsApp.</p>
                 <BotonPedirTarjeta />
               </div>
             </div>
-          </TextureCard>
+          </Hoja>
         )}
 
         <ComoFunciona r={reglas ?? null} />

@@ -13,10 +13,9 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { ArrowRight, Gift, MapPin, Minus, Plus, ShoppingBag, X } from 'lucide-react'
 import { Sitio } from '@/components/marca/Sitio'
-import { EncabezadoSeccion, PaginaHero, Precio } from '@/components/marca/Piezas'
+import { Precio } from '@/components/marca/Piezas'
+import { Boton, DatosEntrega, Hoja, Portadilla, Ticket, TituloSeccion } from '@/components/marca/Hecho'
 import { TarjetaPromo } from '@/components/marca/Promo'
-import { TextureButton } from '@/components/ui/texture-button'
-import { TextureCard, TextureSeparator } from '@/components/ui/texture-card'
 import { RollingNumber } from '@/components/ui/rolling-number'
 import {
   cargarBebidas, cargarMenu, cargarPromos, cargarPupusas, cargarReglasTarjeta, cargarTarjeta, CODIGO_TARJETA, fotoDe, normalizarCodigo, pupusasActivas, seMuestraHoy,
@@ -29,7 +28,7 @@ import { ModalMapa } from './pedido/ModalMapa'
 
 type Agregar = (nombre: string, precio: number, cantidad: number) => void
 
-const control = 'min-h-11 w-full rounded-[10px] border-2 border-crema/16 bg-noche-900/60 px-3 py-2 text-[0.9rem] text-crema focus:border-amarillo [&>option]:bg-noche-800'
+const control = 'min-h-11 w-full rounded-[8px] border-2 border-crema/20 bg-noche-900 px-3 py-2 text-[0.9rem] text-crema focus:border-amarillo [&>option]:bg-noche-800'
 const rotulo = 'font-ui text-[0.72rem] tracking-[0.15em] text-texto-suave uppercase'
 
 /* ── Piezas de control ─────────────────────────────────────────────── */
@@ -55,13 +54,13 @@ function ConPina({ marcado, cambiar }: { marcado: boolean; cambiar: (v: boolean)
 function BotonAgregar({ onClick, children, completo = true }: { onClick: () => void; children: React.ReactNode; completo?: boolean }) {
   const [listo, setListo] = useState(false)
   return (
-    <TextureButton
+    <Boton
       variant={listo ? 'verde' : 'rojo'}
       ancho={completo ? 'completo' : 'auto'}
       onClick={() => { onClick(); setListo(true); setTimeout(() => setListo(false), 900) }}
     >
       <span aria-live="polite">{listo ? '¡Agregado!' : children}</span>
-    </TextureButton>
+    </Boton>
   )
 }
 
@@ -101,15 +100,15 @@ function TarjetaPedido({ plato, coleccion, agregar }: { plato: Plato; coleccion:
 
   const foto = coleccion === 'menu' ? fotoDe(plato) : ''
   return (
-    <TextureCard as="article">
+    <Hoja as="article" className="flex flex-col overflow-hidden">
       {foto && (
         <div className="relative aspect-[16/9] bg-noche-800">
           <img src={foto} alt="" width={720} height={405} loading="lazy" decoding="async" className="size-full object-cover" />
-          {plato.destacado && <span className="esquina-doblada absolute top-3 left-3 bg-rojo px-3 py-1.5 font-ui text-[0.7rem] font-bold tracking-[0.2em] text-white uppercase">{plato.etiqueta || 'Destacado'}</span>}
-          <span aria-hidden="true" className="absolute inset-x-0 -bottom-px h-3.5 bg-noche-500 [mask:var(--rasgado-b)_0_0/260px_100%_repeat-x] [-webkit-mask:var(--rasgado-b)_0_0/260px_100%_repeat-x]" />
+          {plato.destacado && <span className="esquina-doblada absolute top-3 left-3 bg-rojo shadow-[3px_3px_0_var(--color-rojo-sombra)] px-3 py-1.5 font-ui text-[0.7rem] font-bold tracking-[0.2em] text-white uppercase">{plato.etiqueta || 'Destacado'}</span>}
+          <span aria-hidden="true" className="absolute inset-x-0 -bottom-px h-3.5 bg-noche-600 [mask:var(--rasgado-b)_0_0/260px_100%_repeat-x] [-webkit-mask:var(--rasgado-b)_0_0/260px_100%_repeat-x]" />
         </div>
       )}
-      <div className="flex h-full flex-col gap-3 p-5">
+      <div className="flex flex-1 flex-col gap-3 p-5">
         <div className="flex items-baseline justify-between gap-2.5">
           <h3 className="font-ui text-[1.2rem] font-bold tracking-wider text-crema uppercase">{nombreVisible}</h3>
           {plato.nota && <span className="text-[0.8rem] font-semibold whitespace-nowrap text-lima italic">{plato.nota}</span>}
@@ -140,7 +139,7 @@ function TarjetaPedido({ plato, coleccion, agregar }: { plato: Plato; coleccion:
           </BotonAgregar>
         </div>
       </div>
-    </TextureCard>
+    </Hoja>
   )
 }
 
@@ -176,8 +175,8 @@ function TarjetaBebida({ bebida, agregar }: { bebida: Bebida; agregar: Agregar }
   const [cant, setCant] = useState(1)
   const precio = leerPrecio(bebida.precio)
   return (
-    <TextureCard as="article">
-      <div className="flex h-full flex-col gap-3 p-5">
+    <Hoja as="article" className="flex flex-col overflow-hidden">
+      <div className="flex flex-1 flex-col gap-3 p-5">
         <h3 className="font-ui text-[1.05rem] font-bold tracking-wider text-crema uppercase">{bebida.nombre}</h3>
         <div className="mt-auto flex flex-wrap items-center justify-between gap-3">
           <Precio valor={dinero(precio)} className="text-[1.25rem]" />
@@ -185,7 +184,7 @@ function TarjetaBebida({ bebida, agregar }: { bebida: Bebida; agregar: Agregar }
         </div>
         <BotonAgregar onClick={() => { agregar(bebida.nombre, precio, cant); setCant(1) }}>Agregar</BotonAgregar>
       </div>
-    </TextureCard>
+    </Hoja>
   )
 }
 
@@ -285,14 +284,19 @@ export function Pedido() {
     setTimeout(() => entrega.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60)
   }
 
-  const campo = 'min-h-12 w-full rounded-xl border-2 border-crema/16 bg-crema/6 px-4 py-3 text-base text-crema placeholder:text-texto-suave/80 focus:border-amarillo focus:bg-crema/10'
+  const campo = 'min-h-12 w-full rounded-[8px] border-2 border-crema/22 bg-noche-900 px-4 py-3 text-base text-crema placeholder:text-texto-suave/80 focus:border-amarillo'
   const etiqueta = 'font-ui text-[0.8rem] font-medium tracking-[0.12em] text-texto-suave uppercase'
 
   return (
     <Sitio pagina="pedido">
-      <PaginaHero eyebrow="Pide en línea" titulo="Arma tu pedido">
-        <p className="mt-4 text-texto-suave">Elige tus platillos, revisa el total y envíalo por WhatsApp — así de fácil.</p>
-      </PaginaHero>
+      <Portadilla lema="Pide en línea" titulo={<>Arma tu <span className="text-amarillo [text-shadow:4px_4px_0_var(--color-rojo-sombra)]">comanda</span></>}>
+        <ol className="mt-5 grid gap-2.5 text-[1rem]">
+          {['Escoge tus platillos y tu carne', 'Revisa tu comanda con el total', 'Mándala por WhatsApp y nosotros la confirmamos'].map((t, i) => (
+            <li key={t} className="flex items-center gap-3.5"><span aria-hidden="true" className="grid size-9 shrink-0 place-items-center rounded-full bg-crema font-precio text-base text-rojo">{i + 1}</span>{t}</li>
+          ))}
+        </ol>
+        <DatosEntrega className="mt-6" />
+      </Portadilla>
 
       {promos.length > 0 && (
         <div aria-label="Promociones del día" className="mx-auto mt-[clamp(1.75rem,4vw,2.75rem)] flex max-w-(--container-sitio) flex-col gap-6 px-5">
@@ -331,12 +335,11 @@ export function Pedido() {
 
         {/* ── Carrito ── */}
         <aside ref={carritoRef} id="tuPedido" aria-label="Tu pedido" className="scroll-mt-28 lg:sticky lg:top-28">
-          <TextureCard>
-            <span aria-hidden="true" className="papel-picado h-10 border-b border-dashed border-crema/18 [background-position:0_-4px]" />
-            <div className="flex flex-col gap-4 p-6">
-              <div className="flex items-baseline justify-between">
-                <h2 className="font-titulo text-[1.9rem] leading-none text-crema [text-shadow:2px_2px_0_var(--color-rojo)]">Tu pedido</h2>
-                {carrito.lineas.length > 0 && <button type="button" onClick={carrito.vaciar} className="min-h-10 px-1 text-sm text-texto-suave underline underline-offset-4 hover:text-amarillo">Vaciar</button>}
+          <Ticket>
+            <div className="flex flex-col gap-4">
+              <div className="border-b-2 border-dashed border-tinta pb-3 text-center">
+                <h2 className="font-titulo text-[1.9rem] leading-none">Tu comanda</h2>
+                <p className="mt-1 font-ui text-[0.72rem] font-semibold tracking-[0.2em] uppercase">La Hornilla de Zaid · Delivery</p>
               </div>
               <ul aria-live="polite" className="grid gap-2.5">
                 <AnimatePresence initial={false}>
@@ -347,28 +350,28 @@ export function Pedido() {
                       initial={{ opacity: 0, y: -6 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, x: 20 }}
-                      className="grid grid-cols-[1fr_auto_auto] items-start gap-2.5 border-b border-dashed border-crema/18 pb-2.5 text-[0.88rem]"
+                      className="grid grid-cols-[1fr_auto_auto] items-start gap-2.5 border-b border-dashed border-tinta/30 pb-2.5 font-ui text-[0.92rem]"
                     >
-                      <span className="leading-snug"><b className="mr-1 text-amarillo">{l.cantidad}×</b>{l.nombre}</span>
-                      <span className="font-precio whitespace-nowrap text-amarillo">{dinero(l.precioUnitario * l.cantidad)}</span>
-                      <button type="button" onClick={() => carrito.quitar(l.id)} aria-label={`Quitar ${l.nombre}`} className="-mt-1.5 grid size-9 place-items-center rounded-full bg-crema/8 text-texto-suave hover:bg-rojo hover:text-white">
+                      <span className="leading-snug"><b className="mr-1 text-rojo">{l.cantidad}×</b>{l.nombre}</span>
+                      <span className="whitespace-nowrap font-semibold">{dinero(l.precioUnitario * l.cantidad)}</span>
+                      <button type="button" onClick={() => carrito.quitar(l.id)} aria-label={`Quitar ${l.nombre}`} className="-mt-1.5 grid size-9 place-items-center rounded-full text-tinta/70 hover:bg-rojo hover:text-white">
                         <X aria-hidden="true" className="size-3.5" />
                       </button>
                     </motion.li>
                   ))}
                 </AnimatePresence>
               </ul>
-              {carrito.lineas.length === 0 && <p className="py-4 text-center text-sm text-texto-suave">Aún no has agregado nada.</p>}
-              <TextureSeparator />
-              <div className="flex items-baseline justify-between font-ui">
-                <span className="text-sm tracking-[0.15em] text-texto-suave uppercase">Subtotal</span>
-                <span className="font-precio text-[1.6rem] text-amarillo"><RollingNumber value={carrito.subtotal} precision={2} format={dinero} /></span>
+              {carrito.lineas.length === 0 && <p className="py-3 text-center text-sm text-tinta/70">Aún no has agregado nada.</p>}
+              <div className="flex items-baseline justify-between border-t-2 border-dashed border-tinta pt-3 font-ui">
+                <span className="text-sm font-bold tracking-[0.15em] uppercase">Subtotal</span>
+                <span className="font-precio text-[1.7rem] text-rojo"><RollingNumber value={carrito.subtotal} precision={2} format={dinero} /></span>
               </div>
-              <TextureButton variant="rojo" size="lg" ancho="completo" disabled={!carrito.lineas.length} onClick={continuar}>
-                Continuar pedido <ArrowRight aria-hidden="true" className="size-4" />
-              </TextureButton>
+              {carrito.lineas.length > 0 && <button type="button" onClick={carrito.vaciar} className="-mt-2 min-h-10 self-end px-1 text-sm text-tinta/70 underline underline-offset-4 hover:text-rojo">Vaciar comanda</button>}
+              <Boton variant="rojo" size="lg" ancho="completo" disabled={!carrito.lineas.length} onClick={continuar}>
+                Continuar <ArrowRight aria-hidden="true" className="size-4" />
+              </Boton>
             </div>
-          </TextureCard>
+          </Ticket>
         </aside>
       </div>
 
@@ -379,10 +382,10 @@ export function Pedido() {
             initial={{ y: 90 }} animate={{ y: 0 }} exit={{ y: 90 }}
             className="fixed inset-x-3 bottom-3 z-[900] lg:hidden"
           >
-            <a href="#tuPedido" className="flex min-h-14 items-center justify-between gap-3 rounded-2xl border border-crema/20 bg-noche-900/95 px-4 py-2.5 shadow-[0_12px_30px_rgb(0_0_0/0.55)] backdrop-blur-md">
+            <a href="#tuPedido" className="flex min-h-14 items-center justify-between gap-3 rounded-[10px] border-2 border-crema/25 bg-noche-900 px-4 py-2.5 shadow-[0_5px_0_var(--color-noche-950)]">
               <span className="flex items-center gap-2.5 font-ui text-sm font-semibold tracking-[0.12em] text-crema uppercase">
                 <span className="grid size-9 place-items-center rounded-full bg-rojo text-white shadow-[0_2px_0_var(--color-rojo-sombra)]"><ShoppingBag aria-hidden="true" className="size-4" /></span>
-                Ver mi pedido · {carrito.piezas}
+                Ver mi comanda · {carrito.piezas}
               </span>
               <span className="font-precio text-xl text-amarillo"><RollingNumber value={carrito.subtotal} precision={2} format={dinero} /></span>
             </a>
@@ -393,17 +396,17 @@ export function Pedido() {
       {/* ── Paso 2: entrega ── */}
       {paso2 && (
         <section ref={entrega} aria-labelledby="tituloEntrega" className="mx-auto max-w-3xl scroll-mt-24 px-5 py-[clamp(3.5rem,8vw,5.5rem)]">
-          <EncabezadoSeccion id="tituloEntrega" eyebrow="Último paso" titulo="¿Cómo lo quieres?" />
+          <TituloSeccion id="tituloEntrega" titulo="¿A dónde te la llevamos?" />
           {SOLO_DELIVERY && (
-            <p className="mx-auto -mt-3 mb-6 max-w-xl rounded-2xl border-2 border-dashed border-crema/22 bg-crema/6 px-5 py-3.5 text-center text-[0.92rem]">
+            <p className="mb-6 max-w-xl rounded-[8px] border-2 border-dashed border-crema/25 px-5 py-3.5 text-[0.92rem]">
               Por ahora atendemos solo por <strong>delivery</strong>. Muy pronto abriremos nuestro local físico.
             </p>
           )}
-          <div role="radiogroup" aria-label="Tipo de entrega" className={cn('mb-7 grid gap-3.5', SOLO_DELIVERY ? 'mx-auto max-w-xs' : 'sm:grid-cols-3')}>
+          <div role="radiogroup" aria-label="Tipo de entrega" className={cn('mb-7 grid gap-3.5', SOLO_DELIVERY ? 'max-w-xs' : 'sm:grid-cols-3')}>
             {(SOLO_DELIVERY ? (['delivery'] as const) : (['local', 'delivery', 'recoger'] as const)).map((t) => (
               <label key={t} className="cursor-pointer">
                 <input type="radio" name="tipoEntrega" value={t} checked={tipo === t} onChange={() => setTipo(t)} className="peer sr-only" />
-                <span className="flex flex-col items-center gap-1 rounded-2xl border-2 border-crema/16 bg-noche-600 px-3.5 py-5 text-center transition-colors peer-checked:border-amarillo peer-checked:bg-amarillo/8 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-3 peer-focus-visible:outline-amarillo">
+                <span className="flex flex-col items-center gap-1 rounded-[8px] border-2 border-crema/18 bg-noche-600 px-3.5 py-5 text-center shadow-[4px_4px_0_var(--color-noche-950)] transition-colors peer-checked:border-amarillo peer-focus-visible:outline-3 peer-focus-visible:outline-offset-3 peer-focus-visible:outline-amarillo">
                   <strong className="font-ui text-[1.05rem] tracking-wider text-crema uppercase">{{ local: 'Comer en el local', delivery: 'Delivery', recoger: 'Para llevar' }[t]}</strong>
                   <small className="text-xs text-texto-suave">{{ local: '+5% de servicio', delivery: 'Te lo llevamos', recoger: 'Pasas a recogerlo' }[t]}</small>
                 </span>
@@ -431,7 +434,7 @@ export function Pedido() {
                     : <>Si ya tienes tarjeta, escribe tu código. ¿Aún no la tienes? <a className="underline underline-offset-2 hover:text-amarillo" href={PAGINAS.tarjeta}>Cómo pedirla</a>.</>}
                 </p>
                 {tarjetaValida && tarjetaValida.premios > 0 && (
-                  <label className="mt-1 flex cursor-pointer items-start gap-3 rounded-xl border-2 border-lima/50 bg-lima/10 px-4 py-3 text-[0.92rem]">
+                  <label className="mt-1 flex cursor-pointer items-start gap-3 rounded-[8px] border-2 border-lima/50 bg-lima/10 px-4 py-3 text-[0.92rem]">
                     <input type="checkbox" checked={canjear} onChange={(e) => setCanjear(e.target.checked)} className="mt-1 size-5 shrink-0 accent-[var(--color-lima)]" />
                     <span><Gift aria-hidden="true" className="mr-1.5 inline size-4 text-lima" />Quiero canjear mi premio en este pedido{reglasTarjeta.premio ? <> (<strong className="text-crema">{reglasTarjeta.premio}</strong>)</> : null}. Lo confirmamos por WhatsApp antes de aplicarlo.</span>
                   </label>
@@ -443,7 +446,7 @@ export function Pedido() {
                 <label htmlFor="clienteDireccion" className={etiqueta}>Dirección de entrega</label>
                 <input id="clienteDireccion" className={campo} placeholder="Dirección completa y alguna referencia" autoComplete="street-address" value={direccion} onChange={(e) => setDireccion(e.target.value)} />
                 <div className="mt-1.5 flex flex-wrap items-center gap-3">
-                  <TextureButton variant="crema" size="sm" onClick={() => setMapa(true)}><MapPin aria-hidden="true" className="size-4" /> Marcar en el mapa</TextureButton>
+                  <Boton variant="crema" size="sm" onClick={() => setMapa(true)}><MapPin aria-hidden="true" className="size-4" /> Marcar en el mapa</Boton>
                   {pin && (
                     <span className="inline-flex items-center gap-2 rounded-full border border-lima/45 bg-lima/12 py-1.5 pr-1.5 pl-3.5 text-sm font-semibold text-lima">
                       Pin marcado
@@ -457,28 +460,30 @@ export function Pedido() {
             )}
           </div>
 
-          <TextureCard className="mb-6">
-            <div className="p-[clamp(1.1rem,4vw,1.75rem)]">
-              <ul className="grid gap-2 border-b border-dashed border-crema/20 pb-3.5">
-                {carrito.lineas.map((l) => (
-                  <li key={l.id} className="flex justify-between gap-3 text-[0.9rem]"><span>{l.cantidad}× {l.nombre}</span><span className="whitespace-nowrap">{dinero(l.precioUnitario * l.cantidad)}</span></li>
-                ))}
-              </ul>
-              <div className="grid gap-2 pt-3.5 text-[0.9rem] text-texto-suave">
-                <div className="flex justify-between"><span>Subtotal</span><span>{dinero(carrito.subtotal)}</span></div>
-                {esLocal && <div className="flex justify-between"><span>Servicio en el local (5%)</span><span>+{dinero(servicio)}</span></div>}
-                <div className="flex items-baseline justify-between border-t border-dashed border-crema/25 pt-2.5">
-                  <span className="font-ui font-semibold tracking-wider text-crema uppercase">Total estimado{tipo === 'delivery' && <small className="ml-1 font-sans font-normal tracking-normal normal-case text-texto-suave">(sin envío)</small>}</span>
-                  <span className="font-precio text-2xl text-amarillo"><RollingNumber value={total} precision={2} format={dinero} /></span>
-                </div>
+          <Ticket className="mb-7 max-w-xl">
+            <div className="border-b-2 border-dashed border-tinta pb-3 text-center">
+              <p className="font-titulo text-[1.7rem] leading-none">La Hornilla de Zaid</p>
+              <p className="mt-1 font-ui text-[0.72rem] font-semibold tracking-[0.2em] uppercase">Comanda · {tipo ? ETIQUETAS[tipo] : 'Delivery'}</p>
+            </div>
+            <ul className="grid gap-2 border-b-2 border-dashed border-tinta py-3.5 font-ui">
+              {carrito.lineas.map((l) => (
+                <li key={l.id} className="flex justify-between gap-3 text-[0.95rem]"><span>{l.cantidad}× {l.nombre}</span><span className="whitespace-nowrap">{dinero(l.precioUnitario * l.cantidad)}</span></li>
+              ))}
+            </ul>
+            <div className="grid gap-2 pt-3.5 font-ui text-[0.95rem]">
+              <div className="flex justify-between"><span>Subtotal</span><span>{dinero(carrito.subtotal)}</span></div>
+              {esLocal && <div className="flex justify-between"><span>Servicio en el local (5%)</span><span>+{dinero(servicio)}</span></div>}
+              <div className="flex items-baseline justify-between border-t-2 border-dashed border-tinta pt-2.5">
+                <span className="font-bold tracking-wider uppercase">Total estimado{tipo === 'delivery' && <small className="ml-1 font-sans font-normal tracking-normal normal-case text-tinta/70">(sin envío)</small>}</span>
+                <span className="font-precio text-[1.9rem] text-rojo"><RollingNumber value={total} precision={2} format={dinero} /></span>
               </div>
             </div>
-          </TextureCard>
+          </Ticket>
 
-          <TextureButton variant="rojo" size="lg" ancho="completo" disabled={!listo} onClick={enviar}>
+          <Boton variant="rojo" size="lg" className="w-full max-w-xl" disabled={!listo} onClick={enviar}>
             Enviar pedido por WhatsApp <ArrowRight aria-hidden="true" className="size-4" />
-          </TextureButton>
-          <p className="mt-4 text-center text-sm text-texto-suave">Este es un pedido estimado; nosotros lo confirmamos por WhatsApp.</p>
+          </Boton>
+          <p className="mt-4 max-w-xl text-sm text-texto-suave">Este es un pedido estimado; nosotros lo confirmamos por WhatsApp.</p>
         </section>
       )}
 

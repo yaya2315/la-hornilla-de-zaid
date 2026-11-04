@@ -5,17 +5,14 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { ArrowRight, Check, Search, Share2, X } from 'lucide-react'
 import { Sitio } from '@/components/marca/Sitio'
-import { AvisoDelivery, EncabezadoSeccion, EtiquetaPrecio, PaginaHero, Precio } from '@/components/marca/Piezas'
 import { TarjetaPromo } from '@/components/marca/Promo'
-import { TextureButton } from '@/components/ui/texture-button'
-import { TextureCard, TextureSeparator } from '@/components/ui/texture-card'
+import { Boton, DatosEntrega, Etiqueta, FilaPrecio, Portadilla, Recorte, TituloSeccion } from '@/components/marca/Hecho'
 import { DirectionAwareTabs } from '@/components/ui/direction-aware-tabs'
 import {
   cargarBebidas, cargarExtras, cargarMenu, cargarPromos, cargarPupusas, fotoDe, pupusasActivas, seMuestraHoy,
   type Bebida, type Carta, type Extra, type Plato, type Promo,
 } from '@/lib/datos'
-import { HORARIO_MENU, NEGOCIO, PAGINAS } from '@/lib/sitio'
-import { cn } from '@/lib/utils'
+import { HORARIO_MENU, NEGOCIO, PAGINAS, url } from '@/lib/sitio'
 
 /* Resalta lo que coincide con la búsqueda */
 function Resaltar({ texto, termino }: { texto: string; termino: string }) {
@@ -31,57 +28,43 @@ const coincide = (p: Plato, t: string) => {
   return p.nombre.toLowerCase().includes(q) || !!p.descripcion?.toLowerCase().includes(q) || !!p.variantes?.some((v) => v.texto.toLowerCase().includes(q))
 }
 
-function Foto({ plato, alto = 'aspect-[16/10]' }: { plato: Plato; alto?: string }) {
-  const src = fotoDe(plato)
-  if (!src) return null
-  return (
-    <div className={cn('relative bg-noche-800', alto)}>
-      <img src={src} alt={`${plato.nombre} de La Hornilla de Zaid`} width={720} height={450} loading="lazy" decoding="async" className="size-full object-cover" />
-      <span aria-hidden="true" className="absolute inset-x-0 -bottom-px h-4 bg-noche-500 [mask:var(--rasgado-b)_0_0/260px_100%_repeat-x] [-webkit-mask:var(--rasgado-b)_0_0/260px_100%_repeat-x]" />
-    </div>
-  )
-}
-
-function TarjetaPlatillo({ plato, termino }: { plato: Plato; termino: string }) {
+/* Platillo como bloque de flyer: recorte de foto + nombre + precios con puntitos */
+function TarjetaPlatillo({ plato, termino, indice }: { plato: Plato; termino: string; indice: number }) {
+  const foto = fotoDe(plato)
   if (plato.destacado) {
-    const foto = fotoDe(plato)
     return (
-      <TextureCard as="article" className="col-span-full border-amarillo/60">
-        <div className={cn('grid h-full', foto && 'md:grid-cols-[1.1fr_1fr]')}>
-          <div className="relative">
-            {foto && <img src={foto} alt={`${plato.nombre} de La Hornilla de Zaid`} width={720} height={450} loading="lazy" decoding="async" className="aspect-[16/10] size-full object-cover md:aspect-auto md:min-h-64" />}
-            <span className={cn('esquina-doblada bg-rojo px-4 py-2 font-ui text-xs font-bold tracking-[0.22em] text-white uppercase', foto ? 'absolute top-4 left-4' : 'm-6 inline-block')}>
+      <article className="col-span-full grid items-center gap-[clamp(1.5rem,5vw,3rem)] border-y-2 border-dashed border-crema/20 py-[clamp(1.75rem,5vw,2.75rem)] md:grid-cols-[1fr_1.05fr]">
+        {foto && (
+          <Recorte src={foto} alt={`${plato.nombre} de La Hornilla de Zaid`} giro={-1.5} className="mx-auto w-full max-w-[520px]">
+            <span className="esquina-doblada absolute top-4 -left-2 z-[2] -rotate-3 bg-rojo px-4 py-2 font-ui text-xs font-bold tracking-[0.22em] text-white uppercase shadow-[3px_3px_0_var(--color-rojo-sombra)]">
               {plato.etiqueta || 'Destacado'}
             </span>
-          </div>
-          <div className="flex flex-col items-center justify-center gap-3 p-[clamp(1.4rem,4vw,2.25rem)] text-center md:items-start md:text-left">
-            <h3 className="font-titulo text-[clamp(2.2rem,6vw,3rem)] leading-none text-crema [text-shadow:3px_3px_0_var(--color-rojo)]"><Resaltar texto={plato.nombre} termino={termino} /></h3>
-            {plato.descripcion && <p className="max-w-[46ch] text-[0.95rem]"><Resaltar texto={plato.descripcion} termino={termino} /></p>}
-            {plato.precioUnico && <EtiquetaPrecio valor={plato.precioUnico} className="mt-2" />}
-          </div>
+          </Recorte>
+        )}
+        <div>
+          {!foto && <span className="esquina-doblada mb-3 inline-block bg-rojo px-4 py-2 font-ui text-xs font-bold tracking-[0.22em] text-white uppercase">{plato.etiqueta || 'Destacado'}</span>}
+          <h3 className="font-titulo text-[clamp(2.4rem,7vw,3.4rem)] leading-[0.95] text-crema [text-shadow:3px_3px_0_var(--color-rojo)]"><Resaltar texto={plato.nombre} termino={termino} /></h3>
+          {plato.descripcion && <p className="mt-3 max-w-[46ch] text-[0.98rem]"><Resaltar texto={plato.descripcion} termino={termino} /></p>}
+          {plato.precioUnico && <Etiqueta valor={plato.precioUnico} rotulo="Precio" className="mt-5" />}
         </div>
-      </TextureCard>
+      </article>
     )
   }
   return (
-    <TextureCard as="article" className="transition-transform duration-300 ease-(--ease-marca) hover:-translate-y-1">
-      <Foto plato={plato} />
-      <div className="flex flex-1 flex-col px-5 pt-3.5 pb-5 sm:px-6">
-        <div className="flex items-baseline justify-between gap-3">
-          <h3 className="font-ui text-[1.55rem] font-bold tracking-[0.06em] text-crema uppercase"><Resaltar texto={plato.nombre} termino={termino} /></h3>
+    <article className="grid content-start gap-4">
+      {foto && <Recorte src={foto} alt={`${plato.nombre} de La Hornilla de Zaid`} giro={indice % 2 ? 1.2 : -1.2} proporcion="aspect-[16/10]" />}
+      <div>
+        <div className="flex items-baseline justify-between gap-3 border-b-2 border-crema/25 pb-2">
+          <h3 className="font-ui text-[clamp(1.4rem,5vw,1.65rem)] font-bold tracking-[0.05em] text-crema uppercase"><Resaltar texto={plato.nombre} termino={termino} /></h3>
           {plato.nota && <span className="text-sm font-semibold whitespace-nowrap text-lima italic">{plato.nota}</span>}
         </div>
-        <TextureSeparator className="mt-3.5 mb-1" />
-        <ul className="grid gap-2.5 pt-2.5">
+        <ul>
           {(plato.variantes || []).map((v, i) => (
-            <li key={i} className="flex items-baseline justify-between gap-3.5 font-ui text-[0.95rem] font-medium tracking-wide uppercase">
-              <span><Resaltar texto={v.texto} termino={termino} /></span>
-              <Precio valor={v.precio} className="text-[1.25rem] tracking-normal" />
-            </li>
+            <FilaPrecio key={i} nombre={<Resaltar texto={v.texto} termino={termino} />} precio={v.precio} className="[&>span:first-child]:text-[0.88rem] [&>span:first-child]:font-medium" />
           ))}
         </ul>
       </div>
-    </TextureCard>
+    </article>
   )
 }
 
@@ -94,7 +77,7 @@ function Rejilla({ platos, termino }: { platos: Plato[]; termino: string }) {
       </div>
     )
   }
-  return <div className="grid gap-6 [grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr))]">{platos.map((p, i) => <TarjetaPlatillo key={p.id || p.nombre + i} plato={p} termino={termino} />)}</div>
+  return <div className="grid gap-x-[clamp(1.75rem,4vw,3rem)] gap-y-[clamp(2.25rem,5vw,3.25rem)] [grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))]">{platos.map((p, i) => <TarjetaPlatillo key={p.id || p.nombre + i} plato={p} termino={termino} indice={i} />)}</div>
 }
 
 function Carta({ carta }: { carta: Carta }) {
@@ -112,7 +95,7 @@ function Carta({ carta }: { carta: Carta }) {
   )
 
   const buscador: ReactNode = (
-    <div className="relative mx-auto mb-3 flex max-w-xl items-center">
+    <div className="relative mb-3 flex max-w-xl items-center">
       <Search aria-hidden="true" className="pointer-events-none absolute left-4 size-[18px] text-texto-suave" />
       <input
         type="search"
@@ -120,10 +103,10 @@ function Carta({ carta }: { carta: Carta }) {
         onChange={(e) => setTermino(e.target.value)}
         placeholder="Buscar en el menú… (ej. pastor, birria)"
         aria-label="Buscar platillo"
-        className="min-h-12 w-full rounded-full border-2 border-crema/16 bg-noche-900/70 py-3 pr-12 pl-11 text-base text-crema placeholder:text-texto-suave/80 focus:border-amarillo [&::-webkit-search-cancel-button]:hidden"
+        className="min-h-12 w-full rounded-[10px] border-2 border-crema/22 bg-noche-900 py-3 pr-12 pl-11 text-base text-crema placeholder:text-texto-suave/80 focus:border-amarillo [&::-webkit-search-cancel-button]:hidden"
       />
       {termino && (
-        <button type="button" onClick={() => setTermino('')} aria-label="Limpiar búsqueda" className="absolute right-2 grid size-9 place-items-center rounded-full bg-crema/10 text-crema hover:text-amarillo">
+        <button type="button" onClick={() => setTermino('')} aria-label="Limpiar búsqueda" className="absolute right-1.5 grid size-10 place-items-center rounded-[8px] bg-crema/10 text-crema hover:text-amarillo">
           <X aria-hidden="true" className="size-4" />
         </button>
       )}
@@ -137,7 +120,7 @@ function Carta({ carta }: { carta: Carta }) {
       activo={activo}
       alCambiar={setActivo}
       encima={buscador}
-      claseBarra="sticky top-[calc(clamp(42px,5.5vw,58px)+24px)] z-[500] -mx-5 border-b border-dashed border-crema/20 bg-noche-800/95 px-5 py-3 backdrop-blur-md sm:mx-0 sm:rounded-b-2xl"
+      claseBarra="sticky top-[calc(clamp(42px,5.5vw,58px)+24px)] z-[500] -mx-5 border-b-2 border-dashed border-crema/20 bg-noche-700 px-5 py-3"
     />
   )
 }
@@ -150,23 +133,14 @@ function Compartir() {
     try { await navigator.clipboard.writeText(location.href); setCopiado(true); setTimeout(() => setCopiado(false), 2000) } catch { /* sin portapapeles */ }
   }
   return (
-    <TextureButton variant="crema" onClick={compartir} aria-live="polite">
+    <Boton variant="linea" onClick={compartir} aria-live="polite">
       {copiado ? <><Check aria-hidden="true" className="size-4" /> Enlace copiado</> : <><Share2 aria-hidden="true" className="size-4" /> Compartir menú</>}
-    </TextureButton>
+    </Boton>
   )
 }
 
 function Lista({ items }: { items: (Bebida | Extra)[] }) {
-  return (
-    <ul>
-      {items.map((b, i) => (
-        <li key={b.nombre + i} className="flex items-baseline justify-between gap-3.5 border-b border-dashed border-crema/20 py-3 last:border-b-0">
-          <span>{b.nombre}</span>
-          <Precio valor={b.precio} className="text-[1.1rem]" />
-        </li>
-      ))}
-    </ul>
-  )
+  return <ul>{items.map((b, i) => <FilaPrecio key={b.nombre + i} nombre={b.nombre} precio={b.precio} className="[&>span:first-child]:normal-case [&>span:first-child]:font-sans [&>span:first-child]:font-normal [&>span:first-child]:tracking-normal" />)}</ul>
 }
 
 export function Menu() {
@@ -189,53 +163,60 @@ export function Menu() {
 
   return (
     <Sitio pagina="menu">
-      <PaginaHero eyebrow="La Hornilla de Zaid" titulo="Menú">
-        <p className="mt-6 rounded-lg border-2 border-dashed border-verde-oscuro/45 bg-papel px-5 py-2.5 font-ui text-[0.92rem] leading-normal font-medium tracking-wide text-tinta shadow-[0_0_0_4px_var(--color-papel),0_7px_0_rgb(0_0_0/0.35)]">
-          {HORARIO_MENU.map((l) => <span key={l} className="block">{l}</span>)}
-        </p>
-        <AvisoDelivery className="mt-5" />
-        <div className="mt-5 flex flex-wrap justify-center gap-3">
-          <TextureButton asChild variant="rojo"><a href={PAGINAS.pedido}>Pedir en línea <ArrowRight aria-hidden="true" className="size-4" /></a></TextureButton>
+      <Portadilla
+        lema="La Hornilla de Zaid"
+        titulo={<>El menú <span className="text-amarillo [text-shadow:4px_4px_0_var(--color-rojo-sombra)]">completo</span></>}
+        aside={
+          <Recorte src={url('Imagenes/fotos-de-platillos/tacos/tacos-01-mesa-tarjeta.webp')} alt="Orden de 4 tacos de La Hornilla de Zaid" giro={2} cargar="eager" className="mx-auto w-full max-w-[480px]">
+            <span className="absolute -top-8 right-2 z-[2] -rotate-3 font-sans text-base font-semibold text-lima italic">orden de 4</span>
+          </Recorte>
+        }
+        banda={HORARIO_MENU.map((l) => <span key={l}>{l}</span>)}
+      >
+        <p className="mt-4 max-w-[42ch] text-[1.02rem] text-texto-suave">Tacos, burritos, tortas, nachos y más. En cada platillo eliges tu carne.</p>
+        <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
+          <Boton asChild variant="rojo" size="lg"><a href={PAGINAS.pedido}>Pedir en línea <ArrowRight aria-hidden="true" className="size-4" /></a></Boton>
           <Compartir />
         </div>
-      </PaginaHero>
+        <DatosEntrega className="mt-6" />
+      </Portadilla>
 
       {promos.length > 0 && (
-        <div aria-label="Promociones del día" className="mx-auto mt-[clamp(2.2rem,5vw,3.25rem)] flex max-w-(--container-sitio) flex-col gap-6 px-5">
+        <div aria-label="Promociones del día" className="mx-auto mt-[clamp(2.5rem,6vw,3.75rem)] flex max-w-(--container-sitio) flex-col gap-7 px-5">
           {promos.map((p, i) => <TarjetaPromo key={p.nombre + i} promo={p} />)}
         </div>
       )}
 
       <section id="platillos" aria-labelledby="tituloPlatillos" className="mx-auto max-w-(--container-sitio) px-5 pt-[clamp(3.5rem,8vw,5.5rem)] pb-8">
-        <EncabezadoSeccion id="tituloPlatillos" eyebrow="Lo mejor de la casa" titulo="Platillos" />
-        {carta ? <Carta carta={carta} /> : <p className="py-10 text-center text-texto-suave" role="status">Cargando el menú…</p>}
+        <TituloSeccion id="tituloPlatillos" titulo="Platillos" nota="Busca por nombre o por carne, o filtra por categoría." />
+        {carta ? <Carta carta={carta} /> : <p className="py-10 text-texto-suave" role="status">Cargando el menú…</p>}
 
         {extras.length > 0 && (
-          <TextureCard className="mx-auto mt-12 max-w-2xl">
-            <div className="px-[clamp(1.4rem,4vw,2.4rem)] py-7">
-              <h3 className="mb-4 text-center font-titulo text-[2.2rem] leading-none text-crema [text-shadow:3px_3px_0_var(--color-rojo)]">Extras</h3>
-              <div className="grid gap-x-8 sm:grid-cols-2">
-                <Lista items={extras.slice(0, Math.ceil(extras.length / 2))} />
-                <Lista items={extras.slice(Math.ceil(extras.length / 2))} />
-              </div>
+          <div className="mt-[clamp(3rem,7vw,4.5rem)] max-w-3xl">
+            <TituloSeccion titulo="Extras" como="h3" className="mb-3" />
+            <div className="grid gap-x-10 sm:grid-cols-2">
+              <Lista items={extras.slice(0, Math.ceil(extras.length / 2))} />
+              <Lista items={extras.slice(Math.ceil(extras.length / 2))} />
             </div>
-          </TextureCard>
+          </div>
         )}
-        <p className="mt-7 text-center font-ui text-sm tracking-[0.15em] text-texto-suave uppercase">Únicamente delivery · El envío tiene un costo según la zona</p>
+        <p className="mt-8 font-ui text-sm tracking-[0.15em] text-texto-suave uppercase">Únicamente delivery · El envío tiene un costo según la zona</p>
       </section>
 
       {toque.length > 0 && (
-        <section data-pupusas="" aria-labelledby="tituloPupusas" className="bg-noche-800 px-5 py-[clamp(3.5rem,8vw,5.5rem)]">
-          <EncabezadoSeccion id="tituloPupusas" eyebrow="Especialidad de la casa" titulo="Pupusas con un toque mexicano" />
-          <TextureCard className="mx-auto max-w-3xl"><div className="px-6 py-3"><Lista items={toque.map((p) => ({ nombre: p.nombre, precio: p.variantes?.[0]?.precio || '' }))} /></div></TextureCard>
+        <section data-pupusas="" aria-labelledby="tituloPupusas" className="grano bg-noche-800 px-5 py-[clamp(3.5rem,8vw,5.5rem)]">
+          <div className="mx-auto max-w-(--container-sitio)">
+            <TituloSeccion id="tituloPupusas" titulo="Pupusas con un toque mexicano" />
+            <div className="max-w-3xl"><Lista items={toque.map((p) => ({ nombre: p.nombre, precio: p.variantes?.[0]?.precio || '' }))} /></div>
+          </div>
         </section>
       )}
 
       <section id="bebidas" aria-labelledby="tituloBebidas" className="mx-auto max-w-(--container-sitio) px-5 py-[clamp(3.5rem,8vw,5.5rem)]">
-        <EncabezadoSeccion id="tituloBebidas" eyebrow="Para acompañar" titulo="Bebidas" />
-        <div className="mx-auto grid max-w-4xl items-start gap-6 md:grid-cols-[1.4fr_1fr]">
-          <TextureCard><div className="px-6 py-3"><h3 className="pt-3 font-ui text-base font-bold tracking-[0.15em] text-lima uppercase">Frías</h3><Lista items={frias} /></div></TextureCard>
-          {calientes.length > 0 && <TextureCard><div className="px-6 py-3"><h3 className="pt-3 font-ui text-base font-bold tracking-[0.15em] text-lima uppercase">Calientes</h3><Lista items={calientes} /></div></TextureCard>}
+        <TituloSeccion id="tituloBebidas" titulo="Bebidas" nota="Para acompañar tu pedido." />
+        <div className="grid items-start gap-x-[clamp(2rem,5vw,4rem)] gap-y-8 md:grid-cols-[1.4fr_1fr]">
+          <div><h3 className="mb-1 font-ui text-base font-bold tracking-[0.15em] text-lima uppercase">Frías</h3><Lista items={frias} /></div>
+          {calientes.length > 0 && <div><h3 className="mb-1 font-ui text-base font-bold tracking-[0.15em] text-lima uppercase">Calientes</h3><Lista items={calientes} /></div>}
         </div>
       </section>
     </Sitio>
