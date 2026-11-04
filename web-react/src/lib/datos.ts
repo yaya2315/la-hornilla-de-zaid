@@ -161,7 +161,7 @@ const FOTOS: Record<string, string> = {
   torta: 'tortas/torta-01-cenital-tarjeta.webp',
   tortas: 'tortas/torta-01-cenital-tarjeta.webp',
   nachos: 'nachos/nachos-02-para-llevar-tarjeta.webp',
-  quesadillas: 'quesadillas/quesadillas-01-para-llevar-tarjeta.webp',
+  quesadillas: 'quesadillas/quesadillas-01-para-llevar-centrada-tarjeta.webp',
   'sopa de tortilla': 'Sopas/sopa-de-tortilla-02-tazon-tarjeta.webp',
   'papa asada': 'papa-asada/papa-asada-01-mesa-sin-marca-tarjeta.webp',
 }
