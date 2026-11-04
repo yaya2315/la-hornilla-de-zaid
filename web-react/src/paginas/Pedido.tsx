@@ -23,7 +23,7 @@ import {
 } from '@/lib/datos'
 import { dinero, leerPrecio, medir, NEGOCIO, PAGINAS, SOLO_DELIVERY } from '@/lib/sitio'
 import { cn } from '@/lib/utils'
-import { CARNES, CATEGORIAS_CARNE_APARTE, CATEGORIAS_CARNE_GRUPO, llevaPina, usarCarrito } from './pedido/carrito'
+import { CARNES, CATEGORIAS_CARNE_APARTE, CATEGORIAS_CARNE_GRUPO, CATEGORIAS_POR_ORDEN, esPromoTacosSueltos, llevaPina, nombreOrden, TACOS_SUELTOS, textoLinea, usarCarrito } from './pedido/carrito'
 import { ModalMapa } from './pedido/ModalMapa'
 
 type Agregar = (nombre: string, precio: number, cantidad: number) => void
@@ -92,6 +92,7 @@ function TarjetaPedido({ plato, coleccion, agregar }: { plato: Plato; coleccion:
   const nombreLinea = () => {
     const p = puedePina && pina ? ' con piña' : ''
     if (coleccion === 'pupusas') return `Pupusa de ${plato.nombre}`
+    if (tipo === 'carne-grupo' && CATEGORIAS_POR_ORDEN.includes(plato.categoria)) return nombreOrden(plato.nombre, carneActual, p)
     if (tipo === 'carne-grupo') return `${plato.nombre} de ${carneActual}${p}`
     if (tipo === 'carne-aparte') return `${plato.nombre} — ${opcion.texto} — de ${carneActual}${p}`
     if (carneActual) return `${plato.nombre} de ${carneActual}${p}`
@@ -149,7 +150,8 @@ function PromoPedido({ promo, agregar }: { promo: Promo; agregar: Agregar }) {
   const [carne, setCarne] = useState(CARNES[0])
   const [pina, setPina] = useState(false)
   const [cant, setCant] = useState(1)
-  const nombre = () => (promo.pideCarne && carne ? `${promo.nombre} — de ${carne}${llevaPina(carne) && pina ? ' con piña' : ''}` : promo.nombre)
+  const sueltos = esPromoTacosSueltos(promo.nombre, precio)
+  const nombre = () => sueltos ? TACOS_SUELTOS : (promo.pideCarne && carne ? `${promo.nombre} — de ${carne}${llevaPina(carne) && pina ? ' con piña' : ''}` : promo.nombre)
   return (
     <TarjetaPromo promo={promo}>
       <div className="flex flex-wrap items-center justify-center gap-4 md:justify-start">
@@ -260,7 +262,7 @@ export function Pedido() {
   const enviar = () => {
     const partes = [
       '¡Hola! Mucho gusto, este sería mi pedido:', '',
-      ...carrito.lineas.map((l) => `${l.cantidad} ${l.nombre} — ${dinero(l.precioUnitario * l.cantidad)}`), '',
+      ...carrito.lineas.map((l) => `${textoLinea(l.cantidad, l.nombre)} — ${dinero(l.precioUnitario * l.cantidad)}`), '',
       `Subtotal: ${dinero(carrito.subtotal)}`,
     ]
     if (esLocal) partes.push(`Servicio en el local (5%): +${dinero(servicio)}`)

@@ -37,3 +37,20 @@ export const CATEGORIAS_CARNE_APARTE = ['Sopa de Tortilla']
 export const CARNES = ['Pastor', 'Pollo pastor', 'Suadero', 'Cochinita pibil', 'Birria']
 /** La piña solo va con carnes "pastor" (Pastor, Pollo pastor) y no cuesta extra */
 export const llevaPina = (carne = '') => carne.toLowerCase().includes('pastor')
+
+/* Tacos y quesadillas se venden por orden: "1 Orden de tacos de birria" */
+export const CATEGORIAS_POR_ORDEN = ['Tacos', 'Quesadillas']
+const minus = (t: string) => t.charAt(0).toLowerCase() + t.slice(1)
+export const nombreOrden = (plato: string, carne: string, extra = '') => `Orden de ${minus(plato)} de ${carne.toLowerCase()}${extra}`
+
+/* Promo de tacos sueltos (ej. "Tacos a $0.99"): la línea dice "5 tacos mixtos" */
+export const TACOS_SUELTOS = 'tacos mixtos'
+export const esPromoTacosSueltos = (nombre: string, precio: number) => /taco/i.test(nombre) && precio > 0 && precio < 1
+
+/* Texto de la línea con su cantidad, en singular o plural */
+export function textoLinea(cantidad: number, nombre: string) {
+  let n = nombre
+  if (cantidad > 1) n = n.replace(/^Orden de /, 'Órdenes de ')
+  else if (n === TACOS_SUELTOS) n = 'taco mixto'
+  return `${cantidad} ${n}`
+}
