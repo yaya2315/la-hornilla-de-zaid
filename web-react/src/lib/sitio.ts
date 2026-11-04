@@ -15,6 +15,7 @@ export const PAGINAS = {
   pupusas: url('HTML/pupusas.html'),
   pedido: url('HTML/pedido.html'),
   ubicacion: url('HTML/ubicacion.html'),
+  tarjeta: url('HTML/tarjeta.html'),
   privacidad: url('HTML/privacidad.html'),
   terminos: url('HTML/terminos.html'),
   cookies: url('HTML/cookies.html'),

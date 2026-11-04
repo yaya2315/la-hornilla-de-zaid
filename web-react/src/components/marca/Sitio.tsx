@@ -10,7 +10,7 @@ import { pupusasActivas } from '@/lib/datos'
 import { TextureButton } from '@/components/ui/texture-button'
 import { IconoFacebook, IconoInstagram, IconoTikTok, IconoWhatsApp } from './Iconos'
 
-export type Pagina = 'inicio' | 'menu' | 'pedido' | 'ubicacion'
+export type Pagina = 'inicio' | 'menu' | 'pedido' | 'ubicacion' | 'tarjeta'
 
 const ICONO_RED = { WhatsApp: IconoWhatsApp, Instagram: IconoInstagram, Facebook: IconoFacebook, TikTok: IconoTikTok }
 

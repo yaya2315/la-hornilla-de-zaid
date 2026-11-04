@@ -11,7 +11,7 @@
 import type * as React from 'react'
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { ArrowRight, MapPin, Minus, Plus, ShoppingBag, X } from 'lucide-react'
+import { ArrowRight, Gift, MapPin, Minus, Plus, ShoppingBag, X } from 'lucide-react'
 import { Sitio } from '@/components/marca/Sitio'
 import { EncabezadoSeccion, PaginaHero, Precio } from '@/components/marca/Piezas'
 import { TarjetaPromo } from '@/components/marca/Promo'
@@ -19,10 +19,10 @@ import { TextureButton } from '@/components/ui/texture-button'
 import { TextureCard, TextureSeparator } from '@/components/ui/texture-card'
 import { RollingNumber } from '@/components/ui/rolling-number'
 import {
-  cargarBebidas, cargarMenu, cargarPromos, cargarPupusas, fotoDe, pupusasActivas, seMuestraHoy,
-  type Bebida, type Carta, type Plato, type Promo,
+  cargarBebidas, cargarMenu, cargarPromos, cargarPupusas, cargarReglasTarjeta, cargarTarjeta, CODIGO_TARJETA, fotoDe, normalizarCodigo, pupusasActivas, seMuestraHoy,
+  type Bebida, type Carta, type DatosTarjeta, type Plato, type Promo, type ReglasTarjeta,
 } from '@/lib/datos'
-import { dinero, leerPrecio, medir, NEGOCIO, SOLO_DELIVERY } from '@/lib/sitio'
+import { dinero, leerPrecio, medir, NEGOCIO, PAGINAS, SOLO_DELIVERY } from '@/lib/sitio'
 import { cn } from '@/lib/utils'
 import { CARNES, CATEGORIAS_CARNE_APARTE, CATEGORIAS_CARNE_GRUPO, llevaPina, usarCarrito } from './pedido/carrito'
 import { ModalMapa } from './pedido/ModalMapa'
@@ -215,6 +215,12 @@ export function Pedido() {
   const [enlace, setEnlace] = useState('')
   const [pin, setPin] = useState<{ lat: number; lng: number } | null>(null)
   const [mapa, setMapa] = useState(false)
+  /* Tarjeta Hornilla (opcional): código del cliente. Solo identifica la tarjeta;
+     el sello y el premio los confirma el negocio por WhatsApp. */
+  const [reglasTarjeta, setReglasTarjeta] = useState<ReglasTarjeta | null>(null)
+  const [codigoTarjeta, setCodigoTarjeta] = useState('')
+  const [tarjeta, setTarjeta] = useState<DatosTarjeta | null | 'no-existe' | 'error'>(null)
+  const [canjear, setCanjear] = useState(false)
   const entrega = useRef<HTMLElement>(null)
   const carritoRef = useRef<HTMLElement>(null)
 
@@ -223,7 +229,21 @@ export function Pedido() {
     cargarPromos().then((l) => setPromos(l.filter((p) => seMuestraHoy(p))))
     cargarBebidas().then(setBebidas)
     pupusasActivas().then((on) => { if (on) cargarPupusas().then(setPupusas) })
+    cargarReglasTarjeta().then((r) => setReglasTarjeta(r?.activo ? r : null))
   }, [])
+
+  /* Busca la tarjeta en cuanto el código está completo */
+  const codigoNorm = normalizarCodigo(codigoTarjeta)
+  useEffect(() => {
+    setCanjear(false)
+    if (!CODIGO_TARJETA.test(codigoNorm)) { setTarjeta(null); return }
+    let vigente = true
+    cargarTarjeta(codigoNorm)
+      .then((t) => { if (vigente) setTarjeta(t ?? 'no-existe') })
+      .catch(() => { if (vigente) setTarjeta('error') })
+    return () => { vigente = false }
+  }, [codigoNorm])
+  const tarjetaValida = tarjeta && typeof tarjeta === 'object' ? tarjeta : null
 
   const esLocal = tipo === 'local'
   const servicio = esLocal ? carrito.subtotal * 0.05 : 0
@@ -250,6 +270,10 @@ export function Pedido() {
       partes.push(`Dirección: ${direccion.trim()}`)
       const m = enlaceMaps()
       if (m) partes.push(`Ubicación: ${m}`)
+    }
+    if (reglasTarjeta && tarjetaValida) {
+      partes.push('', `Tarjeta Hornilla: ${tarjetaValida.codigo}`)
+      if (canjear && tarjetaValida.premios > 0) partes.push('Quiero canjear mi premio en este pedido.')
     }
     partes.push('', `Mi nombre es ${nombre.trim()}.`)
     medir('pedido_whatsapp', { tipo_entrega: tipo, value: Number(total.toFixed(2)), currency: 'USD' })
@@ -392,6 +416,28 @@ export function Pedido() {
               <label htmlFor="clienteNombre" className={etiqueta}>Tu nombre</label>
               <input id="clienteNombre" className={campo} placeholder="¿Cómo te llamas?" autoComplete="name" value={nombre} onChange={(e) => setNombre(e.target.value)} />
             </div>
+            {reglasTarjeta && (
+              <div className="grid gap-1.5">
+                <label htmlFor="codigoTarjeta" className={etiqueta}>Código de tu Tarjeta Hornilla (opcional)</label>
+                <input
+                  id="codigoTarjeta" className={cn(campo, 'uppercase')} placeholder="HZ-K7M4QX" autoComplete="off" autoCapitalize="characters"
+                  spellCheck={false} maxLength={12} value={codigoTarjeta} onChange={(e) => setCodigoTarjeta(e.target.value)} aria-describedby="ayudaTarjeta"
+                />
+                <p id="ayudaTarjeta" role="status" className="text-sm text-texto-suave">
+                  {tarjetaValida
+                    ? <>Hola <strong className="text-crema">{tarjetaValida.nombre}</strong>: llevas <strong className="text-crema">{tarjetaValida.sellos} de {reglasTarjeta.meta}</strong> sellos. El sello se suma cuando te entregamos el pedido.</>
+                    : tarjeta === 'no-existe' ? 'No encontramos ese código. Revisa que esté bien escrito.'
+                    : tarjeta === 'error' ? 'No pudimos revisar tu tarjeta ahora; igual puedes enviar tu pedido.'
+                    : <>Si ya tienes tarjeta, escribe tu código. ¿Aún no la tienes? <a className="underline underline-offset-2 hover:text-amarillo" href={PAGINAS.tarjeta}>Cómo pedirla</a>.</>}
+                </p>
+                {tarjetaValida && tarjetaValida.premios > 0 && (
+                  <label className="mt-1 flex cursor-pointer items-start gap-3 rounded-xl border-2 border-lima/50 bg-lima/10 px-4 py-3 text-[0.92rem]">
+                    <input type="checkbox" checked={canjear} onChange={(e) => setCanjear(e.target.checked)} className="mt-1 size-5 shrink-0 accent-[var(--color-lima)]" />
+                    <span><Gift aria-hidden="true" className="mr-1.5 inline size-4 text-lima" />Quiero canjear mi premio en este pedido{reglasTarjeta.premio ? <> (<strong className="text-crema">{reglasTarjeta.premio}</strong>)</> : null}. Lo confirmamos por WhatsApp antes de aplicarlo.</span>
+                  </label>
+                )}
+              </div>
+            )}
             {tipo === 'delivery' && (
               <div className="grid gap-1.5">
                 <label htmlFor="clienteDireccion" className={etiqueta}>Dirección de entrega</label>

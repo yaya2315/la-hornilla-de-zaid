@@ -2,12 +2,12 @@
    DATOS — Todo lo que la web pública lee de Firebase (lo edita el admin).
    Mismas colecciones y mismas reglas que la web anterior:
      menuCategorias · menuPrincipal · menuPupusas · promociones
-     menuBebidas · menuExtras · resenas · config/pupusas
+     menuBebidas · menuExtras · resenas · config/pupusas · config/fidelidad · tarjetas
    Si Firebase falla o está vacío, se usa el respaldo (la página nunca
    queda vacía). Sin where()/orderBy() en el servidor para platillos: un
    documento sin "orden" quedaría invisible; se ordena aquí.
    ===================================================================== */
-import { addDoc, collection, getDocs, query, serverTimestamp, where, type Timestamp } from 'firebase/firestore/lite'
+import { addDoc, collection, doc, getDoc, getDocs, query, serverTimestamp, where, type Timestamp } from 'firebase/firestore/lite'
 import { db } from './firebase'
 import { url } from './sitio'
 
@@ -218,4 +218,59 @@ export async function enviarResena(r: { nombre: string; estrellas: number; comen
     nombre: r.nombre, estrellas: r.estrellas, comentario: r.comentario,
     estado: 'pendiente', aceptoPublicar: true, creado: serverTimestamp(),
   })
+}
+
+/* ── Tarjeta Hornilla (tarjeta de sellos) ─────────────────────────────
+   • config/fidelidad: reglas que edita el admin (pestaña Clientes → Tarjeta).
+   • tarjetas/{codigo}: se lee SOLO conociendo el código; trae primer nombre
+     y conteo. Los sellos y canjes los pone únicamente el negocio (admin). */
+export type ReglasTarjeta = { activo: boolean; meta: number; minimo: number; premio: string; condiciones: string }
+export type DatosTarjeta = { codigo: string; nombre: string; sellos: number; premios: number; canjes: number }
+
+/** Mismo formato que las reglas de Firestore: HZ- + 6 letras/números (sin I, L, O, 0, 1) */
+export const CODIGO_TARJETA = /^HZ-[A-HJ-KM-NP-Z2-9]{6}$/
+
+/** Acepta "hz k7m4qx", "HZ-K7M4QX" o solo "K7M4QX" y lo deja como HZ-K7M4QX */
+export function normalizarCodigo(texto: string) {
+  const t = String(texto || '').toUpperCase().replace(/[^A-Z0-9]/g, '')
+  const cuerpo = t.startsWith('HZ') ? t.slice(2) : t
+  return cuerpo ? 'HZ-' + cuerpo : ''
+}
+
+export async function cargarReglasTarjeta(): Promise<ReglasTarjeta | null> {
+  try {
+    const d = await getDoc(doc(db, 'config', 'fidelidad'))
+    if (!d.exists()) return null
+    const r = d.data()
+    return {
+      activo: r.activo === true,
+      meta: Math.max(2, Number(r.meta) || 8),
+      minimo: Math.max(0, Number(r.minimo) || 0),
+      premio: String(r.premio || ''),
+      condiciones: String(r.condiciones || ''),
+    }
+  } catch (err) {
+    console.warn('[datos] No se pudieron leer las reglas de la tarjeta:', err)
+    return null
+  }
+}
+
+/** null = no existe esa tarjeta; lanza error solo si falla la conexión */
+export async function cargarTarjeta(codigo: string): Promise<DatosTarjeta | null> {
+  if (!CODIGO_TARJETA.test(codigo)) return null
+  try {
+    const d = await getDoc(doc(db, 'tarjetas', codigo))
+    if (!d.exists()) return null
+    const t = d.data()
+    return {
+      codigo,
+      nombre: String(t.nombre || ''),
+      sellos: Math.max(0, Number(t.sellos) || 0),
+      premios: Math.max(0, Number(t.premios) || 0),
+      canjes: Math.max(0, Number(t.canjes) || 0),
+    }
+  } catch (err) {
+    if ((err as { code?: string })?.code === 'permission-denied') return null
+    throw err
+  }
 }

@@ -254,6 +254,44 @@
         .cli-subtab .count:not(:empty){display:inline-block;min-width:20px;padding:1px 6px;margin-left:6px;border-radius:10px;
             background:var(--ember-deep);color:#fff;font-size:.72rem;font-family:'Inter',sans-serif}
 
+        /* ===== TARJETA HORNILLA (sellos) ===== */
+        .tj-lista{display:grid;gap:8px;margin-top:14px}
+        .tj-fila{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--card);color:var(--text);
+            border:1px solid var(--line);border-radius:14px;padding:12px 16px;min-height:56px;transition:border-color .2s var(--ease),transform .2s var(--ease)}
+        .tj-fila:hover,.tj-fila.sel{border-color:var(--ember)}
+        .tj-fila:hover{transform:translateY(-1px)}
+        .tj-fila-nom{flex:1;min-width:0;color:var(--cream);font-weight:600}
+        .tj-fila-nom small{display:block;color:var(--muted);font-weight:400;font-size:.76rem}
+        .tj-fila-prog{font-family:'Oswald',sans-serif;font-weight:700;color:var(--ember);font-size:1.1rem;letter-spacing:.5px}
+        .tj-badge{background:var(--ember-deep);color:#fff;border-radius:20px;padding:2px 10px;font-size:.74rem;font-weight:700;white-space:nowrap}
+        .tj-badge.grande{font-size:.82rem;margin-left:8px;padding:4px 12px}
+        .tj-detalle{background:var(--card);border:1px solid var(--ember);border-radius:var(--radius);padding:20px 22px;margin-top:14px;
+            box-shadow:0 12px 36px var(--glow)}
+        .tj-cab{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+        .tj-cab h3{color:var(--cream);font-size:1.5rem}
+        .tj-cab .btn-mini{min-width:44px;min-height:44px;justify-content:center}
+        .tj-sub{color:var(--muted);font-size:.82rem;font-weight:400}
+        .tj-sub a{color:var(--ember-soft)}
+        .tj-prog{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 8px}
+        .tj-punto{width:26px;height:26px;border-radius:50%;border:2px dashed var(--line);display:inline-block;transition:background .25s var(--ease),border-color .25s var(--ease)}
+        .tj-punto.on{background:var(--ember);border:2px solid var(--ember-soft);box-shadow:0 0 12px var(--glow)}
+        .tj-num{color:var(--text);margin-bottom:18px;line-height:2}
+        .tj-num b{color:var(--cream);font-family:'Oswald',sans-serif;font-size:1.3rem}
+        .tj-acciones{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:4px 0 16px}
+        .tj-acciones.sec{margin-top:6px;padding-top:14px;border-top:1px dashed var(--line)}
+        .tj-acciones .btn{min-height:48px}
+        .tj-acciones .btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+        .tj-acciones .btn-mini{min-height:44px;text-decoration:none}
+        .tj-aviso{background:rgba(61,220,132,.08);border:1px solid rgba(61,220,132,.35);border-radius:12px;padding:12px 14px;margin-bottom:14px;
+            display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-size:.9rem}
+        .tj-aviso b{color:var(--ok)}
+        .tj-aviso .btn-mini{min-height:44px;text-decoration:none}
+        .tj-h4{font-family:'Oswald',sans-serif;font-size:.85rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin:10px 0 8px}
+        .tj-mov{list-style:none;display:grid;gap:6px;font-size:.86rem}
+        .tj-mov li{padding:8px 12px;background:rgba(0,0,0,.25);border-radius:10px;color:var(--text)}
+        .tj-mov b{color:var(--cream)}
+        @media (max-width:560px){.tj-detalle{padding:16px}.tj-detalle .field-row{flex-direction:column;gap:0}}
+
         /* ===== CANAL DE WHATSAPP ===== */
         #btnAbrirCanal{text-decoration:none}
         .canal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
@@ -468,11 +506,12 @@
         </section>
         <!-- ===== VISTA: CLIENTES (reseñas + club) ===== -->
         <section id="vistaClientes" class="hidden">
-            <p class="panel-sub">Publica en tu canal de WhatsApp, modera las reseñas y administra el Club La Hornilla.</p>
+            <p class="panel-sub">Publica en tu canal de WhatsApp, modera las reseñas, lleva la Tarjeta Hornilla (sellos y premios) y administra el club.</p>
 
             <nav class="cli-subnav" id="cliSubnav" role="tablist" aria-label="Secciones de clientes">
                 <button type="button" role="tab" class="cli-subtab active" data-sub="canal" aria-selected="true" aria-controls="subCanal" id="tabCanal">Canal de WhatsApp</button>
                 <button type="button" role="tab" class="cli-subtab" data-sub="resenas" aria-selected="false" aria-controls="subResenas" id="tabResenas">Reseñas <span class="count" id="cntPendienteTab"></span></button>
+                <button type="button" role="tab" class="cli-subtab" data-sub="tarjeta" aria-selected="false" aria-controls="subTarjeta" id="tabTarjeta">Tarjeta</button>
                 <button type="button" role="tab" class="cli-subtab" data-sub="club" aria-selected="false" aria-controls="subClub" id="tabClub">Club y cupón</button>
             </nav>
 
@@ -513,6 +552,73 @@
             <p class="loading" id="loadingResenas">Cargando reseñas...</p>
             <div class="promo-list" id="listaResenas"></div>
             <div class="empty hidden" id="vacioResenas"><h3>Nada por aquí</h3><p>No hay reseñas en este grupo.</p></div>
+            </div>
+
+            <!-- ===== TARJETA HORNILLA ===== -->
+            <div id="subTarjeta" role="tabpanel" aria-labelledby="tabTarjeta" class="hidden">
+                <div class="aviso-regla">
+                    <b>Cómo funciona:</b> la persona pide su tarjeta por WhatsApp → la creas aquí y le mandas su enlace →
+                    cada pedido <b>entregado</b> lo sellas con <b>+1 sello</b> → al completar los sellos tiene un premio, que
+                    <b>canjeas aquí</b> cuando lo pide (por WhatsApp o escribiendo su código en Pedir). La página nunca suma ni
+                    descuenta sola: <b>los sellos y canjes los pones tú</b>.
+                </div>
+
+                <h2 class="sub-titulo" style="margin-top:0">Reglas de la tarjeta <span class="contador-chip" id="tjEstado">Apagada</span></h2>
+                <div class="club-config">
+                    <div class="check-row">
+                        <input type="checkbox" id="tjActivo">
+                        <label for="tjActivo">Tarjeta activa en la web (se puede escribir el código en Pedir)</label>
+                    </div>
+                    <div class="field-row">
+                        <div class="field">
+                            <label for="tjMeta">Sellos para ganar el premio</label>
+                            <input type="number" id="tjMeta" min="2" max="30" step="1" value="8" inputmode="numeric">
+                        </div>
+                        <div class="field">
+                            <label for="tjMinimo">Mínimo por pedido ($, 0 = sin mínimo)</label>
+                            <input type="number" id="tjMinimo" min="0" max="100" step="0.5" value="0" inputmode="decimal">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="tjPremio">Premio</label>
+                        <input type="text" id="tjPremio" maxlength="80" placeholder="Lo decide el dueño. Ej. Una bebida gratis en tu próximo pedido">
+                    </div>
+                    <div class="field">
+                        <label for="tjCondiciones">Condiciones (vigencia y límites)</label>
+                        <input type="text" id="tjCondiciones" maxlength="160" placeholder="Ej. Un sello por pedido entregado. El premio no se canjea por dinero ni se acumula con otras promos.">
+                    </div>
+                    <button class="btn btn-primary" id="btnGuardarTj">Guardar reglas</button>
+                    <p class="campo-ayuda" style="margin:12px 0 0">El premio y las condiciones se muestran tal cual en la tarjeta de la persona. Escríbelos claros (si vence, si se acumula con promos): una promoción sin condiciones claras puede considerarse engañosa.</p>
+                </div>
+
+                <h2 class="sub-titulo">Nueva tarjeta</h2>
+                <div class="club-config">
+                    <div class="field-row">
+                        <div class="field">
+                            <label for="tjNombre">Nombre</label>
+                            <input type="text" id="tjNombre" maxlength="40" placeholder="Ana Martínez" autocomplete="off">
+                        </div>
+                        <div class="field">
+                            <label for="tjTelefono">WhatsApp (8 dígitos)</label>
+                            <input type="tel" id="tjTelefono" maxlength="14" placeholder="7099-1660" inputmode="tel" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="check-row">
+                        <input type="checkbox" id="tjConsiente">
+                        <label for="tjConsiente">La persona pidió su tarjeta y aceptó que guardemos su nombre y WhatsApp solo para llevarla.</label>
+                    </div>
+                    <button class="btn btn-primary" id="btnCrearTj">Crear tarjeta</button>
+                </div>
+
+                <h2 class="sub-titulo">Sellar y canjear <span class="contador-chip" id="cntTarjetas">0</span></h2>
+                <div class="field">
+                    <label for="tjBuscar">Buscar por nombre, WhatsApp o código</label>
+                    <input type="search" id="tjBuscar" placeholder="Ej. Ana, 7099 o HZ-K7M4QX" autocomplete="off">
+                </div>
+                <div class="tj-detalle hidden" id="tjDetalle" aria-live="polite"></div>
+                <p class="loading" id="loadingTarjetas">Cargando tarjetas...</p>
+                <div class="tj-lista" id="tjLista"></div>
+                <div class="empty hidden" id="vacioTarjetas"><h3>Nada por aquí</h3><p>Crea la primera con “Nueva tarjeta”.</p></div>
             </div>
 
             <!-- ===== CLUB Y CUPÓN ===== -->

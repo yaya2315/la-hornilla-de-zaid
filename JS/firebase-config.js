@@ -98,6 +98,16 @@ export const COLECCION_RESENAS = 'resenas';
 export const COLECCION_CLUB = 'club';
 export const COLECCION_CONFIG = 'config';
 
+/* Tarjeta Hornilla (tarjeta de sellos digital, pestaña "Tarjeta" del admin):
+   • tarjetas:         una por cliente; id = código (HZ-XXXXXX). Se puede leer
+                       SOLO conociendo el código y únicamente guarda el primer
+                       nombre y el conteo de sellos/premios. Escribe solo el admin.
+   • tarjetasClientes: nombre completo + WhatsApp (id = 503XXXXXXXX). Solo admin.
+   • config:           documento 'fidelidad' con las reglas (activa, sellos para
+                       el premio, mínimo por pedido, premio, condiciones). */
+export const COLECCION_TARJETAS = 'tarjetas';
+export const COLECCION_TARJETAS_CLIENTES = 'tarjetasClientes';
+
 /* Canal de WhatsApp (solo el admin):
    • canalPlantillas: textos e imagen predeterminados de cada publicación.
    • canalPublicaciones: historial de lo que se compartió y cuándo. */

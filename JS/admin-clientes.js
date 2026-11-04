@@ -5,6 +5,7 @@
    • Lista miembros del club, exporta CSV y copia los números para
      crear una lista de difusión en WhatsApp Business.
    • Sub-pestaña "Canal de WhatsApp": ver admin-canal.js.
+   • Sub-pestaña "Tarjeta" (sellos y canjes): ver admin-tarjeta.js.
    Se inicia la primera vez que se abre la pestaña (window.iniciarClientes).
    ===================================================================== */
 
@@ -13,6 +14,7 @@ import {
     collection, onSnapshot, doc, getDoc, setDoc, updateDoc, deleteDoc, serverTimestamp
 } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
 import { iniciarCanal } from './admin-canal.js';
+import { iniciarTarjeta } from './admin-tarjeta.js';
 
 const $ = id => document.getElementById(id);
 function esc(s = '') { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
@@ -163,10 +165,10 @@ async function guardarCupon() {
 }
 
 /* ============================ ARRANQUE ============================ */
-/* Sub-pestañas: Canal · Reseñas · Club */
+/* Sub-pestañas: Canal · Reseñas · Tarjeta · Club */
 function iniciarSubnav() {
     const tabs = [...document.querySelectorAll('#cliSubnav .cli-subtab')];
-    const paneles = { canal: 'subCanal', resenas: 'subResenas', club: 'subClub' };
+    const paneles = { canal: 'subCanal', resenas: 'subResenas', tarjeta: 'subTarjeta', club: 'subClub' };
     const activar = (tab, enfocar = false) => {
         tabs.forEach(t => {
             const on = t === tab;
@@ -191,6 +193,7 @@ function iniciarSubnav() {
 window.iniciarClientes = function iniciarClientes() {
     iniciarSubnav();
     iniciarCanal();
+    iniciarTarjeta();
     onSnapshot(collection(db, COLECCION_RESENAS), snap => {
         resenas = snap.docs.map(d => ({ id: d.id, ...d.data() }))
             .sort((a, b) => (b.creado?.toMillis?.() || 0) - (a.creado?.toMillis?.() || 0));

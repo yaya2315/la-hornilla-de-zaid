@@ -1,5 +1,5 @@
 // =====================================================================
-// REGLAS DE FIRESTORE — colecciones de captación de clientes
+// REGLAS DE FIRESTORE — captación de clientes + Tarjeta Hornilla
 // Cópialas en Firebase Console → Firestore Database → Reglas, DENTRO de
 // tu bloque "match /databases/{database}/documents { ... }" existente,
 // junto a las reglas que ya tienes para el menú, promociones y pedidos.
@@ -42,6 +42,22 @@ service cloud.firestore {
       allow read, update, delete: if esAdmin();
     }
 
+    // Tarjeta Hornilla (sellos). El id es el código HZ-XXXXXX (sin I, L, O, 0 ni 1).
+    // • tarjetas: se puede LEER una sola tarjeta si conoces su código (no se puede
+    //   listar ni buscar); solo guarda primer nombre + sellos. Escribe solo el admin.
+    // • movimientos (historial) y tarjetasClientes (nombre completo + WhatsApp): solo admin.
+    match /tarjetas/{codigo} {
+      allow get: if codigo.matches('HZ-[A-HJ-KM-NP-Z2-9]{6}') || esAdmin();
+      allow list, write: if esAdmin();
+
+      match /movimientos/{id} {
+        allow read, write: if esAdmin();
+      }
+    }
+    match /tarjetasClientes/{tel} {
+      allow read, write: if esAdmin();
+    }
+
     // Canal de WhatsApp: plantillas e historial, solo el admin
     match /canalPlantillas/{id} {
       allow read, write: if esAdmin();
@@ -50,7 +66,7 @@ service cloud.firestore {
       allow read, write: if esAdmin();
     }
 
-    // Configuración pública (cupón del club): todos leen, solo el admin edita
+    // Configuración pública (cupón del club y reglas de la Tarjeta Hornilla): todos leen, solo el admin edita
     match /config/{docId} {
       allow read: if true;
       allow write: if esAdmin();
