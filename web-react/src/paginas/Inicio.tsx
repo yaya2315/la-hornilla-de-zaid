@@ -7,7 +7,6 @@ import { Sitio } from '@/components/marca/Sitio'
 import { AvisoDelivery, EncabezadoSeccion } from '@/components/marca/Piezas'
 import { TextureButton } from '@/components/ui/texture-button'
 import { TextureCard } from '@/components/ui/texture-card'
-import { TextAnimate } from '@/components/ui/text-animate'
 import { RollingNumber } from '@/components/ui/rolling-number'
 import { NeumorphEyebrow } from '@/components/ui/neumorph-eyebrow'
 import { Portada } from './inicio/Portada'
@@ -22,26 +21,17 @@ function Hero() {
     <section ref={ref} className="relative grid min-h-svh place-items-center overflow-hidden px-5 pt-[clamp(6rem,13vh,8rem)] pb-[clamp(7rem,15vh,9.5rem)]">
       <Portada contenedor={ref} />
       {/* Velo verde noche para que el texto se lea sobre cualquier foto */}
-      <div aria-hidden="true" className="absolute inset-0 z-[3] [background:radial-gradient(120%_90%_at_50%_40%,transparent_30%,rgb(7_26_5/0.6)_100%),linear-gradient(180deg,rgb(7_26_5/0.7)_0%,rgb(7_26_5/0.28)_30%,rgb(7_26_5/0.35)_62%,rgb(7_26_5/0.92)_100%)]" />
+      <div aria-hidden="true" className="absolute inset-0 z-[3] [background:radial-gradient(clamp(15rem,40vw,32rem)_clamp(12rem,30vh,19rem)_at_50%_50%,rgb(7_26_5/0.66),rgb(7_26_5/0.32)_62%,transparent_100%),radial-gradient(120%_90%_at_50%_40%,transparent_30%,rgb(7_26_5/0.6)_100%),linear-gradient(180deg,rgb(7_26_5/0.7)_0%,rgb(7_26_5/0.28)_30%,rgb(7_26_5/0.35)_62%,rgb(7_26_5/0.92)_100%)]" />
 
       <div className="relative z-[5] flex max-w-3xl flex-col items-center text-center">
         <h1 className="sr-only">La Hornilla de Zaid — Comida mexicana a domicilio en Sonsonate</h1>
-        <p className="flex animate-subir items-center gap-3 font-ui text-[clamp(0.8rem,2.6vw,1rem)] font-semibold uppercase tracking-[clamp(2px,0.8vw,5px)] whitespace-nowrap text-lima [text-shadow:0_2px_12px_rgb(0_0_0/0.8)]">
-          <span aria-hidden="true" className="h-0.5 w-[clamp(18px,5vw,36px)] bg-lima/70" />
+        <p className="flex animate-subir items-center gap-3 font-ui text-[clamp(0.95rem,3.4vw,1.35rem)] font-semibold uppercase tracking-[clamp(3px,0.9vw,6px)] whitespace-nowrap text-lima [text-shadow:0_2px_12px_rgb(0_0_0/0.8)]">
+          <span aria-hidden="true" className="h-0.5 w-[clamp(20px,6vw,44px)] bg-lima/70" />
           {NEGOCIO.lema}
-          <span aria-hidden="true" className="h-0.5 w-[clamp(18px,5vw,36px)] bg-lima/70" />
+          <span aria-hidden="true" className="h-0.5 w-[clamp(20px,6vw,44px)] bg-lima/70" />
         </p>
-        <TextAnimate
-          as="p"
-          text="Sabor mexicano"
-          delay={0.15}
-          className="mt-3 font-ui text-[clamp(2.5rem,8vw,4.6rem)] leading-none font-bold tracking-[clamp(1px,0.4vw,3px)] text-white uppercase [text-shadow:0_4px_24px_rgb(0_0_0/0.65),0_2px_4px_rgb(0_0_0/0.5)]"
-        />
-        <p className="mt-2 animate-subir font-sans text-[clamp(1.05rem,3.3vw,1.9rem)] font-semibold text-amarillo italic [animation-delay:0.35s] [text-shadow:0_2px_12px_rgb(0_0_0/0.7)]">
-          hasta tu casa
-        </p>
-        <AvisoDelivery className="mt-6 animate-subir [animation-delay:0.45s]" />
-        <div className="mt-7 flex w-full max-w-[17rem] animate-subir flex-col gap-3.5 [animation-delay:0.55s]">
+        <AvisoDelivery className="mt-[clamp(1.25rem,3.5vh,1.75rem)] animate-subir [animation-delay:0.3s]" />
+        <div className="mt-[clamp(1.5rem,4vh,2rem)] flex w-full max-w-[17rem] animate-subir flex-col gap-3.5 [animation-delay:0.4s]">
           <TextureButton asChild variant="rojo" size="lg" ancho="completo">
             <a href={PAGINAS.pedido}>Pedir en línea <ArrowRight aria-hidden="true" className="size-4" /></a>
           </TextureButton>
