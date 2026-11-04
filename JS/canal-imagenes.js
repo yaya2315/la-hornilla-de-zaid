@@ -27,4 +27,5 @@ export const IMAGENES_CANAL = [
     { carpeta: 'avisos', archivo: 'delivery-envio-mapa.jpg', titulo: 'Delivery a $1 (Sonzacate y Sonsonate centro)' },
     { carpeta: 'avisos', archivo: 'hoy-descansamos.jpg', titulo: 'Hoy no hay servicio' },
     { carpeta: 'avisos', archivo: 'resena-google.jpg', titulo: 'Déjanos tu reseña en Google' },
+    { carpeta: 'avisos', archivo: 'menu-completo.jpg', titulo: 'Menú completo con precios' },
 ];
