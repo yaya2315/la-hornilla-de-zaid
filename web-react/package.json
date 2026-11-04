@@ -6,7 +6,7 @@
   "description": "Web pública de La Hornilla de Zaid en React + Tailwind v4 + componentes de Cult UI. El build se escribe en la raíz del sitio (index.html, HTML/menu.html, HTML/pedido.html, HTML/ubicacion.html y la carpeta app/).",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/limpiar-app.mjs && tsc --noEmit && vite build",
+    "build": "tsc --noEmit && node scripts/limpiar-app.mjs && vite build",
     "preview": "node scripts/servir-sitio.mjs"
   },
   "dependencies": {

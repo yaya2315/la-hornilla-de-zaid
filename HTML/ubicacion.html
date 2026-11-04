@@ -30,14 +30,27 @@
     <meta property="og:image:alt" content="Tacos de La Hornilla de Zaid servidos en una bandeja sobre mesa de madera">
     <meta name="twitter:card" content="summary_large_image">
     <script src="../JS/consentimiento.js" defer></script>
-  <script type="module" crossorigin src="../app/ubicacion-vyLD9cjF.js"></script>
+    <!-- Estilo mínimo del fueguito de carga: va aquí para que nunca se vea gigante aunque tarde el CSS -->
+    <style>
+      html,body{margin:0;background:#071a05;color:#ecead6}
+      .pageload{position:fixed;inset:0;z-index:4000;display:grid;place-content:center;justify-items:center;gap:18px;background:#071a05;animation:pageloadSeguro 0s linear 4s forwards}
+      .pageload-flame{width:58px;position:relative}
+      .pageload-flame svg{display:block;width:100%;height:auto}
+      .pageload-flame .llena{position:absolute;inset:0}
+      .pageload-word{font:600 .78rem/1.2 Oswald,system-ui,sans-serif;letter-spacing:4px;text-transform:uppercase;color:#b9c4a0}
+      @keyframes pageloadSeguro{to{opacity:0;visibility:hidden;pointer-events:none}}
+      #app:empty{min-height:100vh}
+      #app:empty::after{content:"No se pudo cargar la página. Revisa tu conexión y recarga.";display:block;padding:40vh 24px 0;text-align:center;font:500 1rem/1.5 system-ui,sans-serif;color:#ecead6;opacity:0;animation:avisoCarga 0s linear 8s forwards}
+      @keyframes avisoCarga{to{opacity:1}}
+    </style>
+  <script type="module" crossorigin src="../app/ubicacion-BbnKlRbh.js"></script>
   <link rel="modulepreload" crossorigin href="../app/react-0zU5oKmd.js">
-  <link rel="modulepreload" crossorigin href="../app/librerias-CEAL7kXT.js">
+  <link rel="modulepreload" crossorigin href="../app/librerias-DZO7ax_H.js">
   <link rel="modulepreload" crossorigin href="../app/motion-B70nZUwc.js">
-  <link rel="modulepreload" crossorigin href="../app/firebase-CJuhLmQY.js">
-  <link rel="modulepreload" crossorigin href="../app/texture-card-CETBR253.js">
+  <link rel="modulepreload" crossorigin href="../app/firebase-DaIr8_aB.js">
+  <link rel="modulepreload" crossorigin href="../app/texture-card-CBDzOTEV.js">
   <link rel="stylesheet" crossorigin href="../app/librerias-UlLI5JPV.css">
-  <link rel="stylesheet" crossorigin href="../app/texture-card-10-qQGjY.css">
+  <link rel="stylesheet" crossorigin href="../app/texture-card-BZsZ0pqk.css">
 </head>
 <body>
     <!-- Pantalla de carga "fueguito" (se esconde al cargar) -->

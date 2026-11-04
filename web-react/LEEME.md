@@ -31,11 +31,13 @@ npm run build      # genera las 4 páginas y la carpeta app/ en la raíz del sit
 npm run preview    # sirve el sitio ya construido en http://localhost:4173, igual que GitHub Pages
 ```
 
-Después de `npm run build`, sube todo desde la raíz del sitio:
+Después de `npm run build`, revisa que al final diga **"✓ built"**. Si sale un error,
+**no subas nada** (la página se quedaría sin su carpeta `app/`): copia el error y pásamelo.
+Si todo salió bien, sube todo desde la raíz del sitio:
 
 ```powershell
 cd ..
-git add -A
+git add -A   # incluye app/ y las páginas generadas
 git commit -m "Describe aquí el cambio"
 git push
 ```

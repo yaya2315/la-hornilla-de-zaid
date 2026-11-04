@@ -75,6 +75,19 @@
     <link rel="preload" as="image" type="image/webp" href="Imagenes/fotos-de-platillos/tacos/tacos-01-mesa-portada.webp" media="(min-aspect-ratio: 1/1)" fetchpriority="high">
     <link rel="preload" as="image" type="image/webp" href="Imagenes/fotos-de-platillos/tacos/tacos-02-con-pina-portada.webp" media="(max-aspect-ratio: 999/1000)" fetchpriority="high">
     <script src="JS/consentimiento.js" defer></script>
+    <!-- Estilo mínimo del fueguito de carga: va aquí para que nunca se vea gigante aunque tarde el CSS -->
+    <style>
+      html,body{margin:0;background:#071a05;color:#ecead6}
+      .pageload{position:fixed;inset:0;z-index:4000;display:grid;place-content:center;justify-items:center;gap:18px;background:#071a05;animation:pageloadSeguro 0s linear 4s forwards}
+      .pageload-flame{width:58px;position:relative}
+      .pageload-flame svg{display:block;width:100%;height:auto}
+      .pageload-flame .llena{position:absolute;inset:0}
+      .pageload-word{font:600 .78rem/1.2 Oswald,system-ui,sans-serif;letter-spacing:4px;text-transform:uppercase;color:#b9c4a0}
+      @keyframes pageloadSeguro{to{opacity:0;visibility:hidden;pointer-events:none}}
+      #app:empty{min-height:100vh}
+      #app:empty::after{content:"No se pudo cargar la página. Revisa tu conexión y recarga.";display:block;padding:40vh 24px 0;text-align:center;font:500 1rem/1.5 system-ui,sans-serif;color:#ecead6;opacity:0;animation:avisoCarga 0s linear 8s forwards}
+      @keyframes avisoCarga{to{opacity:1}}
+    </style>
 </head>
 <body>
     <!-- Pantalla de carga "fueguito" (se esconde al cargar) -->
