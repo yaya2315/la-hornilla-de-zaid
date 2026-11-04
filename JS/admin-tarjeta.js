@@ -15,14 +15,21 @@
    • tarjetas/{codigo}            público por id: primer nombre + conteo
    • tarjetas/{codigo}/movimientos solo admin: historial de cada acción
    • tarjetasClientes/{503XXXXXXXX} solo admin: nombre completo + WhatsApp
-   • config/fidelidad             reglas editables (meta, mínimo, premio…)
+   • config/fidelidad             reglas editables (meta, mínimo, premio, cada cuántos días recordar…)
+
+   Recordatorios semanales (semiautomáticos):
+   WhatsApp no deja mandar mensajes solos desde una página, así que el panel
+   arma la lista de quién toca recordar (aceptó recordatorios y lleva N días
+   sin pedir ni recibir aviso) y tú tocas "Enviar" por cada uno. Se guarda en
+   tarjetasClientes/{tel}: recordatorios (true/false), ultimoRecordatorio y
+   recordatoriosEnviados. Solo se le escribe a quien lo aceptó.
    Reglas de Firestore: ver firestore.rules (se pegan a mano en la consola).
    ===================================================================== */
 
 import { db, COLECCION_TARJETAS, COLECCION_TARJETAS_CLIENTES, COLECCION_CONFIG } from './firebase-config.js';
 import {
     collection, onSnapshot, doc, getDoc, getDocs, query, orderBy, limit,
-    runTransaction, writeBatch, setDoc, serverTimestamp
+    runTransaction, writeBatch, setDoc, updateDoc, increment, serverTimestamp
 } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
 
 const $ = id => document.getElementById(id);
@@ -65,7 +72,8 @@ function normalizarTel(txt) {
 }
 
 /* ============================ ESTADO ============================ */
-let cfg = { activo: false, meta: 8, minimo: 0, premio: '', condiciones: '' };
+let cfg = { activo: false, meta: 8, minimo: 0, premio: '', condiciones: '', recordarDias: 7 };
+const enviadosLocal = new Map();   // codigo → ms del último recordatorio (hasta que Firestore lo confirma)
 let tarjetas = new Map();   // codigo → datos públicos
 let clientes = new Map();   // codigo → { nombre, telefono, ... }
 let seleccion = null;       // código abierto en el panel
@@ -85,7 +93,9 @@ async function cargarConfig() {
     $('tjMinimo').value = cfg.minimo || 0;
     $('tjPremio').value = cfg.premio || '';
     $('tjCondiciones').value = cfg.condiciones || '';
+    $('tjRecDias').value = cfg.recordarDias || 7;
     pintarEstadoConfig();
+    renderRecordatorios();
 }
 
 function pintarEstadoConfig() {
@@ -100,17 +110,20 @@ async function guardarConfig() {
     const minimo = parseFloat($('tjMinimo').value || '0');
     const premio = $('tjPremio').value.trim();
     const condiciones = $('tjCondiciones').value.trim();
+    const recordarDias = parseInt($('tjRecDias').value || '7', 10);
+    if (!Number.isInteger(recordarDias) || recordarDias < 3 || recordarDias > 60) { toast('Recordar cada 3 a 60 días', 'bad'); return; }
     if (!Number.isInteger(meta) || meta < 2 || meta > 30) { toast('Los sellos del premio van de 2 a 30', 'bad'); return; }
     if (!Number.isFinite(minimo) || minimo < 0 || minimo > 100) { toast('El mínimo por pedido debe ser entre $0 y $100', 'bad'); return; }
     if (activo && !premio) { toast('Escribe el premio para activar la tarjeta', 'bad'); return; }
     if (activo && !condiciones) { toast('Agrega las condiciones (vigencia y límites)', 'bad'); return; }
     $('btnGuardarTj').disabled = true;
     try {
-        const nuevo = { activo, meta, minimo, premio, condiciones };
+        const nuevo = { activo, meta, minimo, premio, condiciones, recordarDias };
         await setDoc(doc(db, COLECCION_CONFIG, 'fidelidad'), { ...nuevo, actualizado: serverTimestamp() });
         cfg = nuevo;
         pintarEstadoConfig();
         renderDetalle();
+        renderRecordatorios();
         toast(activo ? 'Tarjeta activa en la web' : 'Reglas guardadas (tarjeta apagada)');
     } catch (err) {
         console.error(err);
@@ -152,6 +165,36 @@ function msgSello(c, t) {
 function msgCanje(c, t) {
     const n = primerNombre(c.nombre);
     return `🎁 ¡Listo ${n}! Canjeamos tu premio${cfg.premio ? `: *${cfg.premio}*` : ''}. Tu tarjeta sigue en ${t.sellos} de ${cfg.meta} 🌮${t.premios > 0 ? ` (y te queda ${t.premios} premio${t.premios === 1 ? '' : 's'} más 🎉)` : ''}`;
+}
+
+/* Recordatorio semanal. Siempre honesto: sin cupones ni envío gratis, solo el
+   avance de su tarjeta y el cierre fijo de la Hornilla. Cambia de texto según
+   su estado y rota entre dos variantes para no repetir lo mismo cada semana. */
+const enlacePedido = SITIO + 'HTML/pedido.html';
+function msgRecordatorio(c, t, enviados = 0) {
+    const n = primerNombre(c.nombre);
+    const sellos = Number(t?.sellos) || 0;
+    const premios = Number(t?.premios) || 0;
+    const faltan = Math.max(1, cfg.meta - sellos);
+    let cabeza;
+    if (premios > 0) {
+        cabeza = [`🎁 ¡${n}, tu premio te está esperando!${cfg.premio ? ` *${cfg.premio}*` : ''}`, `🌮 Pídelo en tu próximo pedido.`];
+    } else if (sellos === 0) {
+        cabeza = [`🤠🔥 ¡Hola ${n}! Tu *Tarjeta Hornilla* te espera.`, `🌮 Tu primer sello llega con tu próximo pedido.`];
+    } else if (faltan === 1) {
+        cabeza = [`🔥 ¡${n}, solo te falta *1 sello* para tu premio! 🎁`];
+    } else if (enviados % 2 === 0) {
+        cabeza = [`🌮 ¡Hola ${n}! Vas en *${sellos} de ${cfg.meta}* sellos.`, `🎁 Te faltan ${faltan} para tu premio.`];
+    } else {
+        cabeza = [`🔥 ${n}, ¿se te antoja algo de la Hornilla?`, `🎁 Te faltan ${faltan} sellos para tu premio.`];
+    }
+    return [
+        ...cabeza,
+        `🛵 Únicamente delivery en Sonsonate`,
+        `📲 Pide aquí: ${enlacePedido}`,
+        `📞 7099-1660`,
+        `Si ya no quieres estos recordatorios, responde BASTA.`
+    ].join('\n');
 }
 
 /* ===================== IMAGEN DE LA TARJETA =====================
@@ -338,8 +381,8 @@ async function enviarConImagen(codigo, texto) {
         try {
             if (file && navigator.canShare?.({ files: [file] })) await navigator.share({ files: [file], text: texto });
             else await navigator.share({ text: texto });
-            return;
-        } catch (err) { if (err?.name === 'AbortError') return; console.error(err); }
+            return true;
+        } catch (err) { if (err?.name === 'AbortError') return false; console.error(err); }
     }
     const url = `https://wa.me/${c.telefono}?text=${encodeURIComponent(texto)}`;
     let copiada = false;
@@ -350,6 +393,13 @@ async function enviarConImagen(codigo, texto) {
     if (!copiada && file) descargarArchivo(file);
     if (ventana) ventana.location.href = url; else window.open(url, '_blank', 'noopener');
     toast(copiada ? 'Imagen copiada: en el chat pégala con Ctrl+V (el texto ya viene escrito)' : 'Imagen descargada: arrástrala al chat de WhatsApp');
+    return true;
+}
+
+/* Solo texto (sin imagen): abre el chat con el mensaje ya escrito */
+function enviarSoloTexto(tel, texto) {
+    window.open(`https://wa.me/${tel}?text=${encodeURIComponent(texto)}`, '_blank', 'noopener');
+    return true;
 }
 
 function descargarArchivo(file) {
@@ -393,6 +443,104 @@ function renderLista() {
             <span class="tj-fila-prog">${Number(t.sellos) || 0}/${cfg.meta}</span>
             ${t.premios > 0 ? `<span class="tj-badge">🎁 ${t.premios}</span>` : ''}
         </button>`).join('');
+}
+
+/* ============================ RECORDATORIOS ============================ */
+const DIA_MS = 86400000;
+const diasRec = () => Math.min(60, Math.max(3, Number(cfg.recordarDias) || 7));
+const msDe = ts => (ts && typeof ts.toMillis === 'function') ? (ts.toMillis() || 0) : 0;
+
+/* Toca recordar si: aceptó, tiene WhatsApp, y pasaron N días desde el último
+   recordatorio Y desde su última actividad (sello, canje o creación). */
+function pendientesRec() {
+    const ahora = Date.now(), cada = diasRec() * DIA_MS;
+    return filas()
+        .filter(t => t.recordatorios === true && t.telefono)
+        .map(t => ({
+            ...t,
+            ult: Math.max(msDe(t.ultimoRecordatorio), enviadosLocal.get(t.codigo) || 0),
+            act: msDe(t.actualizado)
+        }))
+        .filter(t => ahora - t.ult >= cada && ahora - t.act >= cada)
+        .sort((a, b) => ((b.premios > 0) - (a.premios > 0)) || (a.ult - b.ult));
+}
+
+function haceCuanto(ms) {
+    if (!ms) return 'nunca';
+    const d = Math.floor((Date.now() - ms) / DIA_MS);
+    return d <= 0 ? 'hoy' : d === 1 ? 'ayer' : `hace ${d} días`;
+}
+
+function renderRecordatorios() {
+    const caja = $('tjRecLista');
+    if (!caja) return;
+    const lista = pendientesRec();
+    const activos = filas().filter(t => t.recordatorios === true).length;
+    $('cntRec').textContent = lista.length;
+    const pend = $('tjPend');
+    pend.textContent = lista.length;
+    pend.classList.toggle('hidden', lista.length === 0);
+    const vacio = $('vacioRec');
+    vacio.classList.toggle('hidden', lista.length > 0);
+    vacio.querySelector('h3').textContent = activos ? 'Todo al día' : 'Nadie ha aceptado recordatorios';
+    vacio.querySelector('p').textContent = activos
+        ? `Nadie toca recordar hoy (se avisa cada ${diasRec()} días). Vuelve la próxima semana.`
+        : 'Márcalo al crear la tarjeta, o en el detalle de cada cliente con “Activar recordatorios”.';
+    caja.innerHTML = lista.map(t => {
+        const n = esc(primerNombre(t.nombre));
+        return `<div class="tj-rec-fila" data-rec="${esc(t.codigo)}">
+            <span class="tj-fila-nom">${esc(t.nombre || '—')}<small>${esc(telBonito(t.telefono))} · ${Number(t.sellos) || 0}/${cfg.meta} sellos · último aviso: ${haceCuanto(t.ult)}</small></span>
+            ${t.premios > 0 ? `<span class="tj-badge">🎁 ${t.premios}</span>` : ''}
+            <span class="tj-rec-acc">
+                <button type="button" class="btn-mini ok" data-rec-act="enviar" aria-label="Enviar recordatorio a ${n}">Enviar</button>
+                <button type="button" class="btn-mini" data-rec-act="hecho" aria-label="Marcar como enviado a ${n}">Ya lo mandé</button>
+                <button type="button" class="btn-mini bad" data-rec-act="parar" aria-label="No recordarle más a ${n}">Parar</button>
+            </span>
+        </div>`;
+    }).join('');
+}
+
+async function marcarRecordatorio(codigo) {
+    const c = clientes.get(codigo);
+    if (!c?.id) return;
+    enviadosLocal.set(codigo, Date.now());
+    renderRecordatorios();
+    try {
+        await updateDoc(doc(db, COLECCION_TARJETAS_CLIENTES, c.id), { ultimoRecordatorio: serverTimestamp(), recordatoriosEnviados: increment(1) });
+    } catch (err) {
+        console.error(err);
+        toast('Se mandó, pero no se pudo anotar la fecha', 'bad');
+    }
+}
+
+async function cambiarRecordatorios(codigo, activar) {
+    const c = clientes.get(codigo);
+    if (!c?.id) return;
+    try {
+        await updateDoc(doc(db, COLECCION_TARJETAS_CLIENTES, c.id), activar
+            ? { recordatorios: true, textoRecordatorios: 'La persona aceptó recibir por WhatsApp avisos y recordatorios de su Tarjeta Hornilla. Puede pedir que paren cuando quiera.', recordatoriosDesde: serverTimestamp() }
+            : { recordatorios: false, recordatoriosHasta: serverTimestamp() });
+        toast(activar ? 'Recordatorios activados' : 'Listo, ya no se le recordará');
+    } catch (err) {
+        console.error(err);
+        toast('No se pudo cambiar', 'bad');
+    }
+}
+
+async function accionRecordatorio(codigo, act, btn) {
+    const c = datosCliente(codigo);
+    if (act === 'parar') {
+        if (!confirm(`¿Dejar de mandarle recordatorios a ${c.nombre}?\n\nPuedes volver a activarlos en su tarjeta.`)) return;
+        return cambiarRecordatorios(codigo, false);
+    }
+    if (act === 'hecho') return marcarRecordatorio(codigo);
+    const texto = msgRecordatorio(c, tarjetas.get(codigo), Number(clientes.get(codigo)?.recordatoriosEnviados) || 0);
+    btn.disabled = true;
+    try {
+        /* Se llama directo desde el clic para que el navegador deje abrir WhatsApp */
+        const ok = $('tjRecImg').checked ? await enviarConImagen(codigo, texto) : enviarSoloTexto(c.telefono, texto);
+        if (ok) await marcarRecordatorio(codigo);
+    } finally { btn.disabled = false; }
 }
 
 /* ============================ DETALLE ============================ */
@@ -441,9 +589,11 @@ function renderDetalle() {
         </div>
         ${enviarMsg ? `<div class="tj-aviso"><b>Listo.</b> Avísale a ${esc(c.nombre || t.nombre)} con su tarjeta actualizada:
             <button type="button" class="btn-mini ok" data-act="avisar">Enviar por WhatsApp (imagen + mensaje)</button></div>` : ''}
+        <p class="tj-sub tj-rec-estado">Recordatorios semanales: <b>${c.recordatorios === true ? 'activados' : 'apagados'}</b>${c.recordatorios === true ? ` · último aviso: ${haceCuanto(Math.max(msDe(c.ultimoRecordatorio), enviadosLocal.get(t.codigo) || 0))}` : ''}</p>
         <div class="tj-acciones sec">
             <button type="button" class="btn-mini ok" data-act="bienvenida">Mandar su tarjeta (imagen + mensaje)</button>
             <button type="button" class="btn-mini" data-act="imagen">Descargar imagen</button>
+            <button type="button" class="btn-mini" data-act="recordar">${c.recordatorios === true ? 'Pausar recordatorios' : 'Activar recordatorios'}</button>
             <button type="button" class="btn-mini" data-act="copiar">Copiar enlace</button>
             <button type="button" class="btn-mini bad" data-act="borrar">Borrar tarjeta y datos</button>
         </div>
@@ -605,6 +755,14 @@ async function borrarTarjeta() {
     }
 }
 
+async function alternarRecordatorios() {
+    if (!seleccion) return;
+    const c = datosCliente(seleccion);
+    const activo = clientes.get(seleccion)?.recordatorios === true;
+    if (!activo && !confirm(`¿${c.nombre} aceptó recibir un recordatorio por WhatsApp cada ${diasRec()} días?\n\nSolo actívalo si la persona te lo dijo o lo escribió.`)) return;
+    cambiarRecordatorios(seleccion, !activo);
+}
+
 async function copiarEnlace() {
     if (!seleccion) return;
     try { await navigator.clipboard.writeText(enlaceTarjeta(seleccion)); toast('Enlace copiado'); }
@@ -637,6 +795,7 @@ async function crearTarjeta() {
         if (!codigo) throw new Error('No se pudo generar un código libre, intenta de nuevo');
 
         const primerNombre = nombre.split(' ')[0];
+        const quiereRec = $('tjRecordar').checked;
         const lote = writeBatch(db);
         lote.set(doc(db, COLECCION_TARJETAS, codigo), {
             codigo, nombre: primerNombre, sellos: 0, premios: 0, canjes: 0, sellosTotal: 0,
@@ -646,6 +805,11 @@ async function crearTarjeta() {
             codigo, nombre, telefono: tel,
             consentimiento: true,
             textoConsentimiento: 'La persona pidió su Tarjeta Hornilla y aceptó que se guarden su nombre y WhatsApp solo para llevar su tarjeta.',
+            recordatorios: quiereRec,
+            ...(quiereRec ? {
+                textoRecordatorios: 'La persona aceptó recibir por WhatsApp avisos y recordatorios de su Tarjeta Hornilla. Puede pedir que paren cuando quiera.',
+                recordatoriosDesde: serverTimestamp()
+            } : {}),
             creado: serverTimestamp()
         });
         await lote.commit();
@@ -653,6 +817,7 @@ async function crearTarjeta() {
         $('tjNombre').value = '';
         $('tjTelefono').value = '';
         $('tjConsiente').checked = false;
+        $('tjRecordar').checked = false;
         const c = { codigo, nombre: primerNombre, telefono: tel };
         ultimoMensaje = { codigo, tel, texto: msgBienvenida(c) };
         toast('Tarjeta creada');
@@ -675,6 +840,7 @@ export function iniciarTarjeta() {
         tarjetas = new Map(snap.docs.map(d => [d.id, { codigo: d.id, ...d.data() }]));
         renderLista();
         renderDetalle();
+        renderRecordatorios();
     }, err => {
         $('loadingTarjetas').textContent = 'No se pudieron cargar las tarjetas. Revisa las reglas de Firestore.';
         console.error(err);
@@ -683,11 +849,18 @@ export function iniciarTarjeta() {
         clientes = new Map(snap.docs.map(d => [d.data().codigo, { id: d.id, ...d.data() }]));
         renderLista();
         renderDetalle();
+        renderRecordatorios();
     }, err => console.error(err));
 
     $('btnGuardarTj').addEventListener('click', guardarConfig);
     $('btnCrearTj').addEventListener('click', crearTarjeta);
     $('tjBuscar').addEventListener('input', renderLista);
+    $('tjRecLista').addEventListener('click', e => {
+        const b = e.target.closest('[data-rec-act]');
+        const fila = b && b.closest('[data-rec]');
+        if (fila) accionRecordatorio(fila.dataset.rec, b.dataset.recAct, b);
+    });
+    setInterval(renderRecordatorios, 10 * 60 * 1000);   // si dejas el admin abierto días, la lista se refresca sola
     $('tjLista').addEventListener('click', e => {
         const b = e.target.closest('[data-abrir]');
         if (b) abrir(b.dataset.abrir);
@@ -697,6 +870,7 @@ export function iniciarTarjeta() {
         if (!b) return;
         ({ sellar, canjear, quitar: quitarSello, borrar: borrarTarjeta, copiar: copiarEnlace, imagen: descargarImagenTarjeta,
            avisar: () => ultimoMensaje && enviarConImagen(ultimoMensaje.codigo, ultimoMensaje.texto),
+           recordar: alternarRecordatorios,
            bienvenida: () => { const c = datosCliente(seleccion); enviarConImagen(seleccion, msgBienvenida(c)); },
            cerrar: () => { seleccion = null; renderLista(); renderDetalle(); } })[b.dataset.act]?.();
     });

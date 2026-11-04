@@ -290,6 +290,14 @@
         .tj-mov{list-style:none;display:grid;gap:6px;font-size:.86rem}
         .tj-mov li{padding:8px 12px;background:rgba(0,0,0,.25);border-radius:10px;color:var(--text)}
         .tj-mov b{color:var(--cream)}
+        .tj-pend{display:inline-block;min-width:20px;padding:0 6px;margin-left:4px;border-radius:20px;background:var(--ember);color:#fff;font-size:.72rem;font-weight:700;line-height:20px;text-align:center}
+        .tj-pend.hidden{display:none}
+        .tj-rec-fila{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;background:rgba(0,0,0,.22);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+        .tj-rec-fila .tj-fila-nom{flex:1 1 220px}
+        .tj-rec-acc{display:flex;flex-wrap:wrap;gap:8px}
+        .tj-rec-acc .btn-mini{min-height:44px;min-width:44px;justify-content:center}
+        .tj-rec-estado{margin:0 0 6px}
+        @media (max-width:560px){.tj-rec-acc{width:100%}.tj-rec-acc .btn-mini{flex:1}}
         @media (max-width:560px){.tj-detalle{padding:16px}.tj-detalle .field-row{flex-direction:column;gap:0}}
 
         /* ===== CANAL DE WHATSAPP ===== */
@@ -511,7 +519,7 @@
             <nav class="cli-subnav" id="cliSubnav" role="tablist" aria-label="Secciones de clientes">
                 <button type="button" role="tab" class="cli-subtab active" data-sub="canal" aria-selected="true" aria-controls="subCanal" id="tabCanal">Canal de WhatsApp</button>
                 <button type="button" role="tab" class="cli-subtab" data-sub="resenas" aria-selected="false" aria-controls="subResenas" id="tabResenas">Reseñas <span class="count" id="cntPendienteTab"></span></button>
-                <button type="button" role="tab" class="cli-subtab" data-sub="tarjeta" aria-selected="false" aria-controls="subTarjeta" id="tabTarjeta">Tarjeta</button>
+                <button type="button" role="tab" class="cli-subtab" data-sub="tarjeta" aria-selected="false" aria-controls="subTarjeta" id="tabTarjeta">Tarjeta <span class="tj-pend hidden" id="tjPend" title="Recordatorios por mandar"></span></button>
                 <button type="button" role="tab" class="cli-subtab" data-sub="club" aria-selected="false" aria-controls="subClub" id="tabClub">Club y cupón</button>
             </nav>
 
@@ -563,7 +571,18 @@
                     descuenta sola: <b>los sellos y canjes los pones tú</b>.
                 </div>
 
-                <h2 class="sub-titulo" style="margin-top:0">Reglas de la tarjeta <span class="contador-chip" id="tjEstado">Apagada</span></h2>
+                <h2 class="sub-titulo" style="margin-top:0">Recordatorios <span class="contador-chip" id="cntRec">0</span></h2>
+                <div class="club-config">
+                    <p class="campo-ayuda" style="margin:0 0 12px">Cada semana aquí salen las personas que <b>aceptaron recordatorios</b> y llevan varios días sin pedir ni recibir aviso. Toca <b>Enviar</b>: se abre su WhatsApp con el mensaje listo (con su avance en la tarjeta) y la fecha queda anotada. WhatsApp no deja mandarlos solos desde una página, por eso el último toque es tuyo.</p>
+                    <div class="check-row">
+                        <input type="checkbox" id="tjRecImg" checked>
+                        <label for="tjRecImg">Incluir la imagen de su tarjeta</label>
+                    </div>
+                    <div class="tj-lista" id="tjRecLista"></div>
+                    <div class="empty hidden" id="vacioRec"><h3>Todo al día</h3><p></p></div>
+                </div>
+
+                <h2 class="sub-titulo">Reglas de la tarjeta <span class="contador-chip" id="tjEstado">Apagada</span></h2>
                 <div class="club-config">
                     <div class="check-row">
                         <input type="checkbox" id="tjActivo">
@@ -578,6 +597,10 @@
                             <label for="tjMinimo">Mínimo por pedido ($, 0 = sin mínimo)</label>
                             <input type="number" id="tjMinimo" min="0" max="100" step="0.5" value="0" inputmode="decimal">
                         </div>
+                    </div>
+                    <div class="field">
+                        <label for="tjRecDias">Recordar cada (días)</label>
+                        <input type="number" id="tjRecDias" min="3" max="60" step="1" value="7" inputmode="numeric">
                     </div>
                     <div class="field">
                         <label for="tjPremio">Premio</label>
@@ -606,6 +629,10 @@
                     <div class="check-row">
                         <input type="checkbox" id="tjConsiente">
                         <label for="tjConsiente">La persona pidió su tarjeta y aceptó que guardemos su nombre y WhatsApp solo para llevarla.</label>
+                    </div>
+                    <div class="check-row">
+                        <input type="checkbox" id="tjRecordar">
+                        <label for="tjRecordar">Además aceptó que le escribamos por WhatsApp un recordatorio cada semana (puede pedir que paren cuando quiera). Márcalo solo si la persona lo dijo.</label>
                     </div>
                     <button class="btn btn-primary" id="btnCrearTj">Crear tarjeta</button>
                 </div>
