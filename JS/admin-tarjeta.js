@@ -120,52 +120,250 @@ async function guardarConfig() {
     }
 }
 
-/* ===================== MENSAJES DE WHATSAPP ===================== */
-const CIERRE = '\n🛵 Únicamente delivery en Sonsonate\n📞 7099-1660';
+/* ===================== MENSAJES DE WHATSAPP =====================
+   Cortos a propósito: la imagen de la tarjeta lleva el resto. */
+const primerNombre = n => String(n || '').trim().split(/\s+/)[0] || '';
 
 function msgBienvenida(c) {
+    const min = cfg.minimo > 0 ? ` de ${dinero(cfg.minimo)} o más` : '';
     return [
-        `🤠🔥 ¡Hola ${c.nombre}! Ya tienes tu *Tarjeta Hornilla*.`,
-        '',
-        `🌮 Cada pedido entregado${cfg.minimo > 0 ? ` de ${dinero(cfg.minimo)} o más` : ''} suma *1 sello*.`,
-        `🎁 Con *${cfg.meta} sellos* ganas: *${premioTxt()}*`,
-        '',
-        `👉 Tu tarjeta: ${enlaceTarjeta(c.codigo)}`,
-        `🔑 Tu código: *${c.codigo}*`,
-        '',
-        '📲 Guárdala o toma captura. Para canjear, escríbenos aquí o agrega tu código al pedir en la web.',
-        cfg.condiciones ? `📌 ${cfg.condiciones}` : '',
-        CIERRE
-    ].filter((l, i, a) => !(l === '' && a[i - 1] === '')).join('\n');
+        `🤠🔥 ¡Hola ${primerNombre(c.nombre)}! Ya tienes tu *Tarjeta Hornilla*.`,
+        `🌮 Cada pedido entregado${min} suma 1 sello. Con ${cfg.meta}, ¡${cfg.premio ? `*${cfg.premio}*` : 'tu premio'}! 🎁`,
+        `👉 ${enlaceTarjeta(c.codigo)}`,
+        `🔑 Tu código: *${c.codigo}*`
+    ].join('\n');
 }
 function msgSello(c, t) {
+    const n = primerNombre(c.nombre);
     if (t.gano) {
         return [
-            `🎉 ¡Felicidades ${c.nombre}! Completaste tu tarjeta.`,
-            `🎁 Ya tienes un premio disponible: *${premioTxt()}*`,
-            '',
-            `👉 Para canjearlo escríbenos "Quiero canjear mi tarjeta ${c.codigo}" o agrégalo en tu próximo pedido.`,
-            `🔑 ${c.codigo}  ·  ${enlaceTarjeta(c.codigo)}`,
-            CIERRE
+            `🎉 ¡Completaste tu tarjeta, ${n}!`,
+            `🎁 Tu premio: ${cfg.premio ? `*${cfg.premio}*` : 'ya está listo'}`,
+            `Para canjearlo escríbenos "canjear ${c.codigo}" o agrégalo al pedir.`,
+            `👉 ${enlaceTarjeta(c.codigo)}`
         ].join('\n');
     }
     const faltan = cfg.meta - t.sellos;
     return [
-        `🌮 ¡Gracias ${c.nombre}! Sumaste un sello.`,
-        `Llevas *${t.sellos} de ${cfg.meta}*. Te ${faltan === 1 ? 'falta *1*' : `faltan *${faltan}*`} para tu premio 🎁`,
-        '',
-        `👉 Tu tarjeta: ${enlaceTarjeta(c.codigo)}`,
-        CIERRE
+        `🌮 ¡Sello ${t.sellos} de ${cfg.meta}, ${n}! Te ${faltan === 1 ? 'falta 1' : `faltan ${faltan}`} para tu premio 🎁`,
+        `👉 ${enlaceTarjeta(c.codigo)}`
     ].join('\n');
 }
 function msgCanje(c, t) {
-    return [
-        `🎁 ¡Listo ${c.nombre}! Canjeamos tu premio: *${premioTxt()}*`,
-        `Tu tarjeta volvió a empezar: *${t.sellos} de ${cfg.meta}*${t.premios > 0 ? ` (y aún te queda ${t.premios} premio${t.premios === 1 ? '' : 's'} 🎉)` : ''}.`,
-        '',
-        `👉 ${enlaceTarjeta(c.codigo)}`,
-        CIERRE
-    ].join('\n');
+    const n = primerNombre(c.nombre);
+    return `🎁 ¡Listo ${n}! Canjeamos tu premio${cfg.premio ? `: *${cfg.premio}*` : ''}. Tu tarjeta sigue en ${t.sellos} de ${cfg.meta} 🌮${t.premios > 0 ? ` (y te queda ${t.premios} premio${t.premios === 1 ? '' : 's'} más 🎉)` : ''}`;
+}
+
+/* ===================== IMAGEN DE LA TARJETA =====================
+   Misma tarjeta de la web, dibujada en un canvas de 1080×1350 (formato
+   WhatsApp). Cambia con los sellos, así que se manda una nueva cada vez. */
+const FLAGS = ['#d9201f', '#f6ecd2', '#ffd21f', '#ff7a1a', '#d6e22b', '#e4007c'];
+const LLAMA = new Path2D('M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z');
+const REGALO = [
+    new Path2D('M4 8h16a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z'),
+    new Path2D('M12 8v13'),
+    new Path2D('M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7'),
+    new Path2D('M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5')
+];
+const LOGO_URL = '../Imagenes/IMG-20260215-WA0049.jpg.png';
+
+function rrect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+function texto(ctx, str, x, y, { fuente, color, sombra, espaciado = 0, ancho, align = 'center' }) {
+    ctx.font = fuente; ctx.fillStyle = color; ctx.textAlign = align; ctx.textBaseline = 'alphabetic';
+    if ('letterSpacing' in ctx) ctx.letterSpacing = espaciado + 'px';
+    if (ancho) {   // reduce la letra hasta que quepa
+        let px = parseInt(fuente.match(/(\d+)px/)[1], 10);
+        while (ctx.measureText(str).width > ancho && px > 18) { px -= 2; ctx.font = fuente.replace(/\d+px/, px + 'px'); }
+    }
+    if (sombra) { ctx.fillStyle = sombra.color; ctx.fillText(str, x + sombra.dx, y + sombra.dy); ctx.fillStyle = color; }
+    ctx.fillText(str, x, y);
+    if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
+}
+function cargarImg(src) {
+    return new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = src; });
+}
+
+async function imagenTarjeta(codigo) {
+    const t = tarjetas.get(codigo);
+    const meta = cfg.meta;
+    const sellos = Math.min(Number(t.sellos) || 0, meta);
+    const premios = Number(t.premios) || 0;
+    const faltan = meta - sellos;
+    await Promise.all([document.fonts.load('120px Smokum'), document.fonts.load('60px Rye'), document.fonts.load('600 30px Oswald')]).catch(() => {});
+    const logo = await cargarImg(LOGO_URL);
+
+    const W = 1080, H = 1350;
+    const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+    const ctx = cv.getContext('2d');
+
+    /* Fondo noche de feria */
+    ctx.fillStyle = '#0f2a0b'; ctx.fillRect(0, 0, W, H);
+    const g = ctx.createRadialGradient(W / 2, 0, 50, W / 2, 0, 900);
+    g.addColorStop(0, 'rgba(47,116,36,.55)'); g.addColorStop(1, 'rgba(47,116,36,0)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = 'rgba(214,231,166,.06)';
+    for (let y = 9; y < H; y += 18) for (let x = 9; x < W; x += 18) { ctx.beginPath(); ctx.arc(x, y, 1.4, 0, 7); ctx.fill(); }
+
+    /* Logo oficial, sin tocar (solo sombra suave) */
+    if (logo) {
+        const lh = 110, lw = lh * logo.width / logo.height;
+        ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.5)'; ctx.shadowBlur = 16; ctx.shadowOffsetY = 6;
+        ctx.drawImage(logo, (W - lw) / 2, 48, lw, lh); ctx.restore();
+    }
+
+    /* Tarjeta */
+    const cx = 60, cy = 190, cw = 960, ch = 1010, cr = 44;
+    ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.5)'; ctx.shadowBlur = 50; ctx.shadowOffsetY = 24;
+    rrect(ctx, cx, cy, cw, ch, cr); ctx.fillStyle = '#f6ecd2'; ctx.fill(); ctx.restore();
+    ctx.save(); rrect(ctx, cx, cy, cw, ch, cr); ctx.clip();
+
+    /* Cabecera verde */
+    const hh = 350;
+    ctx.fillStyle = '#2f7424'; ctx.fillRect(cx, cy, cw, hh);
+    const gh = ctx.createRadialGradient(cx, cy, 20, cx, cy, 700);
+    gh.addColorStop(0, 'rgba(214,231,166,.25)'); gh.addColorStop(1, 'rgba(214,231,166,0)');
+    ctx.fillStyle = gh; ctx.fillRect(cx, cy, cw, hh);
+    ctx.fillStyle = 'rgba(255,255,255,.10)';
+    for (let y = cy + 8; y < cy + hh; y += 16) for (let x = cx + 8; x < cx + cw; x += 16) { ctx.beginPath(); ctx.arc(x, y, 1.6, 0, 7); ctx.fill(); }
+
+    /* Papel picado */
+    ctx.strokeStyle = 'rgba(246,236,210,.55)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(cx, cy + 20); ctx.quadraticCurveTo(cx + cw / 2, cy + 36, cx + cw, cy + 20); ctx.stroke();
+    const n = 14, fw = cw / n;
+    for (let i = 0; i < n; i++) {
+        const x = cx + i * fw + 6, y = cy + 24, w = fw - 12, h = 78, rot = (i % 2 ? -4 : 3) * Math.PI / 180;
+        ctx.save(); ctx.translate(x + w / 2, y); ctx.rotate(rot); ctx.translate(-w / 2, 0);
+        ctx.fillStyle = FLAGS[i % FLAGS.length];
+        ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(w, 0); ctx.lineTo(w, h);
+        for (let k = 3; k >= 0; k--) { ctx.lineTo(w * (k + .5) / 4 + (k % 2 ? 0 : 0), h - 12); ctx.lineTo(w * k / 4, h); }
+        ctx.closePath(); ctx.fill();
+        ctx.fillStyle = 'rgba(15,42,11,.55)';
+        ctx.beginPath(); ctx.moveTo(w / 2, 20); ctx.lineTo(w / 2 + 11, 34); ctx.lineTo(w / 2, 48); ctx.lineTo(w / 2 - 11, 34); ctx.closePath(); ctx.fill();
+        ctx.restore();
+    }
+
+    texto(ctx, 'LA HORNILLA DE ZAID', W / 2, cy + 150, { fuente: '600 30px Oswald, sans-serif', color: '#f6ecd2', espaciado: 7 });
+    texto(ctx, 'Tarjeta Hornilla', W / 2, cy + 262, { fuente: '124px Smokum, Rye, Georgia, serif', color: '#f6ecd2', sombra: { color: '#0f2a0b', dx: 5, dy: 5 } });
+    /* Etiqueta roja con el nombre */
+    const nombre = primerNombre(t.nombre).toUpperCase();
+    ctx.font = '600 44px Oswald, sans-serif'; if ('letterSpacing' in ctx) ctx.letterSpacing = '4px';
+    const lw = Math.max(200, ctx.measureText(nombre).width + 90); if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
+    ctx.save(); ctx.translate(W / 2, cy + 306); ctx.rotate(-1 * Math.PI / 180);
+    ctx.fillStyle = '#8f1210'; ctx.fillRect(-lw / 2, 6, lw, 62);
+    ctx.fillStyle = '#d9201f'; ctx.fillRect(-lw / 2, 0, lw, 62);
+    ctx.restore();
+    texto(ctx, nombre, W / 2, cy + 306 + 46, { fuente: '600 44px Oswald, sans-serif', color: '#ffffff', espaciado: 4, ancho: 860 });
+
+    /* Cuerpo: puntitos de papel */
+    const by = cy + hh;
+    ctx.fillStyle = 'rgba(47,116,36,.09)';
+    for (let y = by + 8; y < cy + ch; y += 14) for (let x = cx + 8; x < cx + cw; x += 14) { ctx.beginPath(); ctx.arc(x, y, 1.3, 0, 7); ctx.fill(); }
+
+    /* Sellos */
+    const cols = meta <= 8 ? 4 : meta <= 10 ? 5 : 6, rows = Math.ceil(meta / cols);
+    const rowH = Math.min(160, 330 / rows), cellW = (cw - 140) / cols, rad = Math.min(64, rowH * .39, cellW * .33);
+    for (let i = 0; i < meta; i++) {
+        const col = i % cols, row = Math.floor(i / cols);
+        const x = cx + 70 + cellW * (col + .5), y = by + 122 + rowH * row;
+        ctx.save(); ctx.translate(x, y);
+        if (i < sellos) {
+            ctx.rotate(-6 * Math.PI / 180);
+            ctx.fillStyle = '#8f1210'; ctx.beginPath(); ctx.arc(0, 5, rad, 0, 7); ctx.fill();
+            const gr = ctx.createLinearGradient(0, -rad, 0, rad); gr.addColorStop(0, '#e6332c'); gr.addColorStop(1, '#d9201f');
+            ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(0, 0, rad, 0, 7); ctx.fill();
+            ctx.strokeStyle = 'rgba(255,255,255,.22)'; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(0, 0, rad - 5, 0, 7); ctx.stroke();
+            ctx.scale(rad * .9 / 12, rad * .9 / 12); ctx.translate(-12, -12);
+            ctx.strokeStyle = '#fff'; ctx.lineWidth = 2.2; ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.stroke(LLAMA);
+        } else {
+            ctx.strokeStyle = 'rgba(20,20,20,.40)'; ctx.lineWidth = 4; ctx.setLineDash([11, 9]);
+            ctx.beginPath(); ctx.arc(0, 0, rad, 0, 7); ctx.stroke(); ctx.setLineDash([]);
+            if (i === meta - 1) {
+                ctx.scale(rad * .8 / 12, rad * .8 / 12); ctx.translate(-12, -12);
+                ctx.strokeStyle = 'rgba(20,20,20,.62)'; ctx.lineWidth = 1.8; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+                REGALO.forEach(p => ctx.stroke(p));
+            } else {
+                texto(ctx, String(i + 1), 0, rad * .32, { fuente: `${Math.round(rad * .62)}px Rye, Georgia, serif`, color: 'rgba(20,20,20,.55)' });
+            }
+        }
+        ctx.restore();
+    }
+
+    /* Conteo */
+    const yc = by + 122 + rowH * (rows - 1) + rad + 92;
+    ctx.font = '84px Rye, Georgia, serif'; const wN = ctx.measureText(String(sellos)).width;
+    ctx.font = '600 52px Oswald, sans-serif'; if ('letterSpacing' in ctx) ctx.letterSpacing = '3px';
+    const resto = `DE ${meta} SELLOS`, wR = ctx.measureText(resto).width; if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
+    const x0 = W / 2 - (wN + 24 + wR) / 2;
+    texto(ctx, String(sellos), x0, yc, { fuente: '84px Rye, Georgia, serif', color: '#d9201f', align: 'left' });
+    texto(ctx, resto, x0 + wN + 24, yc, { fuente: '600 52px Oswald, sans-serif', color: '#141414', espaciado: 3, align: 'left' });
+    texto(ctx, premios > 0 ? '¡Ya tienes un premio disponible!' : faltan === 1 ? 'Te falta 1 sello para tu premio' : `Te faltan ${faltan} sellos para tu premio`,
+        W / 2, yc + 50, { fuente: '500 34px Oswald, sans-serif', color: 'rgba(20,20,20,.78)' });
+
+    /* Premio */
+    if (cfg.premio) {
+        const py = yc + 76;
+        ctx.save(); ctx.setLineDash([12, 9]); ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(47,116,36,.6)';
+        rrect(ctx, cx + 60, py, cw - 120, 100, 26); ctx.fillStyle = 'rgba(47,116,36,.09)'; ctx.fill(); ctx.stroke(); ctx.restore();
+        texto(ctx, 'TU PREMIO', W / 2, py + 36, { fuente: '600 22px Oswald, sans-serif', color: '#18420f', espaciado: 5 });
+        texto(ctx, cfg.premio, W / 2, py + 80, { fuente: '600 38px Poppins, Inter, sans-serif', color: '#141414', ancho: cw - 170 });
+    }
+
+    ctx.restore();
+
+    /* Pie: código y delivery */
+    texto(ctx, `Tu código: ${t.codigo}`, W / 2, 1268, { fuente: '38px Rye, Georgia, serif', color: '#ffd21f', espaciado: 2 });
+    texto(ctx, 'Únicamente delivery en Sonsonate  ·  7099-1660', W / 2, 1318, { fuente: '600 28px Oswald, sans-serif', color: '#f6ecd2', espaciado: 2 });
+    return cv;
+}
+
+const blobDe = (cv, tipo, q) => new Promise(r => cv.toBlob(r, tipo, q));
+
+/* Manda mensaje + imagen: en celular abre el menú de compartir (eliges el chat);
+   en compu copia la imagen, abre el chat con el texto y solo pegas con Ctrl+V. */
+async function enviarConImagen(codigo, texto) {
+    const c = datosCliente(codigo);
+    const movil = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const ventana = movil ? null : window.open('', '_blank');
+    let cv = null, file = null;
+    try {
+        cv = await imagenTarjeta(codigo);
+        file = new File([await blobDe(cv, 'image/jpeg', .92)], `tarjeta-hornilla-${codigo}.jpg`, { type: 'image/jpeg' });
+    } catch (err) { console.error(err); }
+
+    if (movil && navigator.share) {
+        try {
+            if (file && navigator.canShare?.({ files: [file] })) await navigator.share({ files: [file], text: texto });
+            else await navigator.share({ text: texto });
+            return;
+        } catch (err) { if (err?.name === 'AbortError') return; console.error(err); }
+    }
+    const url = `https://wa.me/${c.telefono}?text=${encodeURIComponent(texto)}`;
+    let copiada = false;
+    if (cv && window.ClipboardItem && navigator.clipboard?.write) {
+        try { await navigator.clipboard.write([new ClipboardItem({ 'image/png': await blobDe(cv, 'image/png') })]); copiada = true; }
+        catch (err) { console.error(err); }
+    }
+    if (!copiada && file) descargarArchivo(file);
+    if (ventana) ventana.location.href = url; else window.open(url, '_blank', 'noopener');
+    toast(copiada ? 'Imagen copiada: en el chat pégala con Ctrl+V (el texto ya viene escrito)' : 'Imagen descargada: arrástrala al chat de WhatsApp');
+}
+
+function descargarArchivo(file) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(file); a.download = file.name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+}
+async function descargarImagenTarjeta() {
+    if (!seleccion) return;
+    try {
+        const cv = await imagenTarjeta(seleccion);
+        descargarArchivo(new File([await blobDe(cv, 'image/jpeg', .92)], `tarjeta-hornilla-${seleccion}.jpg`, { type: 'image/jpeg' }));
+    } catch (err) { console.error(err); toast('No se pudo crear la imagen', 'bad'); }
 }
 
 /* ============================ LISTA ============================ */
@@ -241,10 +439,11 @@ function renderDetalle() {
             <button type="button" class="btn btn-ghost" data-act="canjear"${t.premios > 0 ? '' : ' disabled'}>Canjear premio</button>
             <button type="button" class="btn-mini" data-act="quitar">− Quitar 1 sello (corregir)</button>
         </div>
-        ${enviarMsg ? `<div class="tj-aviso"><b>Listo.</b> Avísale a ${esc(c.nombre || t.nombre)}:
-            <a class="btn-mini ok" target="_blank" rel="noopener" href="https://wa.me/${esc(enviarMsg.tel)}?text=${encodeURIComponent(enviarMsg.texto)}">Avisar por WhatsApp ↗</a></div>` : ''}
+        ${enviarMsg ? `<div class="tj-aviso"><b>Listo.</b> Avísale a ${esc(c.nombre || t.nombre)} con su tarjeta actualizada:
+            <button type="button" class="btn-mini ok" data-act="avisar">Enviar por WhatsApp (imagen + mensaje)</button></div>` : ''}
         <div class="tj-acciones sec">
-            <a class="btn-mini ok" target="_blank" rel="noopener" href="https://wa.me/${esc(c.telefono || '')}?text=${encodeURIComponent(msgBienvenida({ nombre: c.nombre || t.nombre, codigo: t.codigo }))}">Mandar su tarjeta por WhatsApp ↗</a>
+            <button type="button" class="btn-mini ok" data-act="bienvenida">Mandar su tarjeta (imagen + mensaje)</button>
+            <button type="button" class="btn-mini" data-act="imagen">Descargar imagen</button>
             <button type="button" class="btn-mini" data-act="copiar">Copiar enlace</button>
             <button type="button" class="btn-mini bad" data-act="borrar">Borrar tarjeta y datos</button>
         </div>
@@ -496,7 +695,9 @@ export function iniciarTarjeta() {
     $('tjDetalle').addEventListener('click', e => {
         const b = e.target.closest('[data-act]');
         if (!b) return;
-        ({ sellar, canjear, quitar: quitarSello, borrar: borrarTarjeta, copiar: copiarEnlace,
+        ({ sellar, canjear, quitar: quitarSello, borrar: borrarTarjeta, copiar: copiarEnlace, imagen: descargarImagenTarjeta,
+           avisar: () => ultimoMensaje && enviarConImagen(ultimoMensaje.codigo, ultimoMensaje.texto),
+           bienvenida: () => { const c = datosCliente(seleccion); enviarConImagen(seleccion, msgBienvenida(c)); },
            cerrar: () => { seleccion = null; renderLista(); renderDetalle(); } })[b.dataset.act]?.();
     });
 }
