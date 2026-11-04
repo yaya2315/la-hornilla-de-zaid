@@ -26,4 +26,5 @@ export const IMAGENES_CANAL = [
     { carpeta: 'promos', archivo: 'promo-sopa-tacos-hornilla.jpg', v: 2, titulo: '½ sopa + 2 tacos + bebida a $4.50 (29 oct – 1 nov)' },
     { carpeta: 'avisos', archivo: 'delivery-envio-mapa.jpg', titulo: 'Delivery a $1 (Sonzacate y Sonsonate centro)' },
     { carpeta: 'avisos', archivo: 'hoy-descansamos.jpg', titulo: 'Hoy no hay servicio' },
+    { carpeta: 'avisos', archivo: 'resena-google.jpg', titulo: 'Déjanos tu reseña en Google' },
 ];
