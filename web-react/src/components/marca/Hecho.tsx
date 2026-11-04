@@ -66,7 +66,7 @@ export function Hoja({ as: Comp = 'div', tono = 'noche', className, ...props }: 
   return <Comp className={cn('rounded-[6px]', tonos[tono], className)} {...props} />
 }
 
-/* ── Ticket / comanda de papel con orilla dentada ─────────────────────── */
+/* ── Ticket / pedido de papel con orilla dentada ─────────────────────── */
 export function Ticket({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div className={cn('drop-shadow-[6px_8px_0_var(--color-noche-950)]', className)} {...props}>

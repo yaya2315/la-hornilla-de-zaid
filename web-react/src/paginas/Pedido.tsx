@@ -289,9 +289,9 @@ export function Pedido() {
 
   return (
     <Sitio pagina="pedido">
-      <Portadilla lema="Pide en línea" titulo={<>Arma tu <span className="text-amarillo [text-shadow:4px_4px_0_var(--color-rojo-sombra)]">comanda</span></>}>
+      <Portadilla lema="Pide en línea" titulo={<>Arma tu <span className="text-amarillo [text-shadow:4px_4px_0_var(--color-rojo-sombra)]">pedido</span></>}>
         <ol className="mt-5 grid gap-2.5 text-[1rem]">
-          {['Escoge tus platillos y tu carne', 'Revisa tu comanda con el total', 'Mándala por WhatsApp y nosotros la confirmamos'].map((t, i) => (
+          {['Escoge tus platillos y tu carne', 'Revisa tu pedido con el total', 'Mándalo por WhatsApp y nosotros lo confirmamos'].map((t, i) => (
             <li key={t} className="flex items-center gap-3.5"><span aria-hidden="true" className="grid size-9 shrink-0 place-items-center rounded-full bg-crema font-precio text-base text-rojo">{i + 1}</span>{t}</li>
           ))}
         </ol>
@@ -338,7 +338,7 @@ export function Pedido() {
           <Ticket>
             <div className="flex flex-col gap-4">
               <div className="border-b-2 border-dashed border-tinta pb-3 text-center">
-                <h2 className="font-titulo text-[1.9rem] leading-none">Tu comanda</h2>
+                <h2 className="font-titulo text-[1.9rem] leading-none">Tu pedido</h2>
                 <p className="mt-1 font-ui text-[0.72rem] font-semibold tracking-[0.2em] uppercase">La Hornilla de Zaid · Delivery</p>
               </div>
               <ul aria-live="polite" className="grid gap-2.5">
@@ -366,7 +366,7 @@ export function Pedido() {
                 <span className="text-sm font-bold tracking-[0.15em] uppercase">Subtotal</span>
                 <span className="font-precio text-[1.7rem] text-rojo"><RollingNumber value={carrito.subtotal} precision={2} format={dinero} /></span>
               </div>
-              {carrito.lineas.length > 0 && <button type="button" onClick={carrito.vaciar} className="-mt-2 min-h-10 self-end px-1 text-sm text-tinta/70 underline underline-offset-4 hover:text-rojo">Vaciar comanda</button>}
+              {carrito.lineas.length > 0 && <button type="button" onClick={carrito.vaciar} className="-mt-2 min-h-10 self-end px-1 text-sm text-tinta/70 underline underline-offset-4 hover:text-rojo">Vaciar pedido</button>}
               <Boton variant="rojo" size="lg" ancho="completo" disabled={!carrito.lineas.length} onClick={continuar}>
                 Continuar <ArrowRight aria-hidden="true" className="size-4" />
               </Boton>
@@ -385,7 +385,7 @@ export function Pedido() {
             <a href="#tuPedido" className="flex min-h-14 items-center justify-between gap-3 rounded-[10px] border-2 border-crema/25 bg-noche-900 px-4 py-2.5 shadow-[0_5px_0_var(--color-noche-950)]">
               <span className="flex items-center gap-2.5 font-ui text-sm font-semibold tracking-[0.12em] text-crema uppercase">
                 <span className="grid size-9 place-items-center rounded-full bg-rojo text-white shadow-[0_2px_0_var(--color-rojo-sombra)]"><ShoppingBag aria-hidden="true" className="size-4" /></span>
-                Ver mi comanda · {carrito.piezas}
+                Ver mi pedido · {carrito.piezas}
               </span>
               <span className="font-precio text-xl text-amarillo"><RollingNumber value={carrito.subtotal} precision={2} format={dinero} /></span>
             </a>
@@ -396,7 +396,7 @@ export function Pedido() {
       {/* ── Paso 2: entrega ── */}
       {paso2 && (
         <section ref={entrega} aria-labelledby="tituloEntrega" className="mx-auto max-w-3xl scroll-mt-24 px-5 py-[clamp(3.5rem,8vw,5.5rem)]">
-          <TituloSeccion id="tituloEntrega" titulo="¿A dónde te la llevamos?" />
+          <TituloSeccion id="tituloEntrega" titulo="¿A dónde te lo llevamos?" />
           {SOLO_DELIVERY && (
             <p className="mb-6 max-w-xl rounded-[8px] border-2 border-dashed border-crema/25 px-5 py-3.5 text-[0.92rem]">
               Por ahora atendemos solo por <strong>delivery</strong>. Muy pronto abriremos nuestro local físico.
@@ -463,7 +463,7 @@ export function Pedido() {
           <Ticket className="mb-7 max-w-xl">
             <div className="border-b-2 border-dashed border-tinta pb-3 text-center">
               <p className="font-titulo text-[1.7rem] leading-none">La Hornilla de Zaid</p>
-              <p className="mt-1 font-ui text-[0.72rem] font-semibold tracking-[0.2em] uppercase">Comanda · {tipo ? ETIQUETAS[tipo] : 'Delivery'}</p>
+              <p className="mt-1 font-ui text-[0.72rem] font-semibold tracking-[0.2em] uppercase">Pedido · {tipo ? ETIQUETAS[tipo] : 'Delivery'}</p>
             </div>
             <ul className="grid gap-2 border-b-2 border-dashed border-tinta py-3.5 font-ui">
               {carrito.lineas.map((l) => (
