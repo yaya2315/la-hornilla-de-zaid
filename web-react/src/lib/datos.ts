@@ -160,9 +160,9 @@ const FOTOS: Record<string, string> = {
   burritos: 'burritos/burrito-03-abierto-tarjeta.webp',
   torta: 'tortas/torta-01-cenital-tarjeta.webp',
   tortas: 'tortas/torta-01-cenital-tarjeta.webp',
-  nachos: 'nachos/nachos-01-para-llevar-tarjeta.webp',
+  nachos: 'nachos/nachos-02-para-llevar-tarjeta.webp',
   quesadillas: 'quesadillas/quesadillas-01-para-llevar-tarjeta.webp',
-  'sopa de tortilla': 'combos/sopa-de-tortilla-01-tazon-tarjeta.webp',
+  'sopa de tortilla': 'Sopas/sopa-de-tortilla-02-tazon-tarjeta.webp',
   'papa asada': 'papa-asada/papa-asada-01-mesa-sin-marca-tarjeta.webp',
 }
 const normal = (t?: string) => String(t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim()
