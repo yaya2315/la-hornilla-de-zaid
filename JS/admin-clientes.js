@@ -1,17 +1,14 @@
 /* =====================================================================
    ADMIN-CLIENTES.JS — Pestaña "Clientes" del panel (admin.html)
    • Modera reseñas: aprobar, rechazar, responder, borrar.
-   • Configura el cupón de bienvenida del club (config/club).
-   • Lista miembros del club, exporta CSV y copia los números para
-     crear una lista de difusión en WhatsApp Business.
    • Sub-pestaña "Canal de WhatsApp": ver admin-canal.js.
    • Sub-pestaña "Tarjeta" (sellos y canjes): ver admin-tarjeta.js.
    Se inicia la primera vez que se abre la pestaña (window.iniciarClientes).
    ===================================================================== */
 
-import { db, COLECCION_RESENAS, COLECCION_CLUB, COLECCION_CONFIG } from './firebase-config.js';
+import { db, COLECCION_RESENAS } from './firebase-config.js';
 import {
-    collection, onSnapshot, doc, getDoc, setDoc, updateDoc, deleteDoc, serverTimestamp
+    collection, onSnapshot, doc, updateDoc, deleteDoc, serverTimestamp
 } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
 import { iniciarCanal } from './admin-canal.js';
 import { iniciarTarjeta } from './admin-tarjeta.js';
@@ -26,7 +23,6 @@ function toast(texto, tipo = 'ok') {
     toast._timer = setTimeout(() => t.className = 'toast', 2600);
 }
 const fecha = ts => ts?.toDate ? ts.toDate().toLocaleDateString('es-SV', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
-const telBonito = t => { const d = String(t || '').replace(/^503/, ''); return d.length === 8 ? `${d.slice(0, 4)}-${d.slice(4)}` : d; };
 
 /* ============================ RESEÑAS ============================ */
 let resenas = [];
@@ -95,80 +91,11 @@ async function accionResena(accion, id) {
 
 function cerrarModalResp() { $('modalRespBg').classList.remove('open'); respondiendo = null; }
 
-/* ============================== CLUB ============================== */
-let miembros = [];
-
-function renderClub() {
-    $('loadingClub').classList.add('hidden');
-    $('cntClub').textContent = miembros.length;
-    $('vacioClub').classList.toggle('hidden', miembros.length > 0);
-    $('clubTablaWrap').classList.toggle('hidden', miembros.length === 0);
-    $('listaClub').innerHTML = miembros.map(m => `
-        <tr>
-            <td>${esc(m.nombre)}</td>
-            <td><a href="https://wa.me/${esc(m.telefono)}" target="_blank" rel="noopener">${esc(telBonito(m.telefono))}</a></td>
-            <td>${fecha(m.creado)}</td>
-            <td>${esc(m.origen || 'web')}</td>
-            <td><button class="btn-mini bad" data-baja="${esc(m.id)}" title="Dar de baja (cuando la persona escribe BAJA)">Dar de baja</button></td>
-        </tr>`).join('');
-}
-
-function descargarCSV() {
-    if (!miembros.length) { toast('La lista está vacía', 'bad'); return; }
-    const filas = [['nombre', 'telefono', 'se_unio', 'origen']]
-        .concat(miembros.map(m => [m.nombre, '+' + m.telefono, fecha(m.creado), m.origen || 'web']));
-    const csv = filas.map(f => f.map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\r\n');
-    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `club-la-hornilla-${new Date().toISOString().slice(0, 10)}.csv`;
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-}
-
-async function copiarNumeros() {
-    if (!miembros.length) { toast('La lista está vacía', 'bad'); return; }
-    const texto = miembros.map(m => '+' + m.telefono).join('\n');
-    try { await navigator.clipboard.writeText(texto); toast(`${miembros.length} números copiados`); }
-    catch { toast('No se pudo copiar', 'bad'); }
-}
-
-async function cargarCupon() {
-    try {
-        const d = await getDoc(doc(db, COLECCION_CONFIG, 'club'));
-        const c = d.exists() ? d.data() : {};
-        $('cfgActivo').checked = !!c.activo;
-        $('cfgCodigo').value = c.codigo || '';
-        $('cfgBeneficio').value = c.beneficio || '';
-        $('cfgCondiciones').value = c.condiciones || '';
-    } catch (err) { console.error(err); }
-}
-
-async function guardarCupon() {
-    const activo = $('cfgActivo').checked;
-    const codigo = $('cfgCodigo').value.trim().toUpperCase().replace(/\s+/g, '');
-    const beneficio = $('cfgBeneficio').value.trim();
-    const condiciones = $('cfgCondiciones').value.trim();
-    if (activo && (!codigo || !beneficio)) { toast('Pon el código y el beneficio para activarlo', 'bad'); return; }
-    if (activo && !condiciones) { toast('Agrega las condiciones (vigencia y límites)', 'bad'); return; }
-    $('btnGuardarCupon').disabled = true;
-    try {
-        await setDoc(doc(db, COLECCION_CONFIG, 'club'), { activo, codigo, beneficio, condiciones, actualizado: serverTimestamp() });
-        $('cfgCodigo').value = codigo;
-        toast(activo ? 'Cupón activo en la web' : 'Cupón guardado (apagado)');
-    } catch (err) {
-        console.error(err);
-        toast('No se pudo guardar', 'bad');
-    } finally {
-        $('btnGuardarCupon').disabled = false;
-    }
-}
-
 /* ============================ ARRANQUE ============================ */
-/* Sub-pestañas: Canal · Reseñas · Tarjeta · Club */
+/* Sub-pestañas: Canal · Reseñas · Tarjeta */
 function iniciarSubnav() {
     const tabs = [...document.querySelectorAll('#cliSubnav .cli-subtab')];
-    const paneles = { canal: 'subCanal', resenas: 'subResenas', tarjeta: 'subTarjeta', club: 'subClub' };
+    const paneles = { canal: 'subCanal', resenas: 'subResenas', tarjeta: 'subTarjeta' };
     const activar = (tab, enfocar = false) => {
         tabs.forEach(t => {
             const on = t === tab;
@@ -204,17 +131,6 @@ window.iniciarClientes = function iniciarClientes() {
         console.error(err);
     });
 
-    onSnapshot(collection(db, COLECCION_CLUB), snap => {
-        miembros = snap.docs.map(d => ({ id: d.id, ...d.data() }))
-            .sort((a, b) => (b.creado?.toMillis?.() || 0) - (a.creado?.toMillis?.() || 0));
-        renderClub();
-    }, err => {
-        $('loadingClub').textContent = 'No se pudo cargar el club. Revisa las reglas de Firestore.';
-        console.error(err);
-    });
-
-    cargarCupon();
-
     $('filtroResenas').addEventListener('click', e => {
         const b = e.target.closest('.cat-tab');
         if (!b) return;
@@ -245,16 +161,4 @@ window.iniciarClientes = function iniciarClientes() {
         }
     });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarModalResp(); });
-
-    $('btnGuardarCupon').addEventListener('click', guardarCupon);
-    $('btnCsvClub').addEventListener('click', descargarCSV);
-    $('btnCopiarClub').addEventListener('click', copiarNumeros);
-    $('listaClub').addEventListener('click', async e => {
-        const b = e.target.closest('[data-baja]');
-        if (!b) return;
-        const m = miembros.find(x => x.id === b.dataset.baja);
-        if (!confirm(`¿Dar de baja a ${m?.nombre || 'esta persona'}? Se borra su número del club.`)) return;
-        try { await deleteDoc(doc(db, COLECCION_CLUB, b.dataset.baja)); toast('Dado de baja'); }
-        catch (err) { console.error(err); toast('No se pudo borrar', 'bad'); }
-    });
 };
