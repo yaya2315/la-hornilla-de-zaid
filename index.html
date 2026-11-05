@@ -1,42 +1,36 @@
 <!DOCTYPE html>
 <!-- =====================================================================
-     Esta página la arma web-react/ (React + Tailwind v4 + Cult UI).
-     Fuente: web-react/index.html y web-react/src/.  Para publicar un cambio:
-     en web-react/ corre  npm run build  y sube con git (ver web-react/LEEME.md).
-     Si editas la copia que queda en la carpeta del sitio, se pierde en el
-     próximo build.
+     INICIO de La Hornilla de Zaid: página ESTÁTICA (no usa React ni build).
+     Se edita aquí mismo. Motor de scroll: portada/scrollcraft.js (no se
+     edita). Estilos propios: portada/inicio.css. Lógica: portada/inicio.js
+     (menú, ticket de pedido, reseñas reales, visor 3D).
+     Las demás páginas (Menú, Pedir, Ubicación, Tarjeta) siguen en web-react/.
      ===================================================================== -->
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>La Hornilla de Zaid · Comida mexicana a domicilio en Sonsonate</title>
+    <meta name="description" content="Tacos, burritos, tortas, quesadillas, nachos y sopa de tortilla a domicilio en Sonsonate y Sonzacate. Arma tu pedido y mándalo por WhatsApp al 7099-1660.">
+    <meta name="theme-color" content="#0b2008">
+    <meta name="google-site-verification" content="vCjEv9wg-Ccp55yqrC1kZFFWl-jEAKFChwEftCZ6eZU" />
+    <link rel="canonical" href="https://yaya2315.github.io/la-hornilla-de-zaid/">
     <link rel="icon" type="image/png" sizes="32x32" href="Imagenes/favicon-32.png">
     <link rel="icon" type="image/png" sizes="192x192" href="Imagenes/icon-192.png">
     <link rel="apple-touch-icon" href="Imagenes/apple-touch-icon.png">
-    <title>La Hornilla de Zaid — Comida mexicana a domicilio en Sonsonate</title>
-    <meta name="description" content="Tacos, burritos, birria, quesadillas y más comida mexicana en Sonsonate. Pide en línea por WhatsApp y te lo llevamos a domicilio.">
-    <meta name="theme-color" content="#0b2408">
-    <meta name="google-site-verification" content="vCjEv9wg-Ccp55yqrC1kZFFWl-jEAKFChwEftCZ6eZU" />
-    <link rel="canonical" href="https://yaya2315.github.io/la-hornilla-de-zaid/">
-    <!-- Vista previa al compartir (WhatsApp, Facebook, Instagram, X) -->
     <meta property="og:site_name" content="La Hornilla de Zaid">
     <meta property="og:locale" content="es_SV">
     <meta property="og:type" content="restaurant">
-    <meta property="og:title" content="La Hornilla de Zaid — Comida mexicana a domicilio en Sonsonate">
-    <meta property="og:description" content="Tacos, burritos, birria, quesadillas y más comida mexicana en Sonsonate. Pide en línea por WhatsApp y te lo llevamos a domicilio.">
+    <meta property="og:title" content="La Hornilla de Zaid · Comida mexicana a domicilio en Sonsonate">
+    <meta property="og:description" content="Tacos, burritos, tortas, quesadillas y más a domicilio en Sonsonate y Sonzacate. Pide por WhatsApp.">
     <meta property="og:url" content="https://yaya2315.github.io/la-hornilla-de-zaid/">
     <meta property="og:image" content="https://yaya2315.github.io/la-hornilla-de-zaid/Imagenes/og-hornilla.jpg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="Tacos de La Hornilla de Zaid servidos en una bandeja sobre mesa de madera">
+    <meta property="og:image:alt" content="Orden de tacos de La Hornilla de Zaid servida en bandeja sobre mesa de madera">
     <meta name="twitter:card" content="summary_large_image">
-    <!-- Datos estructurados para Google (ficha de restaurante).
-         PENDIENTE al tener el nuevo local:
-         • agregar "streetAddress" dentro de "address" y el bloque "geo"
-           { "@type": "GeoCoordinates", "latitude": ..., "longitude": ... }
-         • agregar "openingHoursSpecification" con el horario confirmado.
-         No se agregan estrellas (aggregateRating): Google no permite
-         mostrar reseñas propias del negocio en su propio sitio. -->
+    <!-- Ficha de restaurante para Google. Sin estrellas (Google no permite reseñas propias en el propio sitio).
+         PENDIENTE con el local nuevo: streetAddress y geo. -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -52,17 +46,15 @@
         "currenciesAccepted": "USD",
         "hasMenu": "https://yaya2315.github.io/la-hornilla-de-zaid/HTML/menu.html",
         "acceptsReservations": false,
-        "address": {
-            "@type": "PostalAddress",
-            "addressLocality": "Sonsonate",
-            "addressRegion": "Sonsonate",
-            "addressCountry": "SV"
-        },
-        "potentialAction": {
-            "@type": "OrderAction",
-            "target": "https://yaya2315.github.io/la-hornilla-de-zaid/HTML/pedido.html",
-            "deliveryMethod": ["http://purl.org/goodrelations/v1#DeliveryModeOwnFleet"]
-        },
+        "areaServed": ["Sonsonate", "Sonzacate"],
+        "address": { "@type": "PostalAddress", "addressLocality": "Sonsonate", "addressRegion": "Sonsonate", "addressCountry": "SV" },
+        "openingHoursSpecification": [
+            { "@type": "OpeningHoursSpecification", "dayOfWeek": "Monday", "opens": "06:00", "closes": "10:30" },
+            { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"], "opens": "10:30", "closes": "14:00" },
+            { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"], "opens": "17:00", "closes": "21:30" },
+            { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "17:00", "closes": "21:30" }
+        ],
+        "potentialAction": { "@type": "OrderAction", "target": "https://yaya2315.github.io/la-hornilla-de-zaid/HTML/pedido.html" },
         "sameAs": [
             "https://www.instagram.com/la_hornilla_de_zaid",
             "https://www.facebook.com/profile.php?id=100090295385638",
@@ -70,50 +62,260 @@
         ]
     }
     </script>
-    <!-- Primera foto de la portada: se descarga antes que todo lo demás.
-         Una para pantallas anchas (1.ª foto data-vista="ancha") y otra para altas (1.ª data-vista="alta"). -->
-    <link rel="preload" as="image" type="image/webp" href="Imagenes/fotos-de-platillos/tacos/tacos-01-mesa-portada.webp" media="(min-aspect-ratio: 1/1)" fetchpriority="high">
-    <link rel="preload" as="image" type="image/webp" href="Imagenes/fotos-de-platillos/tacos/tacos-02-con-pina-portada.webp" media="(max-aspect-ratio: 999/1000)" fetchpriority="high">
+    <!-- Lo primero que se ve: foto del héroe y las 2 fuentes principales -->
+    <link rel="preload" as="image" type="image/webp" fetchpriority="high" media="(min-aspect-ratio: 1/1)"
+          imagesrcset="portada/img/heroe-ancho-828.webp 828w, portada/img/heroe-ancho-1280.webp 1280w, portada/img/heroe-ancho-1920.webp 1920w" imagesizes="100vw">
+    <link rel="preload" as="image" type="image/webp" fetchpriority="high" media="(max-aspect-ratio: 999/1000)"
+          imagesrcset="portada/img/heroe-alto-720.webp 720w, portada/img/heroe-alto-1080.webp 1080w" imagesizes="100vw">
+    <link rel="preload" as="font" type="font/woff2" href="portada/fuentes/smokum-latin-400-normal.woff2" crossorigin>
+    <link rel="preload" as="font" type="font/woff2" href="portada/fuentes/oswald-latin-500-normal.woff2" crossorigin>
+    <link rel="stylesheet" href="portada/scrollcraft.css">
+    <link rel="stylesheet" href="portada/inicio.css">
     <script src="JS/consentimiento.js" defer></script>
-    <!-- Estilo mínimo del fueguito de carga: va aquí para que nunca se vea gigante aunque tarde el CSS -->
-    <style>
-      html,body{margin:0;background:#071a05;color:#ecead6}
-      .pageload{position:fixed;inset:0;z-index:4000;display:grid;place-content:center;justify-items:center;gap:18px;background:#071a05;animation:pageloadSeguro 0s linear 4s forwards}
-      .pageload-flame{width:58px;position:relative}
-      .pageload-flame svg{display:block;width:100%;height:auto}
-      .pageload-flame .llena{position:absolute;inset:0}
-      .pageload-word{font:600 .78rem/1.2 Oswald,system-ui,sans-serif;letter-spacing:4px;text-transform:uppercase;color:#b9c4a0}
-      @keyframes pageloadSeguro{to{opacity:0;visibility:hidden;pointer-events:none}}
-      #app:empty{min-height:100vh}
-      #app:empty::after{content:"No se pudo cargar la página. Revisa tu conexión y recarga.";display:block;padding:40vh 24px 0;text-align:center;font:500 1rem/1.5 system-ui,sans-serif;color:#ecead6;opacity:0;animation:avisoCarga 0s linear 8s forwards}
-      @keyframes avisoCarga{to{opacity:1}}
-    </style>
-  <script type="module" crossorigin src="./app/inicio-x--7VybS.js"></script>
-  <link rel="modulepreload" crossorigin href="./app/react-0zU5oKmd.js">
-  <link rel="modulepreload" crossorigin href="./app/librerias-CBEinxWa.js">
-  <link rel="modulepreload" crossorigin href="./app/motion-B70nZUwc.js">
-  <link rel="modulepreload" crossorigin href="./app/firebase-Khsxcn5m.js">
-  <link rel="modulepreload" crossorigin href="./app/Piezas-18CHvbAk.js">
-  <link rel="modulepreload" crossorigin href="./app/rolling-number-BdC3S-4o.js">
-  <link rel="stylesheet" crossorigin href="./app/librerias-UlLI5JPV.css">
-  <link rel="stylesheet" crossorigin href="./app/Piezas-Bj4UiH18.css">
 </head>
 <body>
-    <!-- Pantalla de carga "fueguito" (se esconde al cargar) -->
-    <div class="pageload" id="pageload" role="status" aria-live="polite" aria-label="Cargando La Hornilla de Zaid">
-        <div class="pageload-flame">
-            <svg viewBox="0 0 24 28" aria-hidden="true" focusable="false"><path fill="none" stroke="rgba(255,210,31,.35)" stroke-width=".6" d="M12 1C12 1 5 9 5 17C5 22 8.1 26 12 26C15.9 26 19 22 19 17C19 13.7 17 11 15 9C15.6 11.7 14.6 13.6 13 14.6C13.8 12 13 9.4 11 7.6C10.6 10 9.4 11.8 9.4 14C9.4 11 10.4 7.8 12 4.6C12 3.4 12 2.1 12 1Z"/></svg>
-            <svg class="llena" viewBox="0 0 24 28" aria-hidden="true" focusable="false"><defs><linearGradient id="llamaGrad" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#ffe27a"/><stop offset="50%" stop-color="#ffd21f"/><stop offset="100%" stop-color="#d9201f"/></linearGradient></defs><path fill="url(#llamaGrad)" d="M12 1C12 1 5 9 5 17C5 22 8.1 26 12 26C15.9 26 19 22 19 17C19 13.7 17 11 15 9C15.6 11.7 14.6 13.6 13 14.6C13.8 12 13 9.4 11 7.6C10.6 10 9.4 11.8 9.4 14C9.4 11 10.4 7.8 12 4.6C12 3.4 12 2.1 12 1Z"/></svg>
+<a class="salto" href="#menu">Saltar al menú</a>
+<span data-sc-progress></span>
+<div class="sc-grain" aria-hidden="true"></div>
+
+<!-- Símbolos reutilizables (papel picado y vapor) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="banderin" viewBox="0 0 60 70">
+      <path fill-rule="evenodd" d="M2 4h56v52l-5 6-5-6-5 6-4.7-6-4.7 6-4.6-6-4.7 6-4.6-6-4.7 6-4.7-6L2 62V4Zm14 14 5 5-5 5-5-5 5-5Zm14-4 6 6-6 6-6-6 6-6Zm14 4 5 5-5 5-5-5 5-5ZM22 34l4 4-4 4-4-4 4-4Zm16 0 4 4-4 4-4-4 4-4ZM30 44a3 3 0 1 1 0 6 3 3 0 0 1 0-6Z"/>
+    </symbol>
+  </defs>
+</svg>
+
+<header class="barra" id="barra">
+    <a class="barra__logo" href="./" aria-label="La Hornilla de Zaid, inicio">
+        <img src="Imagenes/IMG-20260215-WA0049.jpg.png" alt="La Hornilla de Zaid" width="160" height="112" fetchpriority="high">
+    </a>
+    <nav class="barra__indice" aria-label="Platillos">
+        <a href="#plato-tacos" data-salto="tacos">Tacos</a>
+        <a href="#plato-burrito" data-salto="burrito">Burrito</a>
+        <a href="#plato-tortas" data-salto="tortas">Tortas</a>
+        <a href="#plato-quesadillas" data-salto="quesadillas">Quesadillas</a>
+        <a href="#plato-nachos" data-salto="nachos">Nachos</a>
+        <a href="#plato-sopa" data-salto="sopa">Sopa</a>
+        <a href="#plato-papa" data-salto="papa">Papa asada</a>
+    </nav>
+    <a class="btn btn--rojo btn--sm barra__cta" href="https://wa.me/50370991660" target="_blank" rel="noopener" data-whatsapp>
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.4A10 10 0 1 0 12 2zm4.5 12.4c-.3-.2-1.7-.8-2-.9-.3-.1-.5-.2-.7.2-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6l.4-.5.3-.5c.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.2 5.1 4.5 1.9.8 2.6.8 3.6.7.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3z"/></svg>
+        Pedir por WhatsApp
+    </a>
+</header>
+
+<main id="inicio">
+
+  <!-- 1 · ANTOJO: héroe por capas (foto, vapor atrás, texto, vapor adelante, papel picado) -->
+  <section class="heroe" data-sc-act="pin" data-sc-span="1.8" style="height:180vh" aria-labelledby="titulo-heroe">
+    <div data-sc-stage class="sc-stage">
+      <div class="heroe__foto" data-sc-parallax="-0.6">
+        <picture>
+          <source media="(max-aspect-ratio: 999/1000)" type="image/webp" srcset="portada/img/heroe-alto-720.webp 720w, portada/img/heroe-alto-1080.webp 1080w" sizes="100vw">
+          <img src="portada/img/heroe-ancho-1280.webp" srcset="portada/img/heroe-ancho-828.webp 828w, portada/img/heroe-ancho-1280.webp 1280w, portada/img/heroe-ancho-1920.webp 1920w" sizes="100vw"
+               width="1920" height="1072" alt="Orden de cuatro tacos de La Hornilla de Zaid en bandeja con limón, sobre mesa de madera" fetchpriority="high" decoding="async">
+        </picture>
+      </div>
+      <div class="heroe__vapor heroe__vapor--atras" data-sc-parallax="-0.9" aria-hidden="true" data-ambiente>
+        <svg viewBox="0 0 200 200" preserveAspectRatio="none"><path class="vapor-hebra" stroke-width="18" d="M60 200c-14-30 16-48 2-78s14-50 4-82"/><path class="vapor-hebra" stroke-width="14" d="M110 200c12-34-16-52 0-84s-12-48 2-80"/><path class="vapor-hebra" stroke-width="16" d="M150 200c-10-28 14-44 0-74s10-52 0-84"/></svg>
+      </div>
+      <div class="heroe__sombra" aria-hidden="true"></div>
+      <div class="heroe__techo" aria-hidden="true"></div>
+      <div class="heroe__texto" data-sc-cue="0 0.62 0">
+        <p class="heroe__lugar">Sonsonate y Sonzacate</p>
+        <h1 id="titulo-heroe">Comida mexicana a domicilio</h1>
+        <p class="heroe__sub">Tacos, burritos, tortas y quesadillas hechos al momento. Únicamente delivery.</p>
+        <div class="heroe__acciones">
+          <a class="btn btn--rojo" href="https://wa.me/50370991660" target="_blank" rel="noopener" data-whatsapp>Pedir por WhatsApp</a>
+          <a class="pildora-tel" href="tel:+50370991660" aria-label="Llamar al 7099-1660">7099-1660</a>
         </div>
-        <p class="pageload-word">La Hornilla de Zaid</p>
+      </div>
+      <div class="heroe__etiqueta" data-sc-cue="0.3 1">
+        <div class="etiqueta"><small>Orden de 4 tacos</small><span class="precio" data-precio-desde="tacos">$4.99</span></div>
+      </div>
+      <div class="heroe__vapor heroe__vapor--frente" data-sc-parallax="-1.6" aria-hidden="true" data-ambiente>
+        <svg viewBox="0 0 200 200" preserveAspectRatio="none"><path class="vapor-hebra" stroke-width="22" d="M40 200c-12-26 12-44 0-70s14-46 2-78"/><path class="vapor-hebra" stroke-width="18" d="M120 200c14-30-14-50 2-80s-10-44 4-76"/><path class="vapor-hebra" stroke-width="20" d="M170 200c-8-26 10-40 0-70"/></svg>
+      </div>
+      <div class="heroe__picado" data-sc-parallax="-2.2" aria-hidden="true">
+        <svg viewBox="0 0 1200 90" preserveAspectRatio="xMidYMin slice">
+          <path d="M0 8 Q600 26 1200 8" stroke="#f6ecd2" stroke-width="2" fill="none" opacity=".7"/>
+          <g>
+            <use href="#banderin" x="10" y="10" width="60" height="70" fill="#d9201f"/>
+            <use href="#banderin" x="110" y="14" width="60" height="70" fill="#ffd21f"/>
+            <use href="#banderin" x="210" y="17" width="60" height="70" fill="#d6e22b"/>
+            <use href="#banderin" x="310" y="19" width="60" height="70" fill="#f6ecd2"/>
+            <use href="#banderin" x="410" y="20" width="60" height="70" fill="#d9201f"/>
+            <use href="#banderin" x="510" y="21" width="60" height="70" fill="#2f7424"/>
+            <use href="#banderin" x="610" y="21" width="60" height="70" fill="#ffd21f"/>
+            <use href="#banderin" x="710" y="20" width="60" height="70" fill="#d6e22b"/>
+            <use href="#banderin" x="810" y="19" width="60" height="70" fill="#d9201f"/>
+            <use href="#banderin" x="910" y="17" width="60" height="70" fill="#f6ecd2"/>
+            <use href="#banderin" x="1010" y="14" width="60" height="70" fill="#2f7424"/>
+            <use href="#banderin" x="1110" y="10" width="60" height="70" fill="#ffd21f"/>
+          </g>
+        </svg>
+      </div>
     </div>
-    <div id="app"></div>
-    <noscript>
-        <div style="padding:120px 24px;text-align:center;font-family:system-ui,sans-serif;color:#ecead6;background:#0f2a0b;min-height:100vh">
-            <p style="font-size:1.1rem">Para ver el menú y hacer tu pedido, activa JavaScript.</p>
-            <p>O escríbenos por WhatsApp: <a style="color:#ffd21f" href="https://wa.me/50370991660">7099-1660</a></p>
-            <style>.pageload{display:none}</style>
+  </section>
+
+  <!-- 2 · TRANQUILIDAD: dónde llegamos, envío y horario (silencio antes del pico) -->
+  <section class="llevamos" data-sc-act="flow" aria-labelledby="titulo-llevamos">
+    <div class="llevamos__grid">
+      <div data-sc-in data-sc-stagger="60">
+        <h2 id="titulo-llevamos">Te lo llevamos</h2>
+        <p class="llevamos__intro">Por ahora atendemos únicamente por delivery, mientras abrimos nuestro nuevo local. Pides por WhatsApp y te lo llevamos caliente.</p>
+        <a class="pildora-tel" href="tel:+50370991660">Llámanos: 7099-1660</a>
+      </div>
+      <dl class="fichas" data-sc-in data-sc-stagger="70">
+        <div class="ficha"><dt>Entrega</dt><dd><strong>Únicamente delivery</strong></dd></div>
+        <div class="ficha"><dt>Zonas</dt><dd>Sonsonate y Sonzacate</dd></div>
+        <div class="ficha"><dt>Envío</dt><dd><strong>$1</strong> en Sonsonate centro y Sonzacate. Otras zonas: pregúntanos. El envío lo hace un servicio de delivery aparte, que cobra su propio precio.</dd></div>
+        <div class="ficha"><dt>Horario</dt><dd><span>Lunes: 6:00 a 10:30 a.m.</span><span>Martes a sábado: 10:30 a.m. a 2:00 p.m. y 5:00 a 9:30 p.m.</span><span>Domingo: 5:00 a 9:30 p.m.</span></dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 3 · ASOMBRO (pico): el platillo gira mientras bajas -->
+  <section class="giro" id="giro" data-sc-act="pin" data-sc-span="2.6" style="height:260vh" aria-labelledby="titulo-giro">
+    <div data-sc-stage class="sc-stage">
+      <div class="giro__escena" id="giroEscena">
+        <div class="giro__suelo" aria-hidden="true"></div>
+        <figure class="giro__foto" id="giroFoto">
+          <img src="Imagenes/fotos-de-platillos/tacos/tacos-01-mesa-web.webp" width="1200" height="750" loading="lazy" decoding="async" alt="Orden de cuatro tacos con cilantro, cebolla y limón">
+        </figure>
+      </div>
+      <div class="giro__ficha" data-sc-cue="0 0.96 0">
+        <h2 id="titulo-giro">Tacos</h2>
+        <ul class="giro__datos">
+          <li><strong>Orden de 4</strong> en tortilla de maíz</li>
+          <li>Pastor, pollo pastor, suadero o mixta: <strong class="precio" data-precio-normal="tacos">$4.99</strong></li>
+          <li>Birria o cochinita pibil: <strong class="precio" data-precio-especial="tacos">$5.99</strong></li>
+          <li>Con cilantro, cebolla y limón</li>
+        </ul>
+      </div>
+      <p class="giro__nota" data-sc-cue="0.12 0.96" id="giroNota">Baja despacio y mira la orden completa.</p>
+    </div>
+  </section>
+
+  <!-- 4 · CONTROL: el menú como colección. "Lo quiero" imprime en tu ticket -->
+  <section class="menu-riel" id="menu" data-sc-act="pan" data-sc-span="3.4" style="height:340vh" aria-labelledby="titulo-menu">
+    <div data-sc-stage class="sc-stage">
+      <div class="riel" data-sc-pan="0.04" id="riel">
+        <div class="riel__inicio">
+          <h2 id="titulo-menu">El menú</h2>
+          <p>Elige carne y cantidad, toca <strong>Lo quiero</strong> y tu pedido se va armando en el ticket de abajo.</p>
+          <nav class="riel__saltos" aria-label="Ir a un platillo">
+            <a href="#plato-tacos" data-salto="tacos">Tacos</a><a href="#plato-burrito" data-salto="burrito">Burrito</a><a href="#plato-tortas" data-salto="tortas">Tortas</a><a href="#plato-quesadillas" data-salto="quesadillas">Quesadillas</a><a href="#plato-nachos" data-salto="nachos">Nachos</a><a href="#plato-sopa" data-salto="sopa">Sopa</a><a href="#plato-papa" data-salto="papa">Papa asada</a>
+          </nav>
         </div>
-    </noscript>
+        <!-- Las tarjetas se llenan con portada/inicio.js (precios del admin); esto es el respaldo sin JavaScript -->
+        <div id="platos" class="riel__platos" style="display:contents"></div>
+        <p class="riel__fin">¿Bebidas, extras o promos de la semana? Están en el <a class="enlace" href="HTML/menu.html">menú completo</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 · CONFIANZA: reseñas reales y canal de WhatsApp -->
+  <section class="confianza" data-sc-act="flow" aria-labelledby="titulo-resenas">
+    <div class="confianza__wrap">
+      <div data-sc-in data-sc-stagger="60">
+        <h2 id="titulo-resenas">Lo que dicen</h2>
+        <p class="confianza__intro">Publicamos todas las reseñas reales, buenas o malas. Nunca inventamos opiniones.</p>
+      </div>
+      <ul class="resenas" id="resenas" aria-live="polite"></ul>
+      <p class="resenas__vacio" id="resenasVacio" hidden>Aún no hay reseñas publicadas. ¿Ya probaste algo? Cuéntanos qué tal.</p>
+      <div class="confianza__acciones">
+        <button class="btn btn--crema" type="button" id="abrirResena">Dejar mi reseña</button>
+        <a class="enlace" href="https://g.page/r/Ccxz6wzxhzUCEBM/review" target="_blank" rel="noopener">Reseñar en Google</a>
+      </div>
+      <div class="canal" data-sc-reveal="up" data-sc-reveal-at="0.05 0.45">
+        <svg class="canal__picado" viewBox="0 0 1200 40" preserveAspectRatio="xMidYMin slice" aria-hidden="true">
+          <use href="#banderin" x="40" y="2" width="30" height="35" fill="#ffd21f"/><use href="#banderin" x="140" y="4" width="30" height="35" fill="#d9201f"/><use href="#banderin" x="240" y="5" width="30" height="35" fill="#f6ecd2"/><use href="#banderin" x="340" y="6" width="30" height="35" fill="#d6e22b"/><use href="#banderin" x="440" y="6" width="30" height="35" fill="#ffd21f"/><use href="#banderin" x="540" y="6" width="30" height="35" fill="#d9201f"/><use href="#banderin" x="640" y="6" width="30" height="35" fill="#f6ecd2"/><use href="#banderin" x="740" y="6" width="30" height="35" fill="#d6e22b"/><use href="#banderin" x="840" y="5" width="30" height="35" fill="#ffd21f"/><use href="#banderin" x="940" y="4" width="30" height="35" fill="#d9201f"/><use href="#banderin" x="1040" y="2" width="30" height="35" fill="#f6ecd2"/>
+        </svg>
+        <h3>Promos directo a tu WhatsApp</h3>
+        <p>Sigue el canal de La Hornilla y entérate primero de los combos de la semana, las promociones y la dirección de nuestro nuevo local.</p>
+        <a class="btn btn--lima" href="https://whatsapp.com/channel/0029Vb8zxK1AjPXHdtwCnh0q" target="_blank" rel="noopener" data-medir="canal_click">Unirme al canal</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 · DECISIÓN: el ticket sube al centro con tu pedido -->
+  <section class="cierre" id="cierre" data-sc-act="pin" data-sc-span="1.3" style="height:130vh" aria-labelledby="titulo-cierre">
+    <div data-sc-stage class="sc-stage">
+      <div class="cierre__centro">
+        <div class="cierre__texto" data-sc-cue="0 1 0 0">
+          <p class="cierre__antojo">¿Ya se te antojó?</p>
+          <p class="cierre__sub">Mándanos tu pedido y te lo llevamos caliente a Sonsonate o Sonzacate.</p>
+          <a class="pildora-tel" href="tel:+50370991660">Llámanos: 7099-1660</a>
+        </div>
+        <div class="cierre__ticket" data-sc-cue="0 1 0 0">
+          <div class="papel papel--dentado">
+            <h2 id="titulo-cierre">Tu pedido</h2>
+            <div id="cierreContenido"></div>
+          </div>
+        </div>
+      </div>
+      <footer class="pie">
+        <nav aria-label="Páginas">
+          <a href="HTML/menu.html">Menú</a><a href="HTML/pedido.html">Pedir</a><a href="HTML/ubicacion.html">Ubicación</a><a href="HTML/tarjeta.html">Tarjeta Hornilla</a>
+        </nav>
+        <nav aria-label="Información legal">
+          <a href="HTML/privacidad.html">Privacidad</a><a href="HTML/terminos.html">Términos</a><a href="HTML/cookies.html">Cookies</a><a href="HTML/devoluciones.html">Cambios y reclamos</a><button type="button" data-abrir-cookies>Configurar cookies</button>
+        </nav>
+        <nav aria-label="Redes sociales">
+          <a href="https://www.instagram.com/la_hornilla_de_zaid" target="_blank" rel="noopener">Instagram</a><a href="https://www.facebook.com/profile.php?id=100090295385638&amp;locale=es_LA" target="_blank" rel="noopener">Facebook</a><a href="https://www.tiktok.com/@lahornilladezaid" target="_blank" rel="noopener">TikTok</a>
+        </nav>
+        <p>© 2026 La Hornilla de Zaid · Sitio por Black Hole Code</p>
+      </footer>
+    </div>
+  </section>
+
+</main>
+
+<!-- Ticket fijo (interacción firma): crece con cada "Lo quiero" -->
+<aside class="ticket-fijo esta-vacio" id="ticketFijo" aria-label="Tu pedido">
+  <div class="ticket-fijo__ranura" aria-hidden="true"></div>
+  <div class="papel">
+    <button class="ticket-fijo__cabeza" type="button" id="ticketCabeza" aria-expanded="false" aria-controls="ticketCuerpo">
+      <span id="ticketResumen">Tu pedido</span><span class="precio" id="ticketSubtotal">$0.00</span>
+    </button>
+    <div class="ticket-fijo__cuerpo" id="ticketCuerpo" hidden></div>
+  </div>
+</aside>
+
+<!-- Formulario de reseña (llega como pendiente; se publica al aprobarla en el admin) -->
+<dialog class="form-resena" id="dialogoResena" aria-labelledby="tituloFormResena">
+  <form id="formResena" novalidate>
+    <h3 id="tituloFormResena">Tu reseña</h3>
+    <label>Tu nombre<input name="nombre" required minlength="2" maxlength="40" autocomplete="given-name"></label>
+    <label>Calificación
+      <select name="estrellas" required><option value="5">5 estrellas</option><option value="4">4 estrellas</option><option value="3">3 estrellas</option><option value="2">2 estrellas</option><option value="1">1 estrella</option></select>
+    </label>
+    <label>Comentario<textarea name="comentario" required minlength="10" maxlength="500"></textarea></label>
+    <p class="form-resena__estado" id="estadoResena" role="status"></p>
+    <div class="form-resena__acciones">
+      <button class="btn btn--crema btn--sm" type="button" data-cerrar>Cancelar</button>
+      <button class="btn btn--rojo btn--sm" type="submit">Enviar reseña</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Visor 3D (se carga solo al abrirlo) -->
+<dialog class="visor3d" id="visor3d" aria-labelledby="visor3dTitulo">
+  <div class="visor3d__marco">
+    <div class="visor3d__barra"><h3 id="visor3dTitulo">Vista 3D</h3><button class="visor3d__cerrar" type="button" data-cerrar aria-label="Cerrar vista 3D">×</button></div>
+    <div id="visor3dLienzo" style="width:100%;height:100%"></div>
+    <p class="visor3d__nota">Arrastra para girar. Modelo 3D aproximado, hecho con IA a partir de nuestra foto real; la porción es la que indica el menú.</p>
+  </div>
+</dialog>
+
+<noscript>
+  <p style="padding:24px;text-align:center">Para armar tu pedido aquí activa JavaScript, o escríbenos por WhatsApp al <a href="https://wa.me/50370991660">7099-1660</a>.</p>
+</noscript>
+
+<script src="portada/scrollcraft.js"></script>
+<script src="portada/inicio.js"></script>
 </body>
 </html>

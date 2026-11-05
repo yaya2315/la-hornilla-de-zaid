@@ -8,6 +8,7 @@
    • SOLO_DELIVERY: por ahora únicamente delivery.
    • El envío NO se suma: el total dice "estimado (sin envío)".
    ===================================================================== */
+import { Boton3D } from '@/components/marca/Visor3D'
 import type * as React from 'react'
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
@@ -67,9 +68,11 @@ function BotonAgregar({ onClick, children, completo = true }: { onClick: () => v
 /* ── Tarjeta de platillo ───────────────────────────────────────────── */
 function TarjetaPedido({ plato, coleccion, agregar }: { plato: Plato; coleccion: 'menu' | 'pupusas'; agregar: Agregar }) {
   const id = useId()
+  /* Sin distinguir mayúsculas: en el admin la categoría es "Sopa de tortilla" */
+  const en = (lista: string[]) => lista.some((x) => x.toLowerCase() === String(plato.categoria || '').toLowerCase())
   const tipo = plato.destacado ? 'destacado'
-    : CATEGORIAS_CARNE_GRUPO.includes(plato.categoria) ? 'carne-grupo'
-    : CATEGORIAS_CARNE_APARTE.includes(plato.categoria) ? 'carne-aparte' : 'simple'
+    : en(CATEGORIAS_CARNE_GRUPO) ? 'carne-grupo'
+    : en(CATEGORIAS_CARNE_APARTE) ? 'carne-aparte' : 'simple'
 
   const opciones = useMemo(() => {
     if (tipo === 'destacado') return [{ texto: '', precio: leerPrecio(plato.precioUnico) }]
@@ -92,7 +95,7 @@ function TarjetaPedido({ plato, coleccion, agregar }: { plato: Plato; coleccion:
   const nombreLinea = () => {
     const p = puedePina && pina ? ' con piña' : ''
     if (coleccion === 'pupusas') return `Pupusa de ${plato.nombre}`
-    if (tipo === 'carne-grupo' && CATEGORIAS_POR_ORDEN.includes(plato.categoria)) return nombreOrden(plato.nombre, carneActual, p)
+    if (tipo === 'carne-grupo' && en(CATEGORIAS_POR_ORDEN)) return nombreOrden(plato.nombre, carneActual, p)
     if (tipo === 'carne-grupo') return `${plato.nombre} de ${carneActual}${p}`
     if (tipo === 'carne-aparte') return `${plato.nombre} — ${opcion.texto} — de ${carneActual}${p}`
     if (carneActual) return `${plato.nombre} de ${carneActual}${p}`
@@ -105,6 +108,7 @@ function TarjetaPedido({ plato, coleccion, agregar }: { plato: Plato; coleccion:
       {foto && (
         <div className="relative aspect-[16/9] bg-noche-800">
           <img src={foto} alt="" width={720} height={405} loading="lazy" decoding="async" className="size-full object-cover" />
+          <Boton3D plato={plato} className="absolute right-3 bottom-5 z-[2]" />
           {plato.destacado && <span className="esquina-doblada absolute top-3 left-3 bg-rojo shadow-[3px_3px_0_var(--color-rojo-sombra)] px-3 py-1.5 font-ui text-[0.7rem] font-bold tracking-[0.2em] text-white uppercase">{plato.etiqueta || 'Destacado'}</span>}
           <span aria-hidden="true" className="absolute inset-x-0 -bottom-px h-3.5 bg-noche-600 [mask:var(--rasgado-b)_0_0/260px_100%_repeat-x] [-webkit-mask:var(--rasgado-b)_0_0/260px_100%_repeat-x]" />
         </div>
@@ -300,15 +304,18 @@ export function Pedido() {
         <DatosEntrega className="mt-6" />
       </Portadilla>
 
-      {promos.length > 0 && (
+      {/* Las promos salen junto con el menú (no antes): así nada brinca hacia abajo al cargar */}
+      {carta && promos.length > 0 && (
         <div aria-label="Promociones del día" className="mx-auto mt-[clamp(1.75rem,4vw,2.75rem)] flex max-w-(--container-sitio) flex-col gap-6 px-5">
           {promos.map((p, i) => <PromoPedido key={p.nombre + i} promo={p} agregar={carrito.agregar} />)}
         </div>
       )}
 
+      {/* Mientras carga, solo el aviso; la rejilla aparece completa de una vez (sin saltos de diseño) */}
+      {!carta && <p role="status" className="min-h-[100svh] py-14 text-center text-texto-suave">Cargando el menú…</p>}
+      {carta && (
       <div className="mx-auto grid max-w-(--container-sitio) items-start gap-[clamp(1.5rem,4vw,2.5rem)] px-5 pt-[clamp(2.5rem,6vw,4rem)] lg:grid-cols-[1fr_340px]">
         <div>
-          {!carta && <p role="status" className="py-14 text-center text-texto-suave">Cargando el menú…</p>}
           {carta && (
             <Seccion titulo="Platillos">
               <Rejilla>
@@ -376,6 +383,7 @@ export function Pedido() {
           </Ticket>
         </aside>
       </div>
+      )}
 
       {/* Barra del pedido en celular: siempre a la mano */}
       <AnimatePresence>

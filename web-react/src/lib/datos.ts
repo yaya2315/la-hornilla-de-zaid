@@ -7,8 +7,9 @@
    queda vacía). Sin where()/orderBy() en el servidor para platillos: un
    documento sin "orden" quedaría invisible; se ordena aquí.
    ===================================================================== */
-import { addDoc, collection, doc, getDoc, getDocs, query, serverTimestamp, where, type Timestamp } from 'firebase/firestore/lite'
-import { db } from './firebase'
+import { crearConHora, donde, leer, listar } from './firestore-rest'
+/* Fecha de Firestore leída por REST (misma forma que usaba el SDK) */
+type Timestamp = { toMillis: () => number; toDate: () => Date }
 import { url } from './sitio'
 
 /* ── Tipos ─────────────────────────────────────────────────────────── */
@@ -93,11 +94,11 @@ async function cargarCarta(tipo: 'principal' | 'pupusas'): Promise<Carta> {
   const respaldo = tipo === 'principal' ? RESPALDO_MENU : RESPALDO_PUPUSAS
   try {
     const [cats, platos] = await Promise.all([
-      getDocs(collection(db, 'menuCategorias')),
-      getDocs(collection(db, tipo === 'principal' ? 'menuPrincipal' : 'menuPupusas')),
+      listar('menuCategorias'),
+      listar(tipo === 'principal' ? 'menuPrincipal' : 'menuPupusas'),
     ])
-    const categorias = ordenar(cats.docs.map((d) => d.data() as { nombre: string; menu: string; orden?: number }).filter((c) => c.menu === tipo)).map((c) => c.nombre)
-    const lista = ordenar(platos.docs.map((d) => ({ id: d.id, ...(d.data() as Plato) })).filter((p) => p.activo !== false))
+    const categorias = ordenar(cats.map((d) => d.datos as { nombre: string; menu: string; orden?: number }).filter((c) => c.menu === tipo)).map((c) => c.nombre)
+    const lista = ordenar(platos.map((d) => ({ id: d.id, ...(d.datos as Plato) })).filter((p) => p.activo !== false))
     if (!categorias.length || !lista.length) return respaldo
     return { categorias, platos: lista }
   } catch (err) {
@@ -110,8 +111,7 @@ export const cargarPupusas = () => cargarCarta('pupusas')
 
 async function cargarLista<T extends { activo?: boolean; orden?: number }>(col: string, respaldo: T[]): Promise<T[]> {
   try {
-    const snap = await getDocs(collection(db, col))
-    const items = ordenar(snap.docs.map((d) => d.data() as T).filter((x) => x.activo !== false))
+    const items = ordenar((await listar(col)).map((d) => d.datos as T).filter((x) => x.activo !== false))
     return items.length ? items : respaldo
   } catch (err) {
     console.warn(`[datos] No se pudo leer ${col}, uso respaldo:`, err)
@@ -123,8 +123,7 @@ export const cargarExtras = () => cargarLista<Extra>('menuExtras', RESPALDO_EXTR
 
 export async function cargarPromos(): Promise<Promo[]> {
   try {
-    const snap = await getDocs(collection(db, 'promociones'))
-    const l = ordenar(snap.docs.map((d) => d.data() as Promo))
+    const l = ordenar((await listar('promociones')).map((d) => d.datos as Promo))
     return l.length ? l : RESPALDO_PROMOS
   } catch (err) {
     console.warn('[datos] No se pudieron leer las promociones, uso respaldo:', err)
@@ -172,6 +171,22 @@ export function fotoDe(p: Plato) {
   return f ? url('Imagenes/fotos-de-platillos/' + f) : ''
 }
 
+/* ── Modelos 3D (Imagenes/modelos-3d/lista.json, la misma lista del Inicio) ──
+   Clave del platillo -> archivo .glb. Sin entrada en la lista no hay botón 3D. */
+const SLUG_3D: Record<string, string> = {
+  tacos: 'tacos', burrito: 'burrito', burritos: 'burrito', torta: 'tortas', tortas: 'tortas', nachos: 'nachos',
+  quesadillas: 'quesadillas', 'sopa de tortilla': 'sopa', 'papa asada': 'papa',
+}
+let promesaModelos: Promise<Record<string, string>> | null = null
+export function cargarModelos3D() {
+  if (!promesaModelos) promesaModelos = fetch(url('Imagenes/modelos-3d/lista.json'), { cache: 'no-cache' })
+    .then((r) => (r.ok ? r.json() : {}))
+    .then((j: { modelos?: Record<string, string> }) => Object.fromEntries(Object.entries(j.modelos || {}).map(([k, v]) => [k, url('Imagenes/modelos-3d/' + v)])))
+    .catch(() => ({}))
+  return promesaModelos
+}
+export const slug3D = (p: Plato) => SLUG_3D[normal(p.nombre)] || SLUG_3D[normal(p.categoria)] || ''
+
 /* ── Interruptor de pupusas (config/pupusas por la API REST) ─────────── */
 const CLAVE_PUPUSAS = 'hz_pupusas'
 let promesaPupusas: Promise<boolean> | null = null
@@ -203,9 +218,8 @@ export function pupusasActivas() {
 export async function cargarResenas(): Promise<Resena[]> {
   try {
     /* El where() es obligatorio: las reglas solo dejan leer las aprobadas */
-    const snap = await getDocs(query(collection(db, 'resenas'), where('estado', '==', 'aprobada')))
-    return snap.docs
-      .map((d) => ({ id: d.id, ...(d.data() as Omit<Resena, 'id'>) }))
+    return (await donde('resenas', 'estado', 'aprobada'))
+      .map((d) => ({ id: d.id, ...(d.datos as Omit<Resena, 'id'>) }))
       .sort((a, b) => (b.creado?.toMillis?.() || 0) - (a.creado?.toMillis?.() || 0))
   } catch (err) {
     console.warn('[datos] No se pudieron leer las reseñas:', err)
@@ -214,9 +228,9 @@ export async function cargarResenas(): Promise<Resena[]> {
 }
 /** Llega como "pendiente"; se publica cuando se aprueba en el admin (Clientes). */
 export async function enviarResena(r: { nombre: string; estrellas: number; comentario: string }) {
-  await addDoc(collection(db, 'resenas'), {
+  await crearConHora('resenas', {
     nombre: r.nombre, estrellas: r.estrellas, comentario: r.comentario,
-    estado: 'pendiente', aceptoPublicar: true, creado: serverTimestamp(),
+    estado: 'pendiente', aceptoPublicar: true,
   })
 }
 
@@ -239,9 +253,9 @@ export function normalizarCodigo(texto: string) {
 
 export async function cargarReglasTarjeta(): Promise<ReglasTarjeta | null> {
   try {
-    const d = await getDoc(doc(db, 'config', 'fidelidad'))
-    if (!d.exists()) return null
-    const r = d.data()
+    const d = await leer('config', 'fidelidad')
+    if (!d) return null
+    const r = d.datos
     return {
       activo: r.activo === true,
       meta: Math.max(2, Number(r.meta) || 8),
@@ -259,9 +273,9 @@ export async function cargarReglasTarjeta(): Promise<ReglasTarjeta | null> {
 export async function cargarTarjeta(codigo: string): Promise<DatosTarjeta | null> {
   if (!CODIGO_TARJETA.test(codigo)) return null
   try {
-    const d = await getDoc(doc(db, 'tarjetas', codigo))
-    if (!d.exists()) return null
-    const t = d.data()
+    const d = await leer('tarjetas', codigo)
+    if (!d) return null
+    const t = d.datos
     return {
       codigo,
       nombre: String(t.nombre || ''),

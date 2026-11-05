@@ -41,17 +41,14 @@ export const REDES = [
   { nombre: 'TikTok', href: 'https://www.tiktok.com/@lahornilladezaid' },
 ] as const
 
-/* OJO (pendiente): el horario aún no está confirmado y había dos versiones.
-   Se dejan como estaban en cada página hasta que el dueño lo confirme. */
-export const HORARIO_MENU = [
-  'Martes a Sábado · 10:30 a.m. – 2:00 p.m. y 5:00 p.m. – 9:00 p.m.',
-  'Domingo · 5:00 p.m. – 9:00 p.m.',
+/* Horario confirmado por el negocio (nov 2026). Mismo en Menú, Ubicación e Inicio. */
+export const HORARIO = [
+  'Lunes · 6:00 a 10:30 a.m.',
+  'Martes a sábado · 10:30 a.m. a 2:00 p.m. y 5:00 a 9:30 p.m.',
+  'Domingo · 5:00 a 9:30 p.m.',
 ]
-export const HORARIO_UBICACION = [
-  'Lunes · 6:30 a.m. – 10:30 a.m.',
-  'Martes a Sábado · 6:30 a.m. – 2:00 p.m. y 5:00 p.m. – 9:00 p.m.',
-  'Domingo · 5:00 p.m. – 9:00 p.m.',
-]
+export const HORARIO_MENU = HORARIO
+export const HORARIO_UBICACION = HORARIO
 
 /** SOLO DELIVERY: mientras no abra el local nuevo. Al abrir, pásalo a false. */
 export const SOLO_DELIVERY = true

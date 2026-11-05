@@ -3,7 +3,7 @@
    ---------------------------------------------------------------------
    • Multipágina con las MISMAS rutas de siempre, para no romper enlaces,
      Google ni el canal de WhatsApp:
-       index.html · HTML/menu.html · HTML/pedido.html · HTML/ubicacion.html · HTML/tarjeta.html
+       HTML/menu.html · HTML/pedido.html · HTML/ubicacion.html · HTML/tarjeta.html
    • El build se escribe en la carpeta del sitio (una carpeta arriba):
        - reemplaza esas 5 páginas
        - deja el JS/CSS en  app/  (se borra y se vuelve a crear en cada build)
@@ -28,7 +28,7 @@ function servirSitio(): Plugin {
     '.webp': 'image/webp', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png',
     '.svg': 'image/svg+xml', '.js': 'text/javascript', '.css': 'text/css', '.html': 'text/html',
   }
-  const propias = new Set(['/index.html', '/HTML/menu.html', '/HTML/pedido.html', '/HTML/ubicacion.html', '/HTML/tarjeta.html'])
+  const propias = new Set(['/HTML/menu.html', '/HTML/pedido.html', '/HTML/ubicacion.html', '/HTML/tarjeta.html'])
   return {
     name: 'servir-sitio-hornilla',
     configureServer(server) {
@@ -57,7 +57,9 @@ export default defineConfig({
     cssCodeSplit: true,
     rollupOptions: {
       input: {
-        inicio: path.resolve(AQUI, 'index.html'),
+        /* El Inicio (index.html de la raíz) ya NO sale de aquí: es una página
+           estática con el motor scroll-craft (ver portada/). La versión React
+           de Inicio se conserva en src/ por si se quiere volver a ella. */
         menu: path.resolve(AQUI, 'HTML/menu.html'),
         pedido: path.resolve(AQUI, 'HTML/pedido.html'),
         ubicacion: path.resolve(AQUI, 'HTML/ubicacion.html'),

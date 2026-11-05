@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { ArrowRight, Check, Search, Share2, X } from 'lucide-react'
 import { Sitio } from '@/components/marca/Sitio'
 import { TarjetaPromo } from '@/components/marca/Promo'
+import { Boton3D } from '@/components/marca/Visor3D'
 import { Boton, DatosEntrega, Etiqueta, FilaPrecio, Portadilla, Recorte, TituloSeccion } from '@/components/marca/Hecho'
 import { DirectionAwareTabs } from '@/components/ui/direction-aware-tabs'
 import {
@@ -39,6 +40,7 @@ function TarjetaPlatillo({ plato, termino, indice }: { plato: Plato; termino: st
             <span className="esquina-doblada absolute top-4 -left-2 z-[2] -rotate-3 bg-rojo px-4 py-2 font-ui text-xs font-bold tracking-[0.22em] text-white uppercase shadow-[3px_3px_0_var(--color-rojo-sombra)]">
               {plato.etiqueta || 'Destacado'}
             </span>
+            <Boton3D plato={plato} className="absolute right-4 bottom-4 z-[3]" />
           </Recorte>
         )}
         <div>
@@ -52,7 +54,11 @@ function TarjetaPlatillo({ plato, termino, indice }: { plato: Plato; termino: st
   }
   return (
     <article className="grid content-start gap-4">
-      {foto && <Recorte src={foto} alt={`${plato.nombre} de La Hornilla de Zaid`} giro={indice % 2 ? 1.2 : -1.2} proporcion="aspect-[16/10]" />}
+      {foto && (
+        <Recorte src={foto} alt={`${plato.nombre} de La Hornilla de Zaid`} giro={indice % 2 ? 1.2 : -1.2} proporcion="aspect-[16/10]">
+          <Boton3D plato={plato} className="absolute right-4 bottom-4 z-[3]" />
+        </Recorte>
+      )}
       <div>
         <div className="flex items-baseline justify-between gap-3 border-b-2 border-crema/25 pb-2">
           <h3 className="font-ui text-[clamp(1.4rem,5vw,1.65rem)] font-bold tracking-[0.05em] text-crema uppercase"><Resaltar texto={plato.nombre} termino={termino} /></h3>
