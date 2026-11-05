@@ -67,9 +67,11 @@ function BotonAgregar({ onClick, children, completo = true }: { onClick: () => v
 /* ── Tarjeta de platillo ───────────────────────────────────────────── */
 function TarjetaPedido({ plato, coleccion, agregar }: { plato: Plato; coleccion: 'menu' | 'pupusas'; agregar: Agregar }) {
   const id = useId()
+  /* Sin distinguir mayúsculas: en el admin la categoría es "Sopa de tortilla" */
+  const en = (lista: string[]) => lista.some((x) => x.toLowerCase() === String(plato.categoria || '').toLowerCase())
   const tipo = plato.destacado ? 'destacado'
-    : CATEGORIAS_CARNE_GRUPO.includes(plato.categoria) ? 'carne-grupo'
-    : CATEGORIAS_CARNE_APARTE.includes(plato.categoria) ? 'carne-aparte' : 'simple'
+    : en(CATEGORIAS_CARNE_GRUPO) ? 'carne-grupo'
+    : en(CATEGORIAS_CARNE_APARTE) ? 'carne-aparte' : 'simple'
 
   const opciones = useMemo(() => {
     if (tipo === 'destacado') return [{ texto: '', precio: leerPrecio(plato.precioUnico) }]
@@ -92,7 +94,7 @@ function TarjetaPedido({ plato, coleccion, agregar }: { plato: Plato; coleccion:
   const nombreLinea = () => {
     const p = puedePina && pina ? ' con piña' : ''
     if (coleccion === 'pupusas') return `Pupusa de ${plato.nombre}`
-    if (tipo === 'carne-grupo' && CATEGORIAS_POR_ORDEN.includes(plato.categoria)) return nombreOrden(plato.nombre, carneActual, p)
+    if (tipo === 'carne-grupo' && en(CATEGORIAS_POR_ORDEN)) return nombreOrden(plato.nombre, carneActual, p)
     if (tipo === 'carne-grupo') return `${plato.nombre} de ${carneActual}${p}`
     if (tipo === 'carne-aparte') return `${plato.nombre} — ${opcion.texto} — de ${carneActual}${p}`
     if (carneActual) return `${plato.nombre} de ${carneActual}${p}`
