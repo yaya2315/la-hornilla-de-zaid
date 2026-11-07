@@ -55,6 +55,11 @@
         <div id="historialContenido"></div>
     </aside>
 
-    <script type="module" src="../JS/cocina.js"></script>
+    <!-- Primero se pide la sesión del personal; después carga la cocina -->
+    <script type="module">
+        import { esperarSesion, arrancar } from '../JS/sesion-personal.js';
+        await esperarSesion('Cocina');
+        await arrancar(['../JS/cocina.js']);
+    </script>
 </body>
 </html>

@@ -104,7 +104,11 @@
         </div>
     </div>
 
-    <script type="module" src="../JS/mesero.js"></script>
-    <script type="module" src="../JS/promos.js"></script>
+    <!-- Primero se pide la sesión del personal; después carga el POS -->
+    <script type="module">
+        import { esperarSesion, arrancar } from '../JS/sesion-personal.js';
+        await esperarSesion('Mesero');
+        await arrancar(['../JS/mesero.js', '../JS/promos.js']);
+    </script>
 </body>
 </html>

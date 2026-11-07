@@ -17,21 +17,20 @@ service cloud.firestore {
     match /menuBebidas/{doc}     { allow read: if true; allow write: if esAdmin(); }
     match /menuExtras/{doc}      { allow read: if true; allow write: if esAdmin(); }
 
-    /* Pedidos — mesero.html y cocina.html trabajan sin iniciar sesión */
+    /* Pedidos: solo con sesión del personal (mesero, cocina, historial) */
     match /pedidos/{pedidoId} {
-      allow read: if true;
-
-      allow create: if request.resource.data.keys().hasAll(['tipo','mesa','estado','items','total','creadoEn','actualizadoEn'])
+      allow read: if esAdmin();
+      allow create: if esAdmin()
+        && request.resource.data.keys().hasAll(['tipo','mesa','estado','items','total','creadoEn','actualizadoEn'])
         && request.resource.data.tipo in ['local', 'llevar', 'domicilio']
         && request.resource.data.estado == 'pendiente'
         && request.resource.data.items is list
         && request.resource.data.total is number;
-
-      allow update: if request.resource.data.estado in ['pendiente', 'preparando', 'listo', 'entregado', 'cancelado']
+      allow update: if esAdmin()
+        && request.resource.data.estado in ['pendiente', 'preparando', 'listo', 'entregado', 'cancelado']
         && request.resource.data.items is list
         && request.resource.data.total is number;
-
-      allow delete: if false;   // nadie borra pedidos — el historial nunca se pierde
+      allow delete: if false;
     }
 
     /* Reseñas: cualquiera envía (llega pendiente), el público solo ve las aprobadas */
