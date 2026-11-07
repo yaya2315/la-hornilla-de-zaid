@@ -28,9 +28,9 @@ const ERRORES = {
 };
 
 const ESTILOS = `
-.sp-wrap{position:fixed;inset:0;z-index:9000;display:grid;place-items:center;padding:24px 16px;
+.sp-wrap{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;box-sizing:border-box;padding:24px 16px;
   background:var(--char-700,#140d09);overflow-y:auto}
-.sp-card{width:100%;max-width:400px;background:var(--card,#1d140e);border:1px solid var(--line,rgba(255,255,255,.08));
+.sp-card{box-sizing:border-box;width:100%;max-width:400px;margin:auto;background:var(--card,#1d140e);border:1px solid var(--line,rgba(255,255,255,.08));
   border-radius:var(--radius-lg,22px);padding:32px 24px;box-shadow:0 24px 60px rgba(0,0,0,.45)}
 .sp-brand{text-align:center;margin-bottom:28px}
 .sp-eyebrow{display:block;font:600 .72rem/1.2 Oswald,system-ui,sans-serif;letter-spacing:2px;text-transform:uppercase;color:var(--ember,#ff6600);margin-bottom:8px}
@@ -86,6 +86,7 @@ function mostrarAcceso(titulo) {
       </form>`;
     capa.querySelector('.sp-brand p').textContent = titulo;
     document.body.appendChild(capa);
+    document.documentElement.style.overflow = 'hidden';
 
     const form = capa.querySelector('form');
     const btn = capa.querySelector('.sp-btn');
@@ -112,6 +113,7 @@ function mostrarAcceso(titulo) {
 function quitarAcceso() {
     if (!capa) return;
     capa.remove();
+    document.documentElement.style.overflow = '';
     document.getElementById('spEstilos')?.remove();
     capa = null;
 }
