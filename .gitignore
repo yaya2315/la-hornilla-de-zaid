@@ -11,3 +11,9 @@ Imagenes/audios/
 # Cerebro de Obsidian (notas privadas): no se publica en la web
 Cerebro/
 .obsidian/
+
+# Documentos internos (prompts, notas para Claude, configuración local): no se publican
+Claude outputs/
+CLAUDE.md
+PRODUCT.md
+.claude/

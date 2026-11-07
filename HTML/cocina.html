@@ -2,6 +2,9 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <!-- Anti-marco: nadie puede meter esta página dentro de otra (clickjacking) -->
+    <style id="antiMarco">html{display:none}</style>
+    <script>if (self === top) { document.getElementById('antiMarco').remove(); } else { top.location = self.location; }</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" sizes="32x32" href="../Imagenes/favicon-32.png">
     <link rel="icon" type="image/png" sizes="192x192" href="../Imagenes/icon-192.png">
