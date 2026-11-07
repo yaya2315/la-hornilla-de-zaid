@@ -2,7 +2,12 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    function esAdmin() { return request.auth != null; }
+    /* Admin = SOLO estas cuentas (UID de Firebase Auth): Leonardo y La Hornilla.
+       Para agregar a alguien: Authentication → Usuarios → copia su UID y ponlo en la lista. */
+    function esAdmin() {
+      return request.auth != null
+        && request.auth.uid in ['P548YHTdNVV1tQrZQUlzhkeZ0Uw2', 'V1iwBc8viwVXkGPZPAjeGVDh7wn1'];
+    }
 
     /* Menú y promociones: lectura pública, escritura solo admin */
     match /promociones/{doc}     { allow read: if true; allow write: if esAdmin(); }
