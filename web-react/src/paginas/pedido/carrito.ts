@@ -8,7 +8,13 @@ export type Linea = { id: number; nombre: string; precioUnitario: number; cantid
 const CLAVE = 'hornilla_carrito'
 
 function leer(): Linea[] {
-  try { const r = sessionStorage.getItem(CLAVE); return r ? (JSON.parse(r) as Linea[]) : [] } catch { return [] }
+  try {
+    const r: unknown = JSON.parse(sessionStorage.getItem(CLAVE) || '[]')
+    if (!Array.isArray(r)) return []
+    /* Solo líneas bien formadas: un dato dañado no debe romper el total */
+    return r.filter((x): x is Linea => !!x && typeof x.id === 'number' && typeof x.nombre === 'string'
+      && Number.isFinite(x.precioUnitario) && x.precioUnitario >= 0 && Number.isInteger(x.cantidad) && x.cantidad > 0)
+  } catch { return [] }
 }
 
 export function usarCarrito() {

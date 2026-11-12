@@ -26,6 +26,7 @@ export function ModalMapa({ abierto, inicial, alCerrar, alConfirmar }: { abierto
 
   useEffect(() => {
     if (!abierto) return
+    setError('')
     const previo = document.activeElement as HTMLElement | null
     const esc = (e: KeyboardEvent) => e.key === 'Escape' && cerrarRef.current()
     const inicial = inicialRef.current
@@ -64,6 +65,7 @@ export function ModalMapa({ abierto, inicial, alCerrar, alConfirmar }: { abierto
       removeEventListener('keydown', esc)
       mapa.current?.remove()
       mapa.current = null
+      marcador.current = null
       previo?.focus()
     }
   }, [abierto])

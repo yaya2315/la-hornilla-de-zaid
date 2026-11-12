@@ -221,7 +221,8 @@ export function Pedido() {
   /* Tarjeta Hornilla (opcional): código del cliente. Solo identifica la tarjeta;
      el sello y el premio los confirma el negocio por WhatsApp. */
   const [reglasTarjeta, setReglasTarjeta] = useState<ReglasTarjeta | null>(null)
-  const [codigoTarjeta, setCodigoTarjeta] = useState('')
+  /* Si ya abrió su tarjeta en este celular, el código llega escrito */
+  const [codigoTarjeta, setCodigoTarjeta] = useState(() => { try { return localStorage.getItem('hornilla_tarjeta') || '' } catch { return '' } })
   const [tarjeta, setTarjeta] = useState<DatosTarjeta | null | 'no-existe' | 'error'>(null)
   const [canjear, setCanjear] = useState(false)
   const entrega = useRef<HTMLElement>(null)
@@ -280,7 +281,12 @@ export function Pedido() {
     }
     partes.push('', `Mi nombre es ${nombre.trim()}.`)
     medir('pedido_whatsapp', { tipo_entrega: tipo, value: Number(total.toFixed(2)), currency: 'USD' })
-    window.open(`https://wa.me/${NEGOCIO.whatsapp}?text=${encodeURIComponent(partes.join('\n'))}`, '_blank', 'noopener')
+    /* Si el navegador bloquea la pestaña nueva (pasa dentro de Instagram,
+       Facebook o TikTok), se abre WhatsApp en esta misma: el pedido no se pierde. */
+    const destino = `https://wa.me/${NEGOCIO.whatsapp}?text=${encodeURIComponent(partes.join('\n'))}`
+    const ventana = window.open(destino, '_blank')
+    if (ventana) ventana.opener = null
+    else location.href = destino
   }
 
   const continuar = () => {
@@ -432,7 +438,9 @@ export function Pedido() {
                 />
                 <p id="ayudaTarjeta" role="status" className="text-sm text-texto-suave">
                   {tarjetaValida
-                    ? <>Hola <strong className="text-crema">{tarjetaValida.nombre}</strong>: llevas <strong className="text-crema">{tarjetaValida.sellos} de {reglasTarjeta.meta}</strong> sellos. El sello se suma cuando te entregamos el pedido.</>
+                    ? <>Hola <strong className="text-crema">{tarjetaValida.nombre}</strong>: llevas <strong className="text-crema">{tarjetaValida.sellos} de {reglasTarjeta.meta}</strong> sellos. {reglasTarjeta.minimo > 0 && carrito.subtotal < reglasTarjeta.minimo
+                      ? <>Este pedido suma sello desde <strong className="text-crema">{dinero(reglasTarjeta.minimo)}</strong>: te faltan <strong className="text-crema">{dinero(reglasTarjeta.minimo - carrito.subtotal)}</strong>.</>
+                      : 'El sello se suma cuando te entregamos el pedido.'}</>
                     : tarjeta === 'no-existe' ? 'No encontramos ese código. Revisa que esté bien escrito.'
                     : tarjeta === 'error' ? 'No pudimos revisar tu tarjeta ahora; igual puedes enviar tu pedido.'
                     : <>Si ya tienes tarjeta, escribe tu código. ¿Aún no la tienes? <a className="underline underline-offset-2 hover:text-amarillo" href={PAGINAS.tarjeta}>Cómo pedirla</a>.</>}

@@ -212,13 +212,13 @@ export function Menu() {
         </section>
       )}
 
-      <section id="bebidas" aria-labelledby="tituloBebidas" className="mx-auto max-w-(--container-sitio) px-5 py-[clamp(3.5rem,8vw,5.5rem)]">
+      {bebidas.length > 0 && <section id="bebidas" aria-labelledby="tituloBebidas" className="mx-auto max-w-(--container-sitio) px-5 py-[clamp(3.5rem,8vw,5.5rem)]">
         <TituloSeccion id="tituloBebidas" titulo="Bebidas" nota="Para acompañar tu pedido." />
         <div className="grid items-start gap-x-[clamp(2rem,5vw,4rem)] gap-y-8 md:grid-cols-[1.4fr_1fr]">
-          <div><h3 className="mb-1 font-ui text-base font-bold tracking-[0.15em] text-lima uppercase">Frías</h3><Lista items={frias} /></div>
+          {frias.length > 0 && <div><h3 className="mb-1 font-ui text-base font-bold tracking-[0.15em] text-lima uppercase">Frías</h3><Lista items={frias} /></div>}
           {calientes.length > 0 && <div><h3 className="mb-1 font-ui text-base font-bold tracking-[0.15em] text-lima uppercase">Calientes</h3><Lista items={calientes} /></div>}
         </div>
-      </section>
+      </section>}
     </Sitio>
   )
 }

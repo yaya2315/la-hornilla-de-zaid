@@ -37,22 +37,24 @@ export type Resena = { id: string; nombre: string; estrellas: number; comentario
 
 const ordenar = <T extends { orden?: number }>(l: T[]) => l.sort((a, b) => (a.orden ?? Infinity) - (b.orden ?? Infinity))
 
-/* ── Respaldo (igual al de la web anterior) ─────────────────────────── */
-const NORMALES = 'Pastor · Pollo pastor · Suadero · Mixta'
-const ESPECIALES = 'Cochinita pibil · Birria · Mixta'
+/* ── Respaldo ──────────────────────────────────────────────────────────
+   Solo se usa si Firebase no responde o la colección está vacía. Debe
+   coincidir con lo publicado en el admin (revisado en noviembre 2026):
+   un precio viejo aquí sería un precio falso en la página. */
+const porCarne = (normal: string, especial: string): Variante[] => [
+  ...['Pastor', 'Pollo pastor', 'Suadero', 'Mixto'].map((texto) => ({ texto, precio: normal })),
+  ...['Birria', 'Cochinita pibil', 'Mixto'].map((texto) => ({ texto, precio: especial })),
+]
 export const RESPALDO_MENU: Carta = {
-  categorias: ['Tacos', 'Burrito', 'Tortas', 'Nachos', 'Quesadillas', 'Sopa de Tortilla', 'Lo nuevo'],
+  categorias: ['Tacos', 'Burrito', 'Tortas', 'Nachos', 'Quesadillas', 'Sopa de tortilla', 'Papa asada'],
   platos: [
-    { nombre: 'Tacos', categoria: 'Tacos', nota: 'Orden de 4', variantes: [{ texto: NORMALES, precio: '$4.99' }, { texto: ESPECIALES, precio: '$5.99' }] },
-    { nombre: 'Burrito', categoria: 'Burrito', variantes: [{ texto: NORMALES, precio: '$4.99' }, { texto: ESPECIALES, precio: '$5.99' }] },
-    { nombre: 'Tortas', categoria: 'Tortas', variantes: [{ texto: NORMALES, precio: '$4.99' }, { texto: ESPECIALES, precio: '$5.99' }] },
-    { nombre: 'Nachos', categoria: 'Nachos', variantes: [{ texto: NORMALES, precio: '$4.50' }, { texto: ESPECIALES, precio: '$5.50' }] },
-    { nombre: 'Quesadillas', categoria: 'Quesadillas', nota: 'Orden de 3', variantes: [{ texto: NORMALES, precio: '$4.99' }, { texto: ESPECIALES, precio: '$5.99' }] },
-    { nombre: 'Sopa de Tortilla', categoria: 'Sopa de Tortilla', nota: 'Carne a elección', variantes: [{ texto: 'Media (16 oz)', precio: '$3.00' }, { texto: 'Entera (32 oz)', precio: '$5.00' }] },
-    {
-      nombre: 'Papa Asada', categoria: 'Lo nuevo', destacado: true, etiqueta: 'Lo nuevo', precioUnico: '$5.50', carneModo: 'eleccion',
-      descripcion: 'Base de papa asada con mezcla de queso gratinado y cheddar, crema, tu carne a elección, pico de gallo y un toque de salsa de aguacate.',
-    },
+    { nombre: 'Tacos', categoria: 'Tacos', nota: 'Orden de 4', variantes: porCarne('$4.00', '$5.00') },
+    { nombre: 'Burrito', categoria: 'Burrito', variantes: porCarne('$4.00', '$5.00') },
+    { nombre: 'Tortas', categoria: 'Tortas', variantes: porCarne('$4.00', '$5.00') },
+    { nombre: 'Nachos', categoria: 'Nachos', variantes: porCarne('$4.00', '$5.00') },
+    { nombre: 'Quesadillas', categoria: 'Quesadillas', nota: 'Orden de 3', variantes: porCarne('$4.00', '$5.00') },
+    { nombre: 'Sopa de tortilla', categoria: 'Sopa de tortilla', nota: 'Carne a elección', carneModo: 'eleccion', variantes: [{ texto: 'Media (16 oz)', precio: '$3.00' }, { texto: 'Entera (32 oz)', precio: '$5.00' }] },
+    { nombre: 'Papa asada', categoria: 'Papa asada', nota: 'Carne a elección', carneModo: 'eleccion', variantes: [{ texto: 'Carne a elección', precio: '$5.50' }] },
   ],
 }
 const RESPALDO_PUPUSAS: Carta = {
@@ -65,21 +67,8 @@ const RESPALDO_PUPUSAS: Carta = {
     { nombre: 'Pastor con queso y piña', categoria: 'Con un toque mexicano', variantes: [{ texto: '', precio: '$1.50' }] },
   ],
 }
-const RESPALDO_PROMOS: Promo[] = [
-  { nombre: 'Combo Mega Quesadilla', descripcion: '1/2 Sopa de tortilla + Mega Quesadilla + Bebida.', precio: '$5.50', activa: true, dias: [2, 3, 4, 5], pideCarne: true },
-  { nombre: 'Combo Mini Torta', descripcion: '1/2 Sopa de tortilla + Mini Torta + Bebida.', precio: '$5.50', activa: true, dias: [2, 3, 4, 5], pideCarne: true },
-]
 export const RESPALDO_BEBIDAS: Bebida[] = [
-  { nombre: 'Latas (Uva, Mirinda)', precio: '$0.90', grupo: 'fria' },
-  { nombre: 'Coca Cola lata', precio: '$1.00', grupo: 'fria' },
-  { nombre: 'Salutaris (Limón, Naranja, Toronja, Simple)', precio: '$0.90', grupo: 'fria' },
-  { nombre: 'Té Lipton (Durazno, Frambuesa, Limón)', precio: '$0.90', grupo: 'fria' },
-  { nombre: 'Botella con agua', precio: '$0.70', grupo: 'fria' },
-  { nombre: 'Café negro', precio: '$0.50', grupo: 'caliente' },
-  { nombre: 'Café con leche', precio: '$0.75', grupo: 'caliente' },
-  { nombre: 'Café con cremora', precio: '$0.75', grupo: 'caliente' },
-  { nombre: 'Chocolate', precio: '$0.50', grupo: 'caliente' },
-  { nombre: 'Chocolate con leche', precio: '$0.75', grupo: 'caliente' },
+  { nombre: 'Mini botella de Pepsi', precio: '$0.50', grupo: 'fria' },
 ]
 const RESPALDO_EXTRAS: Extra[] = [
   { nombre: 'Aguacate', precio: '$0.75' },
@@ -97,8 +86,10 @@ async function cargarCarta(tipo: 'principal' | 'pupusas'): Promise<Carta> {
       getDocs(collection(db, tipo === 'principal' ? 'menuPrincipal' : 'menuPupusas')),
     ])
     const categorias = ordenar(cats.docs.map((d) => d.data() as { nombre: string; menu: string; orden?: number }).filter((c) => c.menu === tipo)).map((c) => c.nombre)
+    /* Respaldo solo si la colección está VACÍA. Si el dueño desactivó
+       platillos, se respeta: no se "reviven" con datos viejos. */
+    if (!categorias.length || platos.empty) return respaldo
     const lista = ordenar(platos.docs.map((d) => ({ id: d.id, ...(d.data() as Plato) })).filter((p) => p.activo !== false))
-    if (!categorias.length || !lista.length) return respaldo
     return { categorias, platos: lista }
   } catch (err) {
     console.warn('[datos] No se pudo leer la carta, uso respaldo:', err)
@@ -111,8 +102,9 @@ export const cargarPupusas = () => cargarCarta('pupusas')
 async function cargarLista<T extends { activo?: boolean; orden?: number }>(col: string, respaldo: T[]): Promise<T[]> {
   try {
     const snap = await getDocs(collection(db, col))
-    const items = ordenar(snap.docs.map((d) => d.data() as T).filter((x) => x.activo !== false))
-    return items.length ? items : respaldo
+    /* Igual que la carta: lo que el dueño desactivó no vuelve a aparecer */
+    if (snap.empty) return respaldo
+    return ordenar(snap.docs.map((d) => d.data() as T).filter((x) => x.activo !== false))
   } catch (err) {
     console.warn(`[datos] No se pudo leer ${col}, uso respaldo:`, err)
     return respaldo
@@ -124,11 +116,11 @@ export const cargarExtras = () => cargarLista<Extra>('menuExtras', RESPALDO_EXTR
 export async function cargarPromos(): Promise<Promo[]> {
   try {
     const snap = await getDocs(collection(db, 'promociones'))
-    const l = ordenar(snap.docs.map((d) => d.data() as Promo))
-    return l.length ? l : RESPALDO_PROMOS
+    return ordenar(snap.docs.map((d) => d.data() as Promo))
   } catch (err) {
-    console.warn('[datos] No se pudieron leer las promociones, uso respaldo:', err)
-    return RESPALDO_PROMOS
+    /* Sin respaldo a propósito: una promo que no se pudo confirmar no se anuncia */
+    console.warn('[datos] No se pudieron leer las promociones:', err)
+    return []
   }
 }
 
