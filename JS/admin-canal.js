@@ -63,12 +63,6 @@ Hoy [día] no tendremos servicio. [motivo]
 
 Te esperamos [cuándo volvemos] 🙌
 ¡Gracias por tu comprensión!` },
-    { titulo: 'Invitar al Club', imagen: '', texto:
-`🎁 *¡Únete al Club La Hornilla!*
-
-Regístrate gratis en nuestra página y recibe [beneficio del cupón].
-
-👉 {web}#club` },
 ];
 
 const $ = id => document.getElementById(id);

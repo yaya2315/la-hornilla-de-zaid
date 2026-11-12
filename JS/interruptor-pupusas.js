@@ -15,7 +15,8 @@
        pie de página, botón de inicio, sección de pupusas en menu.html).
        Por CSS están ocultos hasta que <html> tiene la clase "pupusas-on".
      • pupusas.html: si está apagado, redirige a menu.html.
-     • Pedir en línea (pedido.js) y la pantalla de mesero (mesero.js).
+     • La pantalla de mesero (mesero.js). La web pública en React usa su
+       propia copia: web-react/src/lib/datos.ts (pupusasActivas).
 
    Se lee con la API REST de Firestore (un fetch pequeño, sin cargar el
    SDK), así sirve también en páginas que no usan Firebase.

@@ -1190,7 +1190,8 @@
 
         /* Categorías cuya carne ya se elige desde las opciones de precio
            (arriba, en "Opciones y precios") — deben coincidir con
-           CATEGORIAS_CARNE_GRUPO / CATEGORIAS_CARNE_APARTE en pedido.js.
+           CATEGORIAS_CARNE_GRUPO / CATEGORIAS_CARNE_APARTE en
+           web-react/src/paginas/pedido/carrito.ts.
            Para estas categorías el selector "Carne" del modal no aplica. */
         const CATEGORIAS_CARNE_PROPIA = ['Tacos', 'Burrito', 'Tortas', 'Nachos', 'Quesadillas', 'Sopa de Tortilla'];
         function categoriaConCarnePropia(categoria) { return CATEGORIAS_CARNE_PROPIA.includes(categoria); }

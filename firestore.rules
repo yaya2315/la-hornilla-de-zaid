@@ -49,17 +49,10 @@ service cloud.firestore {
       allow update, delete: if esAdmin();
     }
 
-    /* Club: cada número se inscribe una sola vez, solo el admin ve la lista */
+    /* Club: la web ya no inscribe a nadie. Solo el admin ve o borra lo que quedó. */
     match /club/{tel} {
-      allow create: if tel.matches('503[67][0-9]{7}')
-        && request.resource.data.telefono == tel
-        && request.resource.data.keys().hasOnly(['nombre', 'telefono', 'consentimiento', 'textoConsentimiento', 'origen', 'creado'])
-        && request.resource.data.consentimiento == true
-        && request.resource.data.nombre is string
-        && request.resource.data.nombre.size() >= 2 && request.resource.data.nombre.size() <= 40
-        && request.resource.data.origen is string && request.resource.data.origen.size() <= 40
-        && request.resource.data.creado == request.time;
       allow read, update, delete: if esAdmin();
+      allow create: if false;
     }
 
     /* Tarjeta Hornilla (sellos). El id es el código HZ-XXXXXX (sin I, L, O, 0 ni 1).
@@ -78,7 +71,7 @@ service cloud.firestore {
       allow read, write: if esAdmin();
     }
 
-    /* Configuración pública (cupón del club y reglas de la tarjeta): todos leen, solo el admin edita */
+    /* Configuración pública (interruptor de pupusas y reglas de la tarjeta): todos leen, solo el admin edita */
     match /config/{docId} {
       allow read: if true;
       allow write: if esAdmin();

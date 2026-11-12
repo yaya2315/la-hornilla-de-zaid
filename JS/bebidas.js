@@ -1,11 +1,10 @@
 /* =====================================================================
    BEBIDAS.JS — Fuente única de las bebidas del sitio
    ---------------------------------------------------------------------
-   Antes cada página (menu.html, pupusas.html, pedido.js) tenía su propia
-   lista de bebidas escrita a mano, y se desincronizaban entre sí. Ahora
-   las tres leen de aquí, y esto lee de Firebase (colección editable
-   desde el admin). Si Firebase falla, se usa el respaldo de abajo.
-   • grupo: 'fria' | 'caliente' — se usa para agrupar en menu.html.
+   La usa pupusas.html (pupusas-contenido.js). Lee de Firebase (colección
+   editable desde el admin); si Firebase falla, se usa el respaldo de abajo.
+   La web pública en React tiene su propio lector: web-react/src/lib/datos.ts.
+   • grupo: 'fria' | 'caliente' — para separar bebidas frías y calientes.
    ===================================================================== */
 
 import { db, COLECCION_BEBIDAS } from './firebase-config.js';

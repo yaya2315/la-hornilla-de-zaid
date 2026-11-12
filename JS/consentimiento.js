@@ -97,10 +97,10 @@
            para que dejen de medir de inmediato. */
     }
 
-    /* ---------- Medición de acciones (pedido, reseña, club) ----------
+    /* ---------- Medición de acciones (pedido, reseña) ----------
        Uso: window.hornillaTrack('pedido_whatsapp', { valor: 12.5 })
        No hace nada si la persona no dio permiso. */
-    const EVENTOS_META = { pedido_whatsapp: 'Contact', club_registro: 'Lead', resena_enviada: 'SubmitApplication' };
+    const EVENTOS_META = { pedido_whatsapp: 'Contact', resena_enviada: 'SubmitApplication' };
     window.hornillaTrack = function (nombre, params = {}) {
         try {
             if (gaCargado) window.gtag('event', nombre, params);
