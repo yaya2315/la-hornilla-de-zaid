@@ -78,7 +78,14 @@
         .panel-top{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;margin-bottom:8px}
         .panel-top h1{color:#fff;font-size:clamp(1.6rem,5vw,2.2rem)}
         .panel-sub{color:var(--muted);font-size:.9rem;margin-bottom:30px}
-        .panel-actions{display:flex;gap:10px;flex-wrap:wrap}
+        .panel-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+        /* Indicador de conexión con Firebase (JS/admin-conexion.js) */
+        .conexion{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border-radius:999px;
+            border:1.5px solid var(--line);background:transparent;color:var(--text);font:600 .82rem Inter,sans-serif;cursor:pointer}
+        .conexion::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--muted)}
+        .conexion.ok::before{background:var(--ok)}
+        .conexion.mal{border-color:var(--bad);color:#fff}
+        .conexion.mal::before{background:var(--bad)}
 
         .promo-list{display:flex;flex-direction:column;gap:14px}
         .promo{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
@@ -422,6 +429,8 @@
             </div>
             <div class="panel-actions">
                 <button class="btn btn-primary hidden" id="btnNueva">+ Nueva promoción</button>
+                <button type="button" class="conexion hidden" id="estadoConexion" aria-live="polite"></button>
+                <button type="button" class="btn btn-ghost hidden" id="btnActualizar">↻ Actualizar</button>
                 <button type="button" class="btn btn-ghost hidden js-instalar">📲 Instalar app</button>
                 <button class="btn btn-ghost" id="btnLogout">Cerrar sesión</button>
             </div>
@@ -1966,6 +1975,7 @@
     </div>
 
     <script type="module" src="../JS/admin-clientes.js"></script>
+    <script type="module" src="../JS/admin-conexion.js"></script>
 
     <!-- ========== INSTALAR COMO APP (solo celular) ==========
          El botón "Instalar app" aparece en el celular mientras el panel no esté

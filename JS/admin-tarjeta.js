@@ -677,6 +677,16 @@ function abrir(codigo) {
 }
 
 /* ============================ ACCIONES ============================ */
+/* Las transacciones se cuentan en window.hornillaOperaciones para que
+   JS/admin-conexion.js no corte la red (reconexión) mientras hay una en curso,
+   y ninguna empieza mientras la red se está cortando y reabriendo. */
+async function transaccion(fn) {
+    while (window.hornillaReconexion) await window.hornillaReconexion;   // si se está reconectando, espera a que la red vuelva
+    window.hornillaOperaciones = (window.hornillaOperaciones || 0) + 1;
+    try { return await runTransaction(db, fn); }
+    finally { window.hornillaOperaciones -= 1; }
+}
+
 function datosCliente(codigo) {
     const t = tarjetas.get(codigo) || {};
     const c = clientes.get(codigo) || {};
@@ -698,7 +708,7 @@ async function sellar() {
     const ref = doc(db, COLECCION_TARJETAS, codigo);
     const mov = doc(collection(ref, 'movimientos'));
     try {
-        const r = await runTransaction(db, async tx => {
+        const r = await transaccion(async tx => {
             const s = await tx.get(ref);
             if (!s.exists()) throw new Error('La tarjeta ya no existe');
             const d = s.data();
@@ -733,7 +743,7 @@ async function canjear() {
     const mov = doc(collection(ref, 'movimientos'));
     const nota = ($('tjNota')?.value || '').trim();
     try {
-        const r = await runTransaction(db, async tx => {
+        const r = await transaccion(async tx => {
             const s = await tx.get(ref);
             if (!s.exists()) throw new Error('La tarjeta ya no existe');
             const d = s.data();
@@ -761,7 +771,7 @@ async function quitarSello() {
     const ref = doc(db, COLECCION_TARJETAS, codigo);
     const mov = doc(collection(ref, 'movimientos'));
     try {
-        await runTransaction(db, async tx => {
+        await transaccion(async tx => {
             const s = await tx.get(ref);
             if (!s.exists()) throw new Error('La tarjeta ya no existe');
             const d = s.data();
