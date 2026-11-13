@@ -22,8 +22,8 @@ export const CARPETAS_CANAL = {
 
 export const IMAGENES_CANAL = [
     { carpeta: 'promociones', archivo: 'precios-charros.jpg', titulo: 'Precios Charros (29 oct – 1 nov)' },
-    { carpeta: 'promos', archivo: 'promo-mega-quesadilla.jpg', v: 2, titulo: '½ sopa + mega quesadilla + bebida a $5 (29 oct – 1 nov)' },
-    { carpeta: 'promos', archivo: 'promo-sopa-tacos-hornilla.jpg', v: 2, titulo: '½ sopa + 2 tacos + bebida a $4.50 (29 oct – 1 nov)' },
+    { carpeta: 'promos', archivo: 'promo-mega-quesadilla.jpg', v: 3, titulo: '½ sopa + mega quesadilla + bebida a $5' },
+    { carpeta: 'promos', archivo: 'promo-sopa-tacos-hornilla.jpg', v: 3, titulo: '½ sopa + 2 tacos + bebida a $4.50' },
     { carpeta: 'avisos', archivo: 'delivery-envio-mapa.jpg', titulo: 'Delivery a $1 (Sonzacate y Sonsonate centro)' },
     { carpeta: 'avisos', archivo: 'hoy-descansamos.jpg', titulo: 'Hoy no hay servicio' },
     { carpeta: 'avisos', archivo: 'resena-google.jpg', titulo: 'Déjanos tu reseña en Google' },
