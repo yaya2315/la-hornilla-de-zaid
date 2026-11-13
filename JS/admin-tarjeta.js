@@ -581,7 +581,7 @@ function renderDetalle() {
             </div>
             <div class="field">
                 <label for="tjNota">Nota o # de pedido (opcional; el cliente la ve en su tarjeta)</label>
-                <input type="text" id="tjNota" maxlength="60" placeholder="Ej. 2 tacos + horchata">
+                <textarea id="tjNota" rows="2" placeholder="Ej. 2 órdenes de tacos al pastor, 1 burrito de res y 2 horchatas"></textarea>
             </div>
         </div>
         <div class="tj-acciones">
@@ -688,7 +688,7 @@ async function sellar() {
     if (!codigo) return;
     const totalTxt = $('tjTotal').value.trim();
     const total = totalTxt === '' ? null : parseFloat(totalTxt);
-    const nota = $('tjNota').value.trim().slice(0, 60);
+    const nota = $('tjNota').value.trim();
     const min = Number(cfg.minimo) || 0;
     if (total != null && (!Number.isFinite(total) || total < 0)) { toast('El total del pedido no es válido', 'bad'); return; }
     if (min > 0) {
@@ -731,7 +731,7 @@ async function canjear() {
     if (!confirm(`¿Canjear el premio de ${c.nombre}?\n\n${premioTxt()}\n\nSe descuenta 1 premio de su tarjeta. Esto no se puede deshacer.`)) return;
     const ref = doc(db, COLECCION_TARJETAS, codigo);
     const mov = doc(collection(ref, 'movimientos'));
-    const nota = ($('tjNota')?.value || '').trim().slice(0, 60);
+    const nota = ($('tjNota')?.value || '').trim();
     try {
         const r = await runTransaction(db, async tx => {
             const s = await tx.get(ref);

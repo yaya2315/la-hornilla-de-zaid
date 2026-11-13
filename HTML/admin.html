@@ -59,9 +59,10 @@
         .login-card .brand span{color:var(--muted);font-size:.8rem;letter-spacing:2px;text-transform:uppercase}
         .field{margin-bottom:16px}
         .field label{display:block;font-size:.74rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
-        .field input{width:100%;background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:12px;
+        .field input,.field textarea{width:100%;background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:12px;
             padding:14px 16px;color:var(--cream);font-size:1rem;transition:border-color .25s var(--ease)}
-        .field input:focus{outline:none;border-color:var(--ember)}
+        .field textarea{font-family:inherit;line-height:1.4;resize:vertical;min-height:52px}
+        .field input:focus,.field textarea:focus{outline:none;border-color:var(--ember)}
         .login-card .btn{width:100%;justify-content:center;margin-top:6px}
         .form-msg{min-height:20px;margin-top:14px;font-size:.85rem;text-align:center}
         .form-msg.error{color:var(--bad)}
