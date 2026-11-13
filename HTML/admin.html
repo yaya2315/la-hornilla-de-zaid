@@ -86,6 +86,12 @@
         .conexion.ok::before{background:var(--ok)}
         .conexion.mal{border-color:var(--bad);color:#fff}
         .conexion.mal::before{background:var(--bad)}
+        /* Aviso: la cuenta con la que se entró no es administradora (JS/admin-conexion.js) */
+        .aviso-cuenta{margin:14px 0;padding:16px 18px;border:1.5px solid var(--bad);border-radius:var(--radius);
+            background:rgba(255,92,92,.12);color:#fff;font-size:.95rem;line-height:1.5}
+        .aviso-cuenta p{margin:0 0 10px}
+        .aviso-cuenta code{display:inline-block;margin:0 10px 8px 0;padding:6px 10px;border-radius:8px;
+            background:rgba(0,0,0,.35);font-size:.9rem;word-break:break-all;user-select:all}
 
         .promo-list{display:flex;flex-direction:column;gap:14px}
         .promo{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
@@ -435,6 +441,8 @@
                 <button class="btn btn-ghost" id="btnLogout">Cerrar sesión</button>
             </div>
         </div>
+
+        <div class="aviso-cuenta hidden" id="avisoCuenta" role="alert"></div>
 
         <nav class="top-tabs">
             <button class="top-tab active" data-tab="promos">Promociones</button>

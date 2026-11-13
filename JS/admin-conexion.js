@@ -12,14 +12,19 @@
      ya está saliendo. Tocarlo reintenta la conexión cuando está caída.
    • Botón "Actualizar" (solo en celular): la app no tiene la barra del
      navegador para recargar, y así se trae la versión más nueva.
+   • Aviso de cuenta sin permiso: si alguien entra con una cuenta que no
+     está en la lista de administradores de firestore.rules, Firebase
+     contesta "Missing or insufficient permissions" a todo. Aquí se dice
+     claro qué cuenta es y se muestra su UID para poder agregarla.
 
    No se reconecta con cada toque ni cada X minutos a propósito: cortar
    la red en medio de un sello o un canje haría fallar esa operación.
    ===================================================================== */
 
-import { db, COLECCION_CONFIG } from './firebase-config.js';
+import { auth, db, COLECCION_CONFIG, COLECCION_TARJETAS_CLIENTES } from './firebase-config.js';
+import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js';
 import {
-    doc, onSnapshot, enableNetwork, disableNetwork
+    doc, onSnapshot, enableNetwork, disableNetwork, getDocFromServer
 } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
 
 const chip = document.getElementById('estadoConexion');
@@ -147,3 +152,38 @@ if (btnActualizar && (esCelular || esApp)) {
     btnActualizar.classList.remove('hidden');
     btnActualizar.addEventListener('click', () => location.reload());
 }
+
+/* ===================== CUENTA SIN PERMISO =====================
+   Se intenta leer un documento que solo un administrador puede leer. Si
+   Firebase contesta "permission-denied", la cuenta no está en la lista de
+   firestore.rules. Cualquier otro fallo (sin internet…) no dice nada. */
+const aviso = document.getElementById('avisoCuenta');
+let revision = 0;
+
+async function revisarCuenta(user) {
+    const turno = ++revision;
+    if (!aviso) return;
+    aviso.classList.add('hidden');
+    aviso.textContent = '';
+    if (!user) return;
+    try {
+        await getDocFromServer(doc(db, COLECCION_TARJETAS_CLIENTES, 'prueba-de-permiso'));
+    } catch (err) {
+        if (turno !== revision || err?.code !== 'permission-denied') return;
+        const p = document.createElement('p');
+        p.textContent = `La cuenta ${user.email || 'con la que entraste'} no está en la lista de administradores, por eso no puede ver ni guardar nada (Firebase responde "Missing or insufficient permissions"). Cierra sesión y entra con la cuenta del negocio. Si esta cuenta también debe administrar, agrega este UID a firestore.rules y publica las reglas:`;
+        const uid = document.createElement('code');
+        uid.textContent = user.uid;
+        const copiar = document.createElement('button');
+        copiar.type = 'button';
+        copiar.className = 'btn-mini';
+        copiar.textContent = 'Copiar UID';
+        copiar.addEventListener('click', async () => {
+            try { await navigator.clipboard.writeText(user.uid); copiar.textContent = 'Copiado'; }
+            catch { copiar.textContent = 'Cópialo a mano'; }
+        });
+        aviso.append(p, uid, copiar);
+        aviso.classList.remove('hidden');
+    }
+}
+onAuthStateChanged(auth, revisarCuenta);
