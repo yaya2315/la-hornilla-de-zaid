@@ -12,6 +12,12 @@
     <title>Panel · La Hornilla de Zaid</title>
     <meta name="robots" content="noindex, nofollow">
     <meta name="theme-color" content="#120600">
+    <!-- App instalable (solo este panel): ver admin.webmanifest y sw-admin.js -->
+    <link rel="manifest" href="admin.webmanifest">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Hornilla Panel">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -402,6 +408,7 @@
                 <input type="password" id="pass" autocomplete="current-password" placeholder="********">
             </div>
             <button class="btn btn-primary" id="btnLogin">Entrar</button>
+            <button type="button" class="btn btn-ghost hidden js-instalar" style="margin-top:12px">📲 Instalar app</button>
             <p class="form-msg" id="loginMsg"></p>
         </div>
     </section>
@@ -415,6 +422,7 @@
             </div>
             <div class="panel-actions">
                 <button class="btn btn-primary hidden" id="btnNueva">+ Nueva promoción</button>
+                <button type="button" class="btn btn-ghost hidden js-instalar">📲 Instalar app</button>
                 <button class="btn btn-ghost" id="btnLogout">Cerrar sesión</button>
             </div>
         </div>
@@ -1958,5 +1966,42 @@
     </div>
 
     <script type="module" src="../JS/admin-clientes.js"></script>
+
+    <!-- ========== INSTALAR COMO APP (solo celular) ==========
+         El botón "Instalar app" aparece en el celular mientras el panel no esté
+         instalado. En la computadora no se muestra: ahí se entra por el enlace. -->
+    <script>
+    (function () {
+        var botones = document.querySelectorAll('.js-instalar');
+        var esIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+        var esCelular = esIOS || /Android/i.test(navigator.userAgent);
+        var instalada = function () { return matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; };
+        var aviso = null;   // el aviso de instalación que da Chrome en Android
+        var mostrar = function (si) { botones.forEach(function (b) { b.classList.toggle('hidden', !si); }); };
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw-admin.js', { scope: './admin.html' }).catch(function (err) { console.error(err); });
+        }
+        if (!esCelular || instalada()) return;
+        mostrar(true);
+
+        window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); aviso = e; });
+        window.addEventListener('appinstalled', function () { aviso = null; mostrar(false); });
+
+        botones.forEach(function (b) {
+            b.addEventListener('click', function () {
+                if (aviso) {
+                    var a = aviso; aviso = null;
+                    a.prompt();
+                    a.userChoice.then(function (r) { if (r.outcome === 'accepted') mostrar(false); else aviso = a; }).catch(function () {});
+                } else if (esIOS) {
+                    alert('Para instalarla en iPhone:\n\n1. Abre esta página en Safari.\n2. Toca el botón Compartir (el cuadro con la flecha hacia arriba).\n3. Elige "Agregar a inicio".');
+                } else {
+                    alert('Para instalarla:\n\n1. Abre esta página en Chrome.\n2. Toca el menú ⋮ (arriba a la derecha).\n3. Elige "Instalar app" o "Agregar a pantalla principal".\n\nSi ya la instalaste, búscala en tu pantalla de inicio como "Hornilla Panel".');
+                }
+            });
+        });
+    })();
+    </script>
 </body>
 </html>

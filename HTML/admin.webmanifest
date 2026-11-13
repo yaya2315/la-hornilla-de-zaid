@@ -1,0 +1,18 @@
+{
+  "id": "./admin.html",
+  "name": "Panel · La Hornilla de Zaid",
+  "short_name": "Hornilla Panel",
+  "description": "Panel privado del negocio: tarjetas, pedidos, menú y promociones.",
+  "lang": "es",
+  "start_url": "./admin.html",
+  "scope": "./admin.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#120600",
+  "theme_color": "#120600",
+  "icons": [
+    { "src": "../Imagenes/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "../Imagenes/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "../Imagenes/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
