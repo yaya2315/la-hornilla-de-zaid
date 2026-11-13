@@ -58,13 +58,20 @@ service cloud.firestore {
     /* Tarjeta Hornilla (sellos). El id es el código HZ-XXXXXX (sin I, L, O, 0 ni 1).
        • tarjetas: se puede LEER una sola tarjeta si conoces su código (no se puede
          listar ni buscar); solo guarda primer nombre + sellos. Escribe solo el admin.
-       • movimientos (historial) y tarjetasClientes (nombre completo + WhatsApp): solo admin. */
+       • movimientos (registro interno, con el total del pedido): solo admin.
+       • historial (lo que ve el cliente: tipo, fecha y nota, SIN montos): igual que la
+         tarjeta, se lee solo conociendo el código. Escribe solo el admin.
+       • tarjetasClientes (nombre completo + WhatsApp): solo admin. */
     match /tarjetas/{codigo} {
       allow get: if codigo.matches('HZ-[A-HJ-KM-NP-Z2-9]{6}') || esAdmin();
       allow list, write: if esAdmin();
 
       match /movimientos/{id} {
         allow read, write: if esAdmin();
+      }
+      match /historial/{id} {
+        allow read: if codigo.matches('HZ-[A-HJ-KM-NP-Z2-9]{6}') || esAdmin();
+        allow write: if esAdmin();
       }
     }
     match /tarjetasClientes/{tel} {

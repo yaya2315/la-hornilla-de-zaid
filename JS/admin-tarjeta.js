@@ -13,7 +13,9 @@
 
    Datos (Firestore):
    • tarjetas/{codigo}            público por id: primer nombre + conteo
-   • tarjetas/{codigo}/movimientos solo admin: historial de cada acción
+   • tarjetas/{codigo}/movimientos solo admin: registro de cada acción (con el total)
+   • tarjetas/{codigo}/historial  copia para el cliente (tipo, fecha y nota, sin
+                                  montos); la ve en su tarjeta con su código
    • tarjetasClientes/{503XXXXXXXX} solo admin: nombre completo + WhatsApp
    • config/fidelidad             reglas editables (meta, mínimo, premio, cada cuántos días recordar…)
 
@@ -578,7 +580,7 @@ function renderDetalle() {
                 <input type="number" id="tjTotal" inputmode="decimal" min="0" step="0.01" placeholder="${cfg.minimo > 0 ? dinero(cfg.minimo) : '0.00'}">
             </div>
             <div class="field">
-                <label for="tjNota">Nota o # de pedido (opcional)</label>
+                <label for="tjNota">Nota o # de pedido (opcional; el cliente la ve en su tarjeta)</label>
                 <input type="text" id="tjNota" maxlength="60" placeholder="Ej. 2 tacos + horchata">
             </div>
         </div>
@@ -612,6 +614,26 @@ function renderMovs() {
         <span class="tj-sub"> · ${fechaHora(m.creado)}</span></li>`).join('');
 }
 
+const LOTE = 400;   // Firestore admite hasta 500 escrituras por lote
+
+/* Copia pública de un movimiento: lo que el cliente ve en su tarjeta (sin el total) */
+const publico = m => ({ tipo: m.tipo, nota: m.tipo === 'ajuste' ? '' : (m.nota || ''), ...(m.tipo === 'canje' ? { premio: m.premio || '' } : {}), creado: m.creado });
+
+/* Los movimientos de antes de que existiera el historial se copian al abrir la tarjeta */
+async function sincronizarHistorial(codigo) {
+    try {
+        const ref = doc(db, COLECCION_TARJETAS, codigo);
+        const [movs, hist] = await Promise.all([getDocs(collection(ref, 'movimientos')), getDocs(collection(ref, 'historial'))]);
+        const ya = new Set(hist.docs.map(d => d.id));
+        const faltan = movs.docs.filter(d => !ya.has(d.id) && d.data().creado);
+        for (let i = 0; i < faltan.length; i += LOTE) {
+            const lote = writeBatch(db);
+            faltan.slice(i, i + LOTE).forEach(d => lote.set(doc(ref, 'historial', d.id), publico(d.data())));
+            await lote.commit();
+        }
+    } catch (err) { console.error(err); }
+}
+
 async function cargarMovs(codigo) {
     try {
         const s = await getDocs(query(collection(db, COLECCION_TARJETAS, codigo, 'movimientos'), orderBy('creado', 'desc'), limit(8)));
@@ -626,6 +648,7 @@ function abrir(codigo) {
     renderLista();
     renderDetalle();
     cargarMovs(codigo);
+    sincronizarHistorial(codigo);
     $('tjDetalle').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
@@ -661,6 +684,7 @@ async function sellar() {
             while (sellos >= cfg.meta) { sellos -= cfg.meta; premios += 1; gano = true; }
             tx.update(ref, { sellos, premios, sellosTotal: (Number(d.sellosTotal) || 0) + 1, actualizado: serverTimestamp() });
             tx.set(mov, { tipo: 'sello', total, nota, creado: serverTimestamp() });
+            tx.set(doc(ref, 'historial', mov.id), publico({ tipo: 'sello', nota, creado: serverTimestamp() }));
             return { sellos, premios, gano };
         });
         const c = datosCliente(codigo);
@@ -693,6 +717,7 @@ async function canjear() {
             if (premios < 1) throw new Error('Esta tarjeta no tiene premios disponibles');
             tx.update(ref, { premios: premios - 1, canjes: (Number(d.canjes) || 0) + 1, actualizado: serverTimestamp() });
             tx.set(mov, { tipo: 'canje', premio: cfg.premio || '', nota, creado: serverTimestamp() });
+            tx.set(doc(ref, 'historial', mov.id), publico({ tipo: 'canje', premio: cfg.premio || '', nota, creado: serverTimestamp() }));
             return { sellos: Number(d.sellos) || 0, premios: premios - 1 };
         });
         ultimoMensaje = { codigo, tel: c.telefono, texto: msgCanje(c, r) };
@@ -723,6 +748,7 @@ async function quitarSello() {
             else throw new Error('La tarjeta ya está en 0');
             tx.update(ref, { sellos, premios, sellosTotal: Math.max(0, (Number(d.sellosTotal) || 0) - 1), actualizado: serverTimestamp() });
             tx.set(mov, { tipo: 'ajuste', nota: 'Se quitó 1 sello', creado: serverTimestamp() });
+            tx.set(doc(ref, 'historial', mov.id), publico({ tipo: 'ajuste', creado: serverTimestamp() }));
         });
         ultimoMensaje = null;
         toast('Sello quitado');
@@ -739,9 +765,19 @@ async function borrarTarjeta() {
     const c = datosCliente(codigo);
     if (!confirm(`¿Borrar la tarjeta de ${c.nombre} y todos sus datos (nombre, WhatsApp, sellos e historial)?\n\nÚsalo cuando la persona pida eliminar sus datos. No se puede deshacer.`)) return;
     try {
-        const movs = await getDocs(collection(db, COLECCION_TARJETAS, codigo, 'movimientos'));
+        const [movs, hist] = await Promise.all([
+            getDocs(collection(db, COLECCION_TARJETAS, codigo, 'movimientos')),
+            getDocs(collection(db, COLECCION_TARJETAS, codigo, 'historial'))
+        ]);
+        /* El historial se borra primero y en tandas; la tarjeta y los datos del cliente, al final */
+        const viejos = [...hist.docs, ...movs.docs];
+        while (viejos.length > LOTE - 2) {
+            const tanda = writeBatch(db);
+            viejos.splice(0, LOTE).forEach(m => tanda.delete(m.ref));
+            await tanda.commit();
+        }
         const lote = writeBatch(db);
-        movs.docs.forEach(m => lote.delete(m.ref));
+        viejos.forEach(m => lote.delete(m.ref));
         lote.delete(doc(db, COLECCION_TARJETAS, codigo));
         if (c.telefono) lote.delete(doc(db, COLECCION_TARJETAS_CLIENTES, c.telefono));
         await lote.commit();

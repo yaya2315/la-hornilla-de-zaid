@@ -7,7 +7,7 @@
    queda vacía). Sin where()/orderBy() en el servidor para platillos: un
    documento sin "orden" quedaría invisible; se ordena aquí.
    ===================================================================== */
-import { addDoc, collection, doc, getDoc, getDocs, query, serverTimestamp, where, type Timestamp } from 'firebase/firestore/lite'
+import { addDoc, collection, doc, getDoc, getDocs, limit, orderBy, query, serverTimestamp, where, type Timestamp } from 'firebase/firestore/lite'
 import { db } from './firebase'
 import { url } from './sitio'
 
@@ -215,9 +215,13 @@ export async function enviarResena(r: { nombre: string; estrellas: number; comen
 /* ── Tarjeta Hornilla (tarjeta de sellos) ─────────────────────────────
    • config/fidelidad: reglas que edita el admin (pestaña Clientes → Tarjeta).
    • tarjetas/{codigo}: se lee SOLO conociendo el código; trae primer nombre
-     y conteo. Los sellos y canjes los pone únicamente el negocio (admin). */
+     y conteo. Los sellos y canjes los pone únicamente el negocio (admin).
+   • tarjetas/{codigo}/historial: lo que el negocio registra con cada pedido
+     (tipo, fecha y nota, sin montos); igual, solo se lee conociendo el código. */
 export type ReglasTarjeta = { activo: boolean; meta: number; minimo: number; premio: string; condiciones: string }
 export type DatosTarjeta = { codigo: string; nombre: string; sellos: number; premios: number; canjes: number }
+export type MovimientoTarjeta = { id: string; tipo: 'sello' | 'canje' | 'ajuste'; nota: string; premio: string; fecha: Date | null }
+export const MAX_MOVIMIENTOS = 40
 
 /** Mismo formato que las reglas de Firestore: HZ- + 6 letras/números (sin I, L, O, 0, 1) */
 export const CODIGO_TARJETA = /^HZ-[A-HJ-KM-NP-Z2-9]{6}$/
@@ -264,5 +268,26 @@ export async function cargarTarjeta(codigo: string): Promise<DatosTarjeta | null
   } catch (err) {
     if ((err as { code?: string })?.code === 'permission-denied') return null
     throw err
+  }
+}
+
+/** Historial de la tarjeta (lo más nuevo primero). null = no se pudo leer. */
+export async function cargarMovimientosTarjeta(codigo: string): Promise<MovimientoTarjeta[] | null> {
+  if (!CODIGO_TARJETA.test(codigo)) return null
+  try {
+    const s = await getDocs(query(collection(db, 'tarjetas', codigo, 'historial'), orderBy('creado', 'desc'), limit(MAX_MOVIMIENTOS)))
+    return s.docs.map((d) => {
+      const m = d.data()
+      return {
+        id: d.id,
+        tipo: m.tipo === 'canje' || m.tipo === 'ajuste' ? m.tipo : 'sello',
+        nota: String(m.nota || ''),
+        premio: String(m.premio || ''),
+        fecha: (m.creado as Timestamp | undefined)?.toDate?.() ?? null,
+      }
+    })
+  } catch (err) {
+    console.warn('[datos] No se pudo leer el historial de la tarjeta:', err)
+    return null
   }
 }

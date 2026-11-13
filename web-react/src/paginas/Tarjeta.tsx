@@ -9,13 +9,13 @@
    ===================================================================== */
 import { useEffect, useId, useState, type FormEvent, type ReactNode } from 'react'
 import { motion } from 'motion/react'
-import { ArrowRight, Check, Copy, Flame, Gift } from 'lucide-react'
+import { ArrowRight, Check, Copy, Flame, Gift, Undo2 } from 'lucide-react'
 import { Sitio } from '@/components/marca/Sitio'
 import { Boton, Hoja, Portadilla } from '@/components/marca/Hecho'
 import { IconoWhatsApp } from '@/components/marca/Iconos'
 import {
-  cargarReglasTarjeta, cargarTarjeta, CODIGO_TARJETA, normalizarCodigo,
-  type DatosTarjeta, type ReglasTarjeta,
+  cargarMovimientosTarjeta, cargarReglasTarjeta, cargarTarjeta, CODIGO_TARJETA, MAX_MOVIMIENTOS, normalizarCodigo,
+  type DatosTarjeta, type MovimientoTarjeta, type ReglasTarjeta,
 } from '@/lib/datos'
 import { dinero, NEGOCIO, PAGINAS } from '@/lib/sitio'
 import { cn } from '@/lib/utils'
@@ -102,6 +102,55 @@ function TarjetaPapel({ t, r, children }: { t: DatosTarjeta; r: ReglasTarjeta; c
   )
 }
 
+/* ── Historial: lo que el negocio ha registrado en esta tarjeta ─────── */
+const fechaMov = (f: Date | null) => f
+  ? f.toLocaleString('es-SV', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' })
+  : 'Sin fecha'
+
+function Movimientos({ lista }: { lista: MovimientoTarjeta[] }) {
+  return (
+    <Hoja as="section" aria-labelledby="tituloMovs">
+      <div className="p-[clamp(1.25rem,4vw,1.75rem)]">
+        <h2 id="tituloMovs" className="mb-1 font-ui text-[1.1rem] font-bold tracking-[0.12em] text-amarillo uppercase">Tus movimientos</h2>
+        <p className="mb-4 text-sm text-texto-suave">Lo que hemos anotado en tu tarjeta con cada pedido.</p>
+        {lista.length === 0 ? (
+          <p className="text-[0.95rem]">Todavía no hay movimientos. Tu primer sello llega con tu próximo pedido entregado.</p>
+        ) : (
+          <ol className="grid">
+            {lista.map((m) => {
+              const Icono = m.tipo === 'canje' ? Gift : m.tipo === 'ajuste' ? Undo2 : Flame
+              const titulo = m.tipo === 'canje' ? 'Premio canjeado' : m.tipo === 'ajuste' ? 'Corrección: −1 sello' : '+1 sello'
+              const detalle = [
+                m.tipo === 'canje' ? m.premio : '',
+                m.tipo === 'ajuste' ? '' : m.nota,
+              ].filter(Boolean).join(' · ')
+              return (
+                <li key={m.id} className="flex gap-3.5 border-t border-dashed border-crema/20 py-3 first:border-t-0 first:pt-0 last:pb-0">
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      'grid size-9 shrink-0 place-items-center rounded-full',
+                      m.tipo === 'sello' ? 'bg-rojo text-white' : m.tipo === 'canje' ? 'bg-amarillo text-tinta' : 'border-2 border-dashed border-crema/40 text-crema',
+                    )}
+                  >
+                    <Icono className="size-[1.1rem]" strokeWidth={2.2} />
+                  </span>
+                  <span className="min-w-0 leading-snug">
+                    <strong className="block text-crema">{titulo}</strong>
+                    {detalle && <span className="block text-[0.92rem] break-words">{detalle}</span>}
+                    <span className="block text-xs text-texto-suave">{fechaMov(m.fecha)}</span>
+                  </span>
+                </li>
+              )
+            })}
+          </ol>
+        )}
+        {lista.length >= MAX_MOVIMIENTOS && <p className="mt-3 text-xs text-texto-suave">Se muestran los {MAX_MOVIMIENTOS} más recientes.</p>}
+      </div>
+    </Hoja>
+  )
+}
+
 function Paso({ n, children }: { n: number; children: ReactNode }) {
   return (
     <li className="flex gap-3.5">
@@ -151,6 +200,7 @@ export function Tarjeta() {
   const [escrito, setEscrito] = useState('')
   const [estado, setEstado] = useState<Estado>(codigo ? 'cargando' : 'inicio')
   const [tarjeta, setTarjeta] = useState<DatosTarjeta | null>(null)
+  const [movs, setMovs] = useState<MovimientoTarjeta[] | null>(null)
   const [reglas, setReglas] = useState<ReglasTarjeta | null | undefined>(undefined)
   const [copiado, setCopiado] = useState(false)
   const [errorForm, setErrorForm] = useState('')
@@ -158,6 +208,7 @@ export function Tarjeta() {
   useEffect(() => { cargarReglasTarjeta().then(setReglas) }, [])
 
   useEffect(() => {
+    setMovs(null)
     if (!codigo) { setEstado('inicio'); setTarjeta(null); return }
     let vigente = true
     setEstado('cargando')
@@ -167,6 +218,7 @@ export function Tarjeta() {
         if (!t) { setTarjeta(null); setEstado('no-existe'); return }
         setTarjeta(t)
         setEstado('lista')
+        cargarMovimientosTarjeta(codigo).then((m) => { if (vigente) setMovs(m) })
         try { localStorage.setItem(CLAVE, codigo) } catch { /* sin almacenamiento */ }
       })
       .catch(() => { if (vigente) setEstado('error') })
@@ -248,6 +300,8 @@ export function Tarjeta() {
                 </div>
               </Hoja>
             )}
+
+            {movs && <Movimientos lista={movs} />}
 
             <div className="flex flex-wrap justify-center gap-3">
               <Boton asChild variant="crema"><a href={PAGINAS.pedido}>Pedir con mi código <ArrowRight aria-hidden="true" className="size-4" /></a></Boton>
