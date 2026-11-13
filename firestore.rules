@@ -6,7 +6,7 @@ service cloud.firestore {
        Para agregar a alguien: Authentication → Usuarios → copia su UID y ponlo en la lista. */
     function esAdmin() {
       return request.auth != null
-        && request.auth.uid in ['P548YHTdNVV1tQrZQUlzhkeZ0Uw2', 'V1iwBc8viwVXkGPZPAjeGVDh7wn1'];
+        && request.auth.uid in ['P548YHTdNVV1tQrZQUlzhkeZ0Uw2', 'JoYOroZZPPV7pXcktADl2Zaa4oC2'];
     }
 
     /* Menú y promociones: lectura pública, escritura solo admin */
