@@ -620,6 +620,29 @@ const LOTE = 400;   // Firestore admite hasta 500 escrituras por lote
 const publico = m => ({ tipo: m.tipo, nota: m.tipo === 'ajuste' ? '' : (m.nota || ''), ...(m.tipo === 'canje' ? { premio: m.premio || '' } : {}), creado: m.creado });
 
 /* Los movimientos de antes de que existiera el historial se copian al abrir la tarjeta */
+const sincronizadas = new Set();   // tarjetas ya revisadas en esta sesión del admin
+let sincronizando = false;
+
+/* Al abrir el admin se revisan TODAS las tarjetas, una por una, para que cada
+   cliente vea su historial completo sin tener que abrir su tarjeta aquí. */
+async function sincronizarTodo() {
+    if (sincronizando) return;
+    sincronizando = true;
+    const fallaron = [];
+    try {
+        let pendientes;
+        while ((pendientes = [...tarjetas.keys()].filter(c => !sincronizadas.has(c))).length) {
+            for (const codigo of pendientes) {
+                sincronizadas.add(codigo);
+                if (!await sincronizarHistorial(codigo)) fallaron.push(codigo);
+            }
+        }
+    } finally {
+        fallaron.forEach(c => sincronizadas.delete(c));   // se reintenta con el próximo cambio o al abrir la tarjeta
+        sincronizando = false;
+    }
+}
+
 async function sincronizarHistorial(codigo) {
     try {
         const ref = doc(db, COLECCION_TARJETAS, codigo);
@@ -631,7 +654,8 @@ async function sincronizarHistorial(codigo) {
             faltan.slice(i, i + LOTE).forEach(d => lote.set(doc(ref, 'historial', d.id), publico(d.data())));
             await lote.commit();
         }
-    } catch (err) { console.error(err); }
+        return true;
+    } catch (err) { console.error(err); return false; }
 }
 
 async function cargarMovs(codigo) {
@@ -877,6 +901,7 @@ export function iniciarTarjeta() {
         renderLista();
         renderDetalle();
         renderRecordatorios();
+        sincronizarTodo();
     }, err => {
         $('loadingTarjetas').textContent = 'No se pudieron cargar las tarjetas. Revisa las reglas de Firestore.';
         console.error(err);
