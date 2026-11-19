@@ -37,7 +37,7 @@ export const NEGOCIO = {
 export const REDES = [
   { nombre: 'WhatsApp', href: `https://wa.me/${NEGOCIO.whatsapp}` },
   { nombre: 'Instagram', href: 'https://www.instagram.com/la_hornilla_de_zaid' },
-  { nombre: 'Facebook', href: 'https://www.facebook.com/profile.php?id=100090295385638&locale=es_LA' },
+  { nombre: 'Facebook', href: 'https://www.facebook.com/share/1CyvfWoxyv/' },
   { nombre: 'TikTok', href: 'https://www.tiktok.com/@lahornilladezaid' },
 ] as const
 
