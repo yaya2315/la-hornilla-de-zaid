@@ -26,6 +26,7 @@ export const IMAGENES_CANAL = [
     { carpeta: 'promos', archivo: 'promo-sopa-tacos-hornilla.jpg', v: 3, titulo: '½ sopa + 2 tacos + bebida a $4.50' },
     { carpeta: 'promos', archivo: 'promo-sopa-nachos-hornilla.jpg', v: 2, titulo: '½ sopa + ½ nachos + bebida a $4.50' },
     { carpeta: 'promos', archivo: 'promo-papa-asada-hornilla.jpg', titulo: 'Papa asada con carne a elección a $5.50' },
+    { carpeta: 'avisos', archivo: 'horarios-hornilla.jpg', titulo: 'Horarios de atención' },
     { carpeta: 'avisos', archivo: 'delivery-envio-mapa.jpg', titulo: 'Delivery a $1 (Sonzacate y Sonsonate centro)' },
     { carpeta: 'avisos', archivo: 'hoy-descansamos.jpg', titulo: 'Hoy no hay servicio' },
     { carpeta: 'avisos', archivo: 'resena-google.jpg', titulo: 'Déjanos tu reseña en Google' },
