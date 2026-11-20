@@ -6,13 +6,14 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { ArrowRight, Check, Search, Share2, X } from 'lucide-react'
 import { Sitio } from '@/components/marca/Sitio'
 import { TarjetaPromo } from '@/components/marca/Promo'
+import { CarruselMenu } from '@/components/marca/CarruselMenu'
 import { Boton, DatosEntrega, Etiqueta, FilaPrecio, Portadilla, Recorte, TituloSeccion } from '@/components/marca/Hecho'
 import { DirectionAwareTabs } from '@/components/ui/direction-aware-tabs'
 import {
-  cargarBebidas, cargarExtras, cargarMenu, cargarPromos, cargarPupusas, fotoDe, pupusasActivas, seMuestraHoy,
+  cargarBebidas, cargarExtras, cargarMenu, cargarPromos, cargarPupusas, fotoDe, pupusasActivas, RESPALDO_MENU, seMuestraHoy,
   type Bebida, type Carta, type Extra, type Plato, type Promo,
 } from '@/lib/datos'
-import { HORARIO_MENU, NEGOCIO, PAGINAS, url } from '@/lib/sitio'
+import { HORARIO_MENU, NEGOCIO, PAGINAS } from '@/lib/sitio'
 
 /* Resalta lo que coincide con la búsqueda */
 function Resaltar({ texto, termino }: { texto: string; termino: string }) {
@@ -166,11 +167,7 @@ export function Menu() {
       <Portadilla
         lema="La Hornilla de Zaid"
         titulo={<>El menú <span className="text-amarillo [text-shadow:4px_4px_0_var(--color-rojo-sombra)]">completo</span></>}
-        aside={
-          <Recorte src={url('Imagenes/fotos-de-platillos/tacos/tacos-01-mesa-tarjeta.webp')} alt="Orden de 4 tacos de La Hornilla de Zaid" giro={2} cargar="eager" className="mx-auto w-full max-w-[480px]">
-            <span className="absolute -top-8 right-2 z-[2] -rotate-3 font-sans text-base font-semibold text-lima italic">orden de 4</span>
-          </Recorte>
-        }
+        aside={<CarruselMenu platos={(carta ?? RESPALDO_MENU).platos.filter((p) => !p.destacado)} />}
         banda={HORARIO_MENU.map((l) => <span key={l}>{l}</span>)}
       >
         <p className="mt-4 max-w-[42ch] text-[1.02rem] text-texto-suave">Tacos, burritos, tortas, nachos y más. En cada platillo eliges tu carne.</p>
