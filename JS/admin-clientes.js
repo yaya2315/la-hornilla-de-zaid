@@ -14,7 +14,7 @@ import { iniciarCanal } from './admin-canal.js';
 import { iniciarTarjeta } from './admin-tarjeta.js';
 
 const $ = id => document.getElementById(id);
-function esc(s = '') { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+function esc(s = '') { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 function toast(texto, tipo = 'ok') {
     const t = $('toast');
     t.textContent = texto;
@@ -44,7 +44,9 @@ function renderResenas() {
 
     const items = resenas.filter(r => r.estado === filtro);
     $('vacioResenas').classList.toggle('hidden', items.length > 0);
-    $('listaResenas').innerHTML = items.map(r => `
+    /* El id de la reseña lo pone quien la envía: SIEMPRE escapado (si no, alguien podría
+       meter HTML en el panel con un id inventado). Las reglas también lo limitan. */
+    $('listaResenas').innerHTML = items.map(r => { const id = esc(r.id); return `
         <article class="resena-adm">
             <div>
                 <h3>${esc(r.nombre)} <span class="fecha">${fecha(r.creado)}</span></h3>
@@ -53,12 +55,12 @@ function renderResenas() {
                 ${r.respuesta ? `<div class="resp"><b>Tu respuesta:</b> ${esc(r.respuesta)}</div>` : ''}
             </div>
             <div class="acciones-col">
-                ${r.estado !== 'aprobada' ? `<button class="btn-mini ok" data-accion="aprobar" data-id="${r.id}">Publicar</button>` : ''}
-                ${r.estado !== 'rechazada' ? `<button class="btn-mini bad" data-accion="rechazar" data-id="${r.id}">${r.estado === 'aprobada' ? 'Ocultar' : 'Rechazar'}</button>` : ''}
-                <button class="btn-mini" data-accion="responder" data-id="${r.id}">${r.respuesta ? 'Editar respuesta' : 'Responder'}</button>
-                <button class="btn-mini bad" data-accion="borrar" data-id="${r.id}">Borrar</button>
+                ${r.estado !== 'aprobada' ? `<button class="btn-mini ok" data-accion="aprobar" data-id="${id}">Publicar</button>` : ''}
+                ${r.estado !== 'rechazada' ? `<button class="btn-mini bad" data-accion="rechazar" data-id="${id}">${r.estado === 'aprobada' ? 'Ocultar' : 'Rechazar'}</button>` : ''}
+                <button class="btn-mini" data-accion="responder" data-id="${id}">${r.respuesta ? 'Editar respuesta' : 'Responder'}</button>
+                <button class="btn-mini bad" data-accion="borrar" data-id="${id}">Borrar</button>
             </div>
-        </article>`).join('');
+        </article>`; }).join('');
 }
 
 async function accionResena(accion, id) {

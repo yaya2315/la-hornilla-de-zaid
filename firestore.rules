@@ -25,18 +25,24 @@ service cloud.firestore {
         && request.resource.data.tipo in ['local', 'llevar', 'domicilio']
         && request.resource.data.estado == 'pendiente'
         && request.resource.data.items is list
-        && request.resource.data.total is number;
+        && request.resource.data.items.size() <= 100
+        && request.resource.data.total is number
+        && request.resource.data.total >= 0;
       allow update: if esAdmin()
         && request.resource.data.estado in ['pendiente', 'preparando', 'listo', 'entregado', 'cancelado']
         && request.resource.data.items is list
-        && request.resource.data.total is number;
+        && request.resource.data.items.size() <= 100
+        && request.resource.data.total is number
+        && request.resource.data.total >= 0;
       allow delete: if false;
     }
 
-    /* Reseñas: cualquiera envía (llega pendiente), el público solo ve las aprobadas */
+    /* Reseñas: cualquiera envía (llega pendiente), el público solo ve las aprobadas.
+       El id debe ser automático de Firestore (20 letras/números): así nadie mete HTML en el id. */
     match /resenas/{id} {
       allow read: if resource.data.estado == 'aprobada' || esAdmin();
-      allow create: if request.resource.data.keys().hasOnly(['nombre', 'estrellas', 'comentario', 'estado', 'aceptoPublicar', 'creado'])
+      allow create: if id.matches('^[A-Za-z0-9]{20}$')
+        && request.resource.data.keys().hasOnly(['nombre', 'estrellas', 'comentario', 'estado', 'aceptoPublicar', 'creado'])
         && request.resource.data.estado == 'pendiente'
         && request.resource.data.aceptoPublicar == true
         && request.resource.data.nombre is string
