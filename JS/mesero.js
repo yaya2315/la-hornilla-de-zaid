@@ -36,10 +36,22 @@ try { enableIndexedDbPersistence(db); } catch { /* ya activa en otra pestaña, o
 
 const MESAS = [1, 2, 3, 4, 5, 6];
 const TIPOS_PEDIDO = [
-    { id: 'local',     icono: '🍽️', label: 'Comer aquí' },
-    { id: 'llevar',    icono: '🥡', label: 'Para llevar' },
-    { id: 'domicilio', icono: '🛵', label: 'Domicilio' }
+    { id: 'local',     icono: 'cubiertos', label: 'Comer aquí' },
+    { id: 'llevar',    icono: 'bolsa',     label: 'Para llevar' },
+    { id: 'domicilio', icono: 'moto',      label: 'Domicilio' }
 ];
+
+/* Íconos dibujados (trazo de 2 px, mismo estilo en toda la pantalla) en vez de emojis */
+const TRAZOS = {
+    cubiertos: '<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/>',
+    bolsa: '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>',
+    moto: '<circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/>',
+    pin: '<path d="M20 10c0 4.99-5.54 10.19-7.4 11.8a1 1 0 0 1-1.2 0C9.54 20.19 4 14.99 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/>',
+    cerrar: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+};
+function icono(nombre) {
+    return `<svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${TRAZOS[nombre] || ''}</svg>`;
+}
 
 /* ===== ESTADO EN MEMORIA ============================================ */
 const menu = { categorias: [], principal: [], pupusas: [], bebidas: [], extras: [] };
@@ -314,7 +326,7 @@ function renderTipoPedido() {
     if (!wrap) return;
     wrap.innerHTML = TIPOS_PEDIDO.map(t => `
         <button type="button" class="tipo-pill ${tipoActual === t.id ? 'is-active' : ''}" data-tipo="${t.id}" role="tab" aria-selected="${tipoActual === t.id}">
-            <span aria-hidden="true">${t.icono}</span> ${t.label}
+            ${icono(t.icono)}<span>${t.label}</span>
         </button>`).join('');
     wrap.querySelectorAll('.tipo-pill').forEach(btn => {
         btn.addEventListener('click', () => cambiarTipoPedido(btn.dataset.tipo));
@@ -399,7 +411,7 @@ function renderOrigen() {
             </label>
             <div class="ubicacion-bloque">
                 <div class="ubicacion-row">
-                    <button type="button" id="btnMarcarMapa" class="btn-ubicacion-mapa">📍 Marcar en el mapa</button>
+                    <button type="button" id="btnMarcarMapa" class="btn-ubicacion-mapa">${icono('pin')}Marcar en el mapa</button>
                     <span id="ubicacionEstado" class="ubicacion-estado"></span>
                 </div>
                 <label class="ficha-lbl">Enlace de ubicación (opcional)
@@ -491,7 +503,7 @@ function renderEstadoUbicacion() {
     const el = document.getElementById('ubicacionEstado');
     if (!el) return;
     if (ubicacionLat != null && ubicacionLng != null) {
-        el.innerHTML = `<span class="ubicacion-chip">📍 Pin marcado <button type="button" id="btnQuitarPin" aria-label="Quitar pin">✕</button></span>`;
+        el.innerHTML = `<span class="ubicacion-chip">${icono('pin')}Pin marcado <button type="button" id="btnQuitarPin" aria-label="Quitar pin">${icono('cerrar')}</button></span>`;
         document.getElementById('btnQuitarPin')?.addEventListener('click', () => {
             ubicacionLat = null; ubicacionLng = null;
             renderEstadoUbicacion();
@@ -582,7 +594,7 @@ function renderCarrito() {
                         <button type="button" class="stepper-btn" data-i="${i}" data-accion="mas" aria-label="Agregar uno">+</button>
                     </div>
                     <span class="carrito-item-precio">${money(it.precio * it.cantidad)}</span>
-                    <button type="button" class="carrito-item-quitar" data-i="${i}" aria-label="Quitar ítem">✕</button>
+                    <button type="button" class="carrito-item-quitar" data-i="${i}" aria-label="Quitar ítem">${icono('cerrar')}</button>
                 </div>
             </div>`).join('');
     }
@@ -786,13 +798,13 @@ document.getElementById('btnCapturaDomicilio')?.addEventListener('click', async 
         toast('No se pudo cargar el generador de capturas', 'error');
         return;
     }
-    const textoOriginal = btn.textContent;
+    const textoOriginal = btn.innerHTML; // guarda también el ícono
     btn.disabled = true;
     btn.textContent = 'Generando…';
     try {
         const canvas = await html2canvas(area, { backgroundColor: '#1d0c03', scale: 2 });
         canvas.toBlob(async blob => {
-            if (!blob) { btn.disabled = false; btn.textContent = textoOriginal; return; }
+            if (!blob) { btn.disabled = false; btn.innerHTML = textoOriginal; return; }
             const nombreArchivo = `domicilio-${clienteActual.trim().replace(/\s+/g, '-') || 'pedido'}.png`;
             const archivo = new File([blob], nombreArchivo, { type: 'image/png' });
             try {
@@ -812,14 +824,14 @@ document.getElementById('btnCapturaDomicilio')?.addEventListener('click', async 
                 if (err?.name !== 'AbortError') console.warn('[mesero] No se pudo compartir la captura:', err);
             } finally {
                 btn.disabled = false;
-                btn.textContent = textoOriginal;
+                btn.innerHTML = textoOriginal;
             }
         }, 'image/png');
     } catch (err) {
         console.error('[mesero] Error al generar la captura:', err);
         toast('No se pudo generar la captura', 'error');
         btn.disabled = false;
-        btn.textContent = textoOriginal;
+        btn.innerHTML = textoOriginal;
     }
 });
 

@@ -47,7 +47,7 @@ body.kds-body, .kds-body { font-family: 'Poppins', system-ui, sans-serif; }
     width: 8px; height: 8px;
     border-radius: 50%;
     background: var(--ember);
-    box-shadow: 0 0 10px 1px var(--glow);
+    box-shadow: none;
     margin-right: 10px;
 }
 
@@ -58,12 +58,12 @@ body.kds-body, .kds-body { font-family: 'Poppins', system-ui, sans-serif; }
 
 /* ===== MESAS ========================================================= */
 .mesas-wrap {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 10px;
-    overflow-x: auto;
-    scrollbar-width: none;
-    padding-bottom: 2px;
+    max-width: 560px;
 }
+@media (min-width: 520px) { .mesas-wrap { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
 .mesas-wrap::-webkit-scrollbar { display: none; }
 .mesa-btn {
     flex: 0 0 auto;
@@ -71,7 +71,7 @@ body.kds-body, .kds-body { font-family: 'Poppins', system-ui, sans-serif; }
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 64px; height: 56px;
+    min-height: 60px;
     border-radius: var(--radius);
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid var(--line);
@@ -85,7 +85,7 @@ body.kds-body, .kds-body { font-family: 'Poppins', system-ui, sans-serif; }
 .mesa-btn.is-active {
     background: linear-gradient(135deg, var(--relleno-1), var(--relleno-2));
     border-color: transparent;
-    box-shadow: 0 8px 22px var(--glow);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
 }
 .mesa-btn.is-active .mesa-lbl { color: rgba(255, 255, 255, 0.85); }
 
@@ -98,35 +98,40 @@ body.kds-body, .kds-body { font-family: 'Poppins', system-ui, sans-serif; }
 
 /* ===== TIPO DE PEDIDO (Comer aquí / Para llevar / Domicilio) ========= */
 .tipo-pedido-wrap {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 8px;
     margin-top: 14px;
-    flex-wrap: wrap;
+    max-width: 560px;
 }
 .tipo-pill {
-    display: inline-flex;
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
+    gap: 4px;
+    min-height: 56px;
+    text-align: center;
     font-family: 'Oswald', sans-serif;
     font-weight: 600;
     font-size: 0.8rem;
     letter-spacing: 0.5px;
     text-transform: uppercase;
     color: var(--text);
-    padding: 10px 18px;
-    border-radius: 30px;
+    padding: 8px 6px;
+    border-radius: 14px;
     border: 1px solid var(--line);
     background: rgba(255, 255, 255, 0.03);
     cursor: pointer;
-    transition: color 0.25s var(--ease), background 0.25s var(--ease), border-color 0.25s var(--ease), transform 0.25s var(--ease);
+    transition: color 0.25s var(--ease), background 0.25s var(--ease), border-color 0.25s var(--ease);
 }
+.tipo-pill .ico { width: 22px; height: 22px; }
 .tipo-pill:hover { border-color: var(--ember); color: var(--cream); }
 .tipo-pill.is-active {
     color: #fff;
     background: linear-gradient(135deg, var(--relleno-1), var(--relleno-2));
     border-color: transparent;
-    box-shadow: 0 8px 22px var(--glow);
-    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
 }
 
 /* ===== FORMULARIO DE CLIENTE (para llevar / domicilio) =============== */
@@ -238,19 +243,17 @@ body.kds-body, .kds-body { font-family: 'Poppins', system-ui, sans-serif; }
     border: 1px solid rgba(255, 102, 0, 0.35);
     box-shadow: 0 10px 26px rgba(0, 0, 0, 0.4);
 }
-.mesero-promos .combo-badge { font-size: 0.64rem; padding: 5px 12px; margin-bottom: 10px; }
-.mesero-promos .combo-vigencia { font-size: 0.74rem; color: var(--muted); margin-bottom: 6px; }
+.mesero-promos .combo-badge { display: none; } /* el nombre ya dice "Combo" */
+.mesero-promos .combo-vigencia { font-size: 0.74rem; color: var(--muted); margin: 6px 0 0; }
 .mesero-promos .combo-grid { grid-template-columns: 1fr auto; gap: 12px; }
 .mesero-promos .combo-name { font-size: 1.2rem; letter-spacing: 0.5px; }
 .mesero-promos .combo-desc { font-size: 0.82rem; margin-top: 4px; max-width: 32ch; }
-.mesero-promos .combo-price { font-size: 1.5rem; }
-.mesero-promos .combo-price small { font-size: 0.62rem; margin-bottom: 2px; }
-@media (max-width: 520px) {
-    .mesero-promos .combo-grid { grid-template-columns: 1fr; text-align: left; }
-}
+.mesero-promos .combo-price { font-size: 1.35rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.mesero-promos .combo-price small { display: none; }
+
 /* Carne + botón para meter el combo a la orden */
 .combo-acciones { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px; margin-top: 14px; }
-.combo-carne-lbl { display: grid; gap: 6px; flex: 1 1 160px; font-size: 0.7rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+.combo-carne-lbl { display: grid; gap: 6px; flex: 1 1 130px; font-size: 0.7rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
 .combo-carne {
     min-height: 44px;
     background: rgba(255, 255, 255, 0.05);
@@ -265,7 +268,7 @@ body.kds-body, .kds-body { font-family: 'Poppins', system-ui, sans-serif; }
 }
 .combo-carne option { background: #1a0a02; color: var(--cream); }
 .combo-carne:focus-visible { outline: 2px solid var(--ember); outline-offset: 2px; }
-.combo-agregar { flex: 1 1 180px; min-height: 44px; }
+.combo-agregar { flex: 1 1 150px; min-height: 44px; }
 
 /* ===== BUSCADOR + PILLS DE GRUPO ====================================== */
 .menu-toolbar { display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px; }
@@ -307,7 +310,7 @@ body.kds-body, .kds-body { font-family: 'Poppins', system-ui, sans-serif; }
     color: #fff;
     background: linear-gradient(135deg, var(--relleno-1), var(--relleno-2));
     border-color: transparent;
-    box-shadow: 0 6px 18px var(--glow);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .menu-estado, .menu-vacio {
@@ -320,10 +323,12 @@ body.kds-body, .kds-body { font-family: 'Poppins', system-ui, sans-serif; }
 /* ===== GRID DE FICHAS ================================================= */
 .menu-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
     gap: 14px;
 }
 .ficha {
+    min-width: 0;
+    container-type: inline-size;
     background: var(--card);
     border: 1px solid var(--line);
     border-radius: var(--radius);
@@ -337,12 +342,25 @@ body.kds-body, .kds-body { font-family: 'Poppins', system-ui, sans-serif; }
     background: none;
     border: none;
     color: inherit;
-    padding: 16px 18px;
+    padding: 16px 48px 16px 18px;
     cursor: pointer;
     display: grid;
     gap: 4px;
+    position: relative;
 }
-.ficha-grupo { font-size: 0.66rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ember-soft); }
+/* Flecha que indica "toca para abrir" */
+.ficha-head::after {
+    content: "";
+    position: absolute;
+    top: 22px; right: 20px;
+    width: 9px; height: 9px;
+    border-right: 2px solid var(--muted);
+    border-bottom: 2px solid var(--muted);
+    transform: rotate(45deg);
+    transition: transform 0.2s var(--ease);
+}
+.ficha.is-abierta .ficha-head::after { transform: translateY(4px) rotate(-135deg); border-color: var(--ember); }
+.ficha-grupo { display: none; } /* la pestaÃ±a de arriba ya dice el grupo */
 .ficha-nombre { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 1.05rem; color: var(--cream); line-height: 1.2; }
 .ficha-nota { font-size: 0.75rem; color: var(--muted); }
 .ficha-desc { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
@@ -351,6 +369,7 @@ body.kds-body, .kds-body { font-family: 'Poppins', system-ui, sans-serif; }
 .ficha-panel {
     padding: 0 18px 18px;
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: 14px;
     animation: fichaAbrir 0.3s var(--ease);
 }
@@ -360,19 +379,23 @@ body.kds-body, .kds-body { font-family: 'Poppins', system-ui, sans-serif; }
 .opcion-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 8px 10px;
+    gap: 12px;
+    min-width: 0;
+    min-height: 48px;
+    padding: 10px 14px;
     border-radius: 10px;
     border: 1px solid var(--line);
     background: rgba(255, 255, 255, 0.03);
     cursor: pointer;
-    font-size: 0.86rem;
+    font-size: 0.95rem;
 }
+.opcion-item input[type="radio"] { width: 20px; height: 20px; margin: 0; flex: 0 0 auto; accent-color: var(--ember); }
 .opcion-item:has(input:checked) { border-color: var(--ember); background: rgba(255, 102, 0, 0.08); }
-.opcion-texto { flex: 1; color: var(--text); }
-.opcion-precio { color: var(--ember); font-weight: 600; }
+.opcion-texto { flex: 1; min-width: 0; color: var(--text); overflow-wrap: anywhere; }
+.opcion-precio { flex: 0 0 auto; white-space: nowrap; color: var(--ember); font-weight: 600; font-variant-numeric: tabular-nums; }
 
-.ficha-fila { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: end; }
+.ficha-fila { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: end; }
+@container (max-width: 300px) { .ficha-fila { grid-template-columns: minmax(0, 1fr); } }
 /* Selector de carne (papa asada y platillos con carne a elección) */
 select.ficha-carne { min-height: 44px; font-size: 0.9rem; letter-spacing: 0; text-transform: none; }
 select.ficha-carne option { background: #1a0a02; color: var(--cream); }
@@ -385,18 +408,22 @@ select.ficha-carne option { background: #1a0a02; color: var(--cream); }
     color: var(--cream);
     font-family: 'Poppins', sans-serif;
     font-size: 0.85rem;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 44px;
 }
 .ficha-notas:focus { outline: none; border-color: var(--ember); }
 
 .stepper { display: flex; align-items: center; gap: 8px; }
 .stepper-btn {
-    width: 32px; height: 32px;
+    width: 44px; height: 44px;
     display: grid; place-items: center;
-    border-radius: 8px;
+    border-radius: 10px;
     border: 1px solid var(--line);
     background: rgba(255, 255, 255, 0.05);
     color: var(--cream);
-    font-size: 1.1rem;
+    font-size: 1.25rem;
     cursor: pointer;
 }
 .stepper-btn:hover { border-color: var(--ember); color: var(--ember); }
@@ -409,7 +436,7 @@ select.ficha-carne option { background: #1a0a02; color: var(--cream); }
     font-family: 'Oswald', sans-serif;
     font-weight: 600;
 }
-.stepper--sm .stepper-btn { width: 26px; height: 26px; font-size: 0.95rem; }
+.stepper--sm .stepper-btn { width: 36px; height: 36px; font-size: 1.05rem; }
 .stepper-valor-txt { width: 22px; text-align: center; font-family: 'Oswald', sans-serif; font-weight: 600; color: var(--cream); }
 
 .btn-agregar-comanda {
@@ -428,10 +455,10 @@ select.ficha-carne option { background: #1a0a02; color: var(--cream); }
     border: none;
     border-radius: 30px;
     cursor: pointer;
-    box-shadow: 0 8px 22px var(--glow);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
     transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
 }
-.btn-agregar-comanda:hover { transform: translateY(-2px); box-shadow: 0 12px 30px var(--glow); }
+.btn-agregar-comanda:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(0, 0, 0, 0.4); }
 
 /* ===== COMANDA (carrito) ============================================== */
 .comanda-panel {
@@ -466,13 +493,15 @@ select.ficha-carne option { background: #1a0a02; color: var(--cream); }
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--line);
 }
-.carrito-item-info { display: grid; gap: 2px; min-width: 0; }
+.carrito-item { flex-wrap: wrap; } /* en celular angosto: nombre arriba, controles abajo a la derecha */
+.carrito-item-info { display: grid; gap: 2px; min-width: 0; flex: 1 1 150px; }
+.carrito-item-controles { margin-left: auto; }
 .carrito-item-nombre { font-size: 0.86rem; color: var(--cream); font-weight: 600; }
 .carrito-item-notas { font-size: 0.74rem; color: var(--muted); font-style: italic; }
 .carrito-item-controles { display: flex; align-items: center; gap: 10px; flex: 0 0 auto; }
 .carrito-item-precio { font-family: 'Oswald', sans-serif; font-weight: 600; color: var(--ember); font-size: 0.85rem; min-width: 52px; text-align: right; }
 .carrito-item-quitar {
-    width: 26px; height: 26px;
+    width: 36px; height: 36px;
     display: grid; place-items: center;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.06);
@@ -499,7 +528,7 @@ select.ficha-carne option { background: #1a0a02; color: var(--cream); }
     border: none;
     border-radius: 30px;
     cursor: pointer;
-    box-shadow: 0 10px 26px var(--glow);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
     transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), opacity 0.25s var(--ease);
 }
 .btn-enviar-pedido:hover:not(:disabled) { transform: translateY(-2px); }
@@ -647,7 +676,7 @@ select.ficha-carne option { background: #1a0a02; color: var(--cream); }
     height: 52px;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--relleno-1), var(--relleno-2));
-    box-shadow: 0 10px 26px var(--glow);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
     font-size: 1.4rem;
     margin-bottom: 12px;
 }
@@ -748,3 +777,11 @@ select.ficha-carne option { background: #1a0a02; color: var(--cream); }
     .ficha-panel { animation: none; }
     .domicilio-modal-card { transition: none; }
 }
+
+/* ===== DETALLES DEL NAVEGADOR (selecciÃ³n, cursor, foco, barras) ======= */
+.ico { width: 1.15em; height: 1.15em; flex: 0 0 auto; }
+.kds-body ::selection { background: rgba(255, 102, 0, 0.4); color: #fff; }
+.kds-body input, .kds-body textarea { caret-color: var(--ember); }
+.kds-body :is(button, a, input, select, [tabindex]):focus-visible { outline: 2px solid var(--cream); outline-offset: 2px; }
+.carrito-lista { scrollbar-width: thin; scrollbar-color: rgba(255, 102, 0, 0.45) transparent; }
+.ficha-precio, .carrito-item-precio, .comanda-total-val { font-variant-numeric: tabular-nums; }
