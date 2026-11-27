@@ -152,8 +152,8 @@ function cargarImagen(src) {
 const dinero = n => (Math.round(n * 100) / 100).toFixed(2);
 
 /**
- * pedido = { numero, tipo ('Mesa 3' / 'Para llevar' / 'Domicilio'), atendio, fecha (Date),
- *            items: [{ nombre, cant, precio }], ofertas: [texto], total? }
+ * pedido = { numero, tipo ('Mesa 3' / 'Para llevar · Ana' / 'Domicilio · Ana'), fecha (Date),
+ *            items: [{ nombre, cant, precio }], total? }
  * base = ruta a la raíz del sitio (p. ej. '../')
  * Devuelve { canvas, zonasFoto }
  */
@@ -167,8 +167,7 @@ export async function dibujarTicket(pedido, base = '../') {
     const cv = document.createElement('canvas');
     /* alto de sobra según lo que trae el pedido (luego se recorta a lo dibujado) */
     const largoItems = (pedido.items || []).reduce((s, it) => s + 40 + String(it.nombre || '').length * 3, 0);
-    const largoOfertas = (pedido.ofertas || []).reduce((s, o) => s + 30 + String(o).length * 3, 0);
-    cv.width = ANCHO; cv.height = 1500 + largoItems + largoOfertas;
+    cv.width = ANCHO; cv.height = 1000 + largoItems;
     const ctx = cv.getContext('2d');
     ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, ANCHO, cv.height);
     ctx.fillStyle = '#000'; ctx.strokeStyle = '#000';
@@ -183,7 +182,7 @@ export async function dibujarTicket(pedido, base = '../') {
     };
 
     /* Logo: letras blancas del PNG → negro; el horno queda en grises (luego se trama) */
-    const lw = 300, lh = Math.round(lw * logo.height / logo.width);
+    const lw = 230, lh = Math.round(lw * logo.height / logo.width);
     const tmp = document.createElement('canvas'); tmp.width = lw; tmp.height = lh;
     const tc = tmp.getContext('2d'); tc.drawImage(logo, 0, 0, lw, lh);
     const px = tc.getImageData(0, 0, lw, lh);
@@ -196,69 +195,67 @@ export async function dibujarTicket(pedido, base = '../') {
     const lx = Math.round((ANCHO - lw) / 2);
     ctx.drawImage(tmp, lx, y);
     zonasFoto.push({ x: lx, y, w: lw, h: lh });
-    y += lh + 10;
+    y += lh + 4;
 
-    texto('La Hornilla de Zaid', ANCHO / 2, y += 24, `700 26px ${F}`, 'center');
-    texto('Comida mexicana · Sonsonate', ANCHO / 2, y += 26, `600 19px ${F}`, 'center');
-    texto('Pedidos y WhatsApp: 7099-1660', ANCHO / 2, y += 24, `600 18px ${F}`, 'center');
-    y += 14; raya(y, false); y += 8;
+    /* Versión compacta (ahorra papel): el nombre ya va en el logo; sin promos ni enlaces largos */
+    texto('Sonsonate · Pedidos 7099-1660', ANCHO / 2, y += 22, `600 18px ${F}`, 'center');
+    y += 10; raya(y, false); y += 4;
 
+    const recortar = (t, max, fuente) => {
+        ctx.font = fuente; let s = String(t);
+        if (ctx.measureText(s).width <= max) return s;
+        while (s.length > 1 && ctx.measureText(s + '…').width > max) s = s.slice(0, -1);
+        return s + '…';
+    };
     const f = pedido.fecha instanceof Date ? pedido.fecha : new Date();
     const dd = `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`;
     const hh = `${String(f.getHours()).padStart(2, '0')}:${String(f.getMinutes()).padStart(2, '0')}`;
-    if (pedido.numero) texto(`Pedido #${pedido.numero}`, M, y += 24, `700 20px ${F}`);
-    else y += 24;
-    if (pedido.tipo) texto(pedido.tipo, ANCHO - M, y, `700 20px ${F}`, 'right');
-    if (pedido.atendio) texto(`Le atendió: ${pedido.atendio}`, M, y += 24, `600 18px ${F}`);
-    texto(`Fecha: ${dd}`, M, y += 24, `600 18px ${F}`);
-    texto(`Hora: ${hh}`, ANCHO - M, y, `600 18px ${F}`, 'right');
-    y += 14;
+    const izq = pedido.numero ? `Pedido #${pedido.numero}` : '';
+    texto(izq, M, y += 22, `700 19px ${F}`);
+    ctx.font = `700 19px ${F}`;
+    const anchoIzq = izq ? ctx.measureText(izq).width + 14 : 0;
+    if (pedido.tipo) texto(recortar(pedido.tipo, ANCHO - 2 * M - anchoIzq, `700 19px ${F}`), ANCHO - M, y, `700 19px ${F}`, 'right');
+    texto(`${dd} · ${hh}`, M, y += 21, `600 17px ${F}`);
+    y += 6;
 
     const xC = 226, xP = 290, xI = ANCHO - M;
-    texto('Artículo', M, y += 22, `700 17px ${F}`); texto('Cant', xC, y, `700 17px ${F}`, 'right');
-    texto('Precio', xP, y, `700 17px ${F}`, 'right'); texto('Importe', xI, y, `700 17px ${F}`, 'right');
-    y += 8; raya(y); y += 4;
+    texto('Artículo', M, y += 20, `700 16px ${F}`); texto('Cant', xC, y, `700 16px ${F}`, 'right');
+    texto('Precio', xP, y, `700 16px ${F}`, 'right'); texto('Importe', xI, y, `700 16px ${F}`, 'right');
+    y += 6; raya(y); y += 2;
     let total = 0;
     for (const it of pedido.items || []) {
         const cant = Math.max(1, Number(it.cant) || 1), precio = Math.max(0, Number(it.precio) || 0), imp = cant * precio;
         total += imp;
         partir(it.nombre, xC - 40 - M, `600 18px ${F}`).forEach((l, k) => {
-            texto(l, M, y += 23, `600 18px ${F}`);
+            texto(l, M, y += 22, `600 18px ${F}`);
             if (k === 0) {
                 texto(String(cant), xC, y, `600 18px ${F}`, 'right');
                 texto(dinero(precio), xP, y, `600 18px ${F}`, 'right');
                 texto(dinero(imp), xI, y, `600 18px ${F}`, 'right');
             }
         });
-        y += 4;
+        y += 2;
     }
     if (typeof pedido.total === 'number') total = pedido.total;
-    y += 6; raya(y); y += 8;
-    texto('TOTAL USD', M, y += 32, `700 28px ${F}`);
-    texto(`$${dinero(total)}`, xI, y, `700 32px ${F}`, 'right');
-    y += 12; raya(y, false); y += 6;
+    y += 6; raya(y);
+    texto('TOTAL USD', M, y += 32, `700 26px ${F}`);
+    texto(`$${dinero(total)}`, xI, y, `700 30px ${F}`, 'right');
+    y += 10; raya(y, false); y += 8;
 
-    texto('¡Gracias por tu visita!', ANCHO / 2, y += 34, `700 24px ${F}`, 'center');
-    texto('Hecho al momento, a la hornilla.', ANCHO / 2, y += 24, `600 18px ${F}`, 'center');
-    if (pedido.ofertas?.length) {
-        y += 10;
-        texto('PROMOS DE LA SEMANA', ANCHO / 2, y += 26, `700 18px ${F}`, 'center');
-        for (const o of pedido.ofertas) for (const l of partir(o, ANCHO - 2 * M, `600 17px ${F}`)) texto(l, ANCHO / 2, y += 22, `600 17px ${F}`, 'center');
-    }
-    y += 14;
+    /* QR a la izquierda y el agradecimiento a la derecha, en el mismo espacio */
+    const q = 104, xTexto = M + q + 14, anchoTexto = ANCHO - xTexto - M;
+    const yBloque = y;
     if (qr) {
-        const q = 128;
         ctx.imageSmoothingEnabled = false;
-        ctx.drawImage(qr, Math.round((ANCHO - q) / 2), y += 6, q, q);
-        y += q;
-        texto('Escanea: menú, pedidos y redes', ANCHO / 2, y += 24, `700 17px ${F}`, 'center');
+        ctx.drawImage(qr, M, y, q, q);
     }
-    texto('yaya2315.github.io/la-hornilla-de-zaid', ANCHO / 2, y += 22, `600 16px ${F}`, 'center');
-    texto('IG @la_hornilla_de_zaid · TikTok @lahornilladezaid', ANCHO / 2, y += 21, `600 15px ${F}`, 'center');
-    texto('Facebook: La Hornilla de Zaid', ANCHO / 2, y += 20, `600 15px ${F}`, 'center');
-    y += 12; raya(y);
-    texto('Comprobante de pedido · No es factura', ANCHO / 2, y += 24, `600 15px ${F}`, 'center');
-    y += 24;
+    let yt = y;
+    texto('¡Gracias por', xTexto, yt += 24, `700 22px ${F}`);
+    texto('tu visita!', xTexto, yt += 25, `700 22px ${F}`);
+    for (const l of ['Escanea el código para', 'ver el menú, pedir', 'y seguirnos en redes.']) texto(recortar(l, anchoTexto, `600 16px ${F}`), xTexto, yt += 19, `600 16px ${F}`);
+    y = Math.max(yBloque + (qr ? q : 0), yt) + 8;
+    texto('Comprobante de pedido · No es factura', ANCHO / 2, y += 18, `600 14px ${F}`, 'center');
+    y += 12;
 
     /* recorta el lienzo a lo dibujado */
     const final = document.createElement('canvas');

@@ -27,6 +27,7 @@ import {
     moneyParse, money, crearPedido, actualizarItemsPedido, buscarPedidoActivoPorMesa
 } from './pedidos.js';
 import { pupusasActivas } from './interruptor-pupusas.js';
+import { hayBluetooth, conectar, conectada, dibujarTicket, imprimirCanvas } from './impresora.js';
 
 /* Offline: si hay más de una pestaña abierta del sistema, Firestore
    solo puede activar la persistencia en una — el resto sigue
@@ -571,6 +572,8 @@ function renderCarrito() {
         btnEnviar.disabled = !origenListo() || !itemsCarrito.length;
         btnEnviar.textContent = pedidoIdActual ? 'Guardar cambios' : 'Enviar pedido a cocina';
     }
+    const btnTicket = document.getElementById('btnImprimirTicket');
+    if (btnTicket && !imprimiendo) btnTicket.disabled = !itemsCarrito.length;
 
     lista.querySelectorAll('.stepper-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -618,6 +621,67 @@ async function enviarPedido() {
         toast('No se pudo guardar. Revisa tu conexión — se reintentará solo.', 'error');
     } finally {
         renderCarrito();
+    }
+}
+
+/* ===== TICKET IMPRESO (impresora Bluetooth X6h) ======================
+   Un solo botón: si la impresora no está conectada, Chrome muestra la
+   lista y se toca "X6h"; después imprime el ticket con lo que hay en la
+   orden. Mientras la página siga abierta ya no vuelve a preguntar. */
+let imprimiendo = false;
+
+function estadoImpresora(texto, error = false) {
+    const el = document.getElementById('estadoImpresora');
+    if (!el) return;
+    el.textContent = texto;
+    el.classList.toggle('is-error', error);
+}
+
+function tipoParaTicket() {
+    if (tipoActual === 'local') return mesaActual != null ? `Mesa ${mesaActual}` : 'Comer aquí';
+    const nombre = clienteActual.trim();
+    return (tipoActual === 'llevar' ? 'Para llevar' : 'Domicilio') + (nombre ? ` · ${nombre}` : '');
+}
+
+async function imprimirTicket() {
+    if (imprimiendo || !itemsCarrito.length) return;
+    if (!hayBluetooth()) {
+        estadoImpresora('Para imprimir abre esta página en Google Chrome en un celular Android.', true);
+        return;
+    }
+    const btn = document.getElementById('btnImprimirTicket');
+    imprimiendo = true;
+    btn.disabled = true;
+    try {
+        if (!conectada()) {
+            btn.textContent = 'Elige la impresora…';
+            estadoImpresora('En la lista, toca la que dice X6h.');
+            await conectar();
+        }
+        btn.textContent = 'Imprimiendo…';
+        estadoImpresora('Imprimiendo ticket…');
+        const { canvas, zonasFoto } = await dibujarTicket({
+            numero: pedidoIdActual ? String(pedidoIdActual).slice(-4).toUpperCase() : '',
+            tipo: tipoParaTicket(),
+            fecha: new Date(),
+            /* Las notas ("sin cebolla") van a cocina, no al ticket del cliente: así se ahorra papel. */
+            items: itemsCarrito.map(it => ({ nombre: it.platillo, cant: it.cantidad, precio: it.precio })),
+        }, '../');
+        await imprimirCanvas(canvas, zonasFoto, {
+            progreso: p => { btn.textContent = `Imprimiendo… ${Math.round(p * 100)}%`; }
+        });
+        estadoImpresora('Ticket impreso.');
+    } catch (err) {
+        if (err?.name === 'NotFoundError') {
+            estadoImpresora('No se eligió la impresora. Toca "Imprimir ticket" otra vez.', true);
+        } else {
+            console.error('[mesero] Error al imprimir:', err);
+            estadoImpresora('No se pudo imprimir. Revisa que la impresora esté encendida y vuelve a tocar el botón.', true);
+        }
+    } finally {
+        imprimiendo = false;
+        btn.textContent = 'Imprimir ticket';
+        btn.disabled = !itemsCarrito.length;
     }
 }
 
@@ -810,6 +874,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.getElementById('btnEnviarPedido')?.addEventListener('click', enviarPedido);
+    document.getElementById('btnImprimirTicket')?.addEventListener('click', imprimirTicket);
     document.getElementById('btnNuevaMesa')?.addEventListener('click', () => {
         if (itemsCarrito.length && !confirm('Se perderán los ítems no enviados. ¿Continuar?')) return;
         mesaActual = null; pedidoIdActual = null; estadoPedidoActual = null; itemsCarrito = [];

@@ -56,6 +56,14 @@
         .btn-ghost:hover{border-color:var(--ember);color:var(--ember)}
         .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
 
+        /* Acceso directo a la pantalla del mesero (tomar pedido e imprimir ticket) */
+        .acceso-mesero{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+            margin:0 0 24px;padding:18px 20px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.03)}
+        .acceso-mesero h2{margin:0 0 4px;font-family:'Oswald',sans-serif;font-size:1.15rem;color:var(--text)}
+        .acceso-mesero p{margin:0;color:var(--muted);font-size:.9rem;max-width:46ch}
+        .acceso-mesero .btn{min-height:48px;text-decoration:none}
+        .btn:focus-visible{outline:2px solid #fff;outline-offset:3px}
+
         /* ===== LOGIN ===== */
         .login-wrap{min-height:100vh;display:grid;place-items:center;padding:24px}
         .login-card{width:min(400px,100%);background:var(--card);border:1px solid var(--line);
@@ -443,6 +451,14 @@
         </div>
 
         <div class="aviso-cuenta hidden" id="avisoCuenta" role="alert"></div>
+
+        <section class="acceso-mesero" aria-labelledby="accesoMeseroTitulo">
+            <div>
+                <h2 id="accesoMeseroTitulo">Tomar un pedido</h2>
+                <p>Abre la pantalla del mesero para armar el pedido, mandarlo a cocina e imprimir el ticket.</p>
+            </div>
+            <a class="btn btn-primary" href="mesero.html">Ir a mesero</a>
+        </section>
 
         <nav class="top-tabs">
             <button class="top-tab active" data-tab="promos">Promociones</button>

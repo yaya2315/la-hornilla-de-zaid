@@ -494,6 +494,29 @@
 }
 .btn-nueva-mesa:hover { border-color: var(--ember); color: var(--ember); }
 
+/* Botón de ticket impreso (impresora Bluetooth X6h) */
+.btn-imprimir-ticket {
+    width: 100%;
+    min-height: 52px;
+    background: var(--cream);
+    color: #1d0c03;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: transform 0.25s var(--ease), opacity 0.25s var(--ease);
+}
+.btn-imprimir-ticket:hover:not(:disabled) { transform: translateY(-2px); }
+.btn-imprimir-ticket:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-imprimir-ticket:focus-visible, .btn-enviar-pedido:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.impresora-estado { margin: -4px 0 0; min-height: 1.2em; text-align: center; font-size: 0.8rem; color: var(--muted); }
+.impresora-estado.is-error { color: #ff8a7a; }
+@media (prefers-reduced-motion: reduce) { .btn-imprimir-ticket { transition: none; } .btn-imprimir-ticket:hover:not(:disabled) { transform: none; } }
+
 /* ===== TOASTS ========================================================= */
 .kds-toasts {
     position: fixed;
