@@ -373,6 +373,9 @@ body.kds-body, .kds-body { font-family: 'Poppins', system-ui, sans-serif; }
 .opcion-precio { color: var(--ember); font-weight: 600; }
 
 .ficha-fila { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: end; }
+/* Selector de carne (papa asada y platillos con carne a elección) */
+select.ficha-carne { min-height: 44px; font-size: 0.9rem; letter-spacing: 0; text-transform: none; }
+select.ficha-carne option { background: #1a0a02; color: var(--cream); }
 .ficha-lbl { font-size: 0.68rem; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); display: grid; gap: 6px; }
 .ficha-notas {
     background: rgba(255, 255, 255, 0.05);

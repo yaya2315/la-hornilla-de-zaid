@@ -103,8 +103,24 @@ function normalizarPlato(p, grupo) {
     if (!opciones.length) return null;
     return {
         id: p.id, grupo, nombre: p.nombre, categoria: p.categoria || '',
-        nota: p.nota || '', descripcion: '', opciones
+        nota: p.nota || '', descripcion: '', opciones,
+        /* Carne a elección (papa asada y lo que el admin marque así): se elige al agregar */
+        pideCarne: grupo === 'Menú mexicano' && (p.carneModo === 'eleccion' || /papa\s+asada/i.test(p.nombre || ''))
     };
+}
+
+/* Carnes para los platillos con "carne a elección" (las mismas que "Pedir en línea":
+   web-react/src/paginas/pedido/carrito.ts → CARNES). Los combos usan otra lista (promos.js). */
+const CARNES_PLATO = ['Pastor', 'Pollo pastor', 'Suadero', 'Cochinita pibil', 'Birria'];
+
+function renderSelectorCarne(f) {
+    if (!f.pideCarne) return '';
+    return `
+        <label class="ficha-lbl ficha-lbl--carne">Carne
+            <select class="ficha-notas ficha-carne">
+                ${CARNES_PLATO.map(c => `<option>${esc(c)}</option>`).join('')}
+            </select>
+        </label>`;
 }
 
 function reconstruirFichas() {
@@ -226,6 +242,7 @@ function renderMenu() {
             </button>
             <div class="ficha-panel" ${abierta ? '' : 'hidden'}>
                 ${renderFichaOpciones(f)}
+                ${renderSelectorCarne(f)}
                 <div class="ficha-fila">
                     <label class="ficha-lbl">Cantidad
                         <div class="stepper">
@@ -271,10 +288,15 @@ function renderMenu() {
             const idxOpcion = parseInt(radioSel.value, 10) || 0;
             const label = f.opciones[idxOpcion]?.label;
             const cantidad = Math.max(1, parseInt(card.querySelector('.stepper-valor').value, 10) || 1);
-            const notas = card.querySelector('.ficha-notas').value.trim();
+            const notas = card.querySelector('input.ficha-notas').value.trim();
+            const selCarne = card.querySelector('.ficha-carne');
+            const carne = f.pideCarne && selCarne && CARNES_PLATO.includes(selCarne.value) ? selCarne.value : '';
+            /* "Carne a elección" no se repite en el nombre si ya va la carne elegida */
+            const etiqueta = label && !(carne && /carne a elecci/i.test(label)) ? label : '';
+            const partes = [f.nombre, etiqueta, carne ? `de ${carne}` : ''].filter(Boolean);
 
             itemsCarrito.push({
-                platillo: label ? `${f.nombre} — ${label}` : f.nombre,
+                platillo: partes.join(' — '),
                 cantidad, notas, precio
             });
 
