@@ -21,22 +21,24 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Poppins:wght@600&family=Smokum&family=Rye&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Poppins:wght@400;500;600&family=Smokum&family=Rye&display=swap" rel="stylesheet">
 
     <style>
         :root{
             --ember:#ff6600; --ember-deep:#d44e00; --ember-soft:#ff8533;
+            /* relleno de botones con letra blanca: naranja más oscuro para que se lea (contraste AA) */
+            --relleno-1:#c44a00; --relleno-2:#9e3a00;
             --glow:rgba(255,102,0,.35); --line:rgba(255,102,0,.18);
             --char-900:#0a0300; --char-800:#120600; --char-700:#1a0a02;
             --card:rgba(40,18,5,.95); --card-soft:rgba(122,63,29,.4);
-            --cream:#f3e9dd; --text:#e3d6c8; --muted:#9d8b7c;
+            --cream:#f3e9dd; --text:#e3d6c8; --muted:#b3a191;
             --ok:#3ddc84; --bad:#ff5c5c;
             --radius:16px; --radius-lg:22px;
             --ease:cubic-bezier(.22,1,.36,1); --maxw:920px;
         }
         *{margin:0;padding:0;box-sizing:border-box}
         body{
-            font-family:'Inter',system-ui,sans-serif;
+            font-family:'Poppins',system-ui,sans-serif;
             background:
                 radial-gradient(80% 60% at 50% 0%, rgba(255,102,0,.10), transparent 60%),
                 var(--char-700);
@@ -50,7 +52,7 @@
         .btn{display:inline-flex;align-items:center;gap:8px;font-family:'Oswald',sans-serif;font-weight:700;
             text-transform:uppercase;letter-spacing:1.5px;font-size:.85rem;padding:13px 24px;border-radius:12px;
             transition:transform .25s var(--ease),box-shadow .25s var(--ease),background .25s var(--ease),color .25s var(--ease)}
-        .btn-primary{background:linear-gradient(135deg,var(--ember-soft),var(--ember-deep));color:#fff;box-shadow:0 10px 30px var(--glow)}
+        .btn-primary{background:linear-gradient(135deg,var(--relleno-1),var(--relleno-2));color:#fff;box-shadow:0 10px 30px var(--glow)}
         .btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 40px var(--glow)}
         .btn-ghost{border:1.5px solid var(--line);color:var(--text);background:transparent}
         .btn-ghost:hover{border-color:var(--ember);color:var(--ember)}
@@ -89,7 +91,7 @@
         .panel-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
         /* Indicador de conexión con Firebase (JS/admin-conexion.js) */
         .conexion{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border-radius:999px;
-            border:1.5px solid var(--line);background:transparent;color:var(--text);font:600 .82rem Inter,sans-serif;cursor:pointer}
+            border:1.5px solid var(--line);background:transparent;color:var(--text);font:600 .82rem Poppins,sans-serif;cursor:pointer}
         .conexion::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--muted)}
         .conexion.ok::before{background:var(--ok)}
         .conexion.mal{border-color:var(--bad);color:#fff}
@@ -112,7 +114,7 @@
         .switch input{position:absolute;opacity:0;width:100%;height:100%;cursor:pointer;margin:0;z-index:2}
         .switch .track{position:absolute;inset:0;background:rgba(255,255,255,.12);border-radius:30px;transition:background .25s var(--ease)}
         .switch .thumb{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .25s var(--ease)}
-        .switch input:checked ~ .track{background:linear-gradient(135deg,var(--ember-soft),var(--ember-deep))}
+        .switch input:checked ~ .track{background:linear-gradient(135deg,var(--relleno-1),var(--relleno-2))}
         .switch input:checked ~ .thumb{transform:translateX(22px)}
         .switch input:focus-visible ~ .track{outline:2px solid var(--ember-soft);outline-offset:2px}
 
@@ -154,7 +156,7 @@
             border:1px solid var(--line);color:var(--text);font-size:.82rem;font-weight:600;
             letter-spacing:.5px;transition:background .2s var(--ease),color .2s var(--ease),border-color .2s var(--ease)}
         .dia-chip:hover{border-color:var(--ember)}
-        .dia-chip.on{background:linear-gradient(135deg,var(--ember-soft),var(--ember-deep));color:#fff;border-color:transparent}
+        .dia-chip.on{background:linear-gradient(135deg,var(--relleno-1),var(--relleno-2));color:#fff;border-color:transparent}
         .dias-atajos{display:flex;gap:14px;margin-top:10px}
         .dias-atajos button{background:none;color:var(--muted);font-size:.74rem;letter-spacing:.5px;
             text-decoration:underline;text-underline-offset:3px}
@@ -184,7 +186,7 @@
             letter-spacing:.5px;padding:9px 16px;border-radius:30px;border:1px solid var(--line);
             transition:background .2s var(--ease),border-color .2s var(--ease),color .2s var(--ease)}
         .cat-tab:hover{border-color:var(--ember)}
-        .cat-tab.active{background:linear-gradient(135deg,var(--ember-soft),var(--ember-deep));color:#fff;border-color:transparent}
+        .cat-tab.active{background:linear-gradient(135deg,var(--relleno-1),var(--relleno-2));color:#fff;border-color:transparent}
         .cat-tab .count{opacity:.7;margin-left:4px}
         .cat-tab-add{background:none;color:var(--ember);border:1px dashed var(--line);font-size:.78rem;
             font-weight:600;padding:9px 16px;border-radius:30px}
@@ -252,7 +254,7 @@
         .resena-adm{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;
             display:grid;grid-template-columns:1fr auto;gap:14px;align-items:start}
         .resena-adm h3{color:var(--cream);font-size:1.05rem;letter-spacing:.5px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
-        .resena-adm .fecha{color:var(--muted);font-size:.74rem;font-family:'Inter',sans-serif;font-weight:400;letter-spacing:0;text-transform:none}
+        .resena-adm .fecha{color:var(--muted);font-size:.74rem;font-family:'Poppins',sans-serif;font-weight:400;letter-spacing:0;text-transform:none}
         .resena-adm .stars{color:#ffc23a;letter-spacing:2px;margin:4px 0 6px}
         .resena-adm .stars i{color:rgba(255,255,255,.18);font-style:normal}
         .resena-adm p{color:var(--text);font-size:.9rem;line-height:1.55;overflow-wrap:anywhere}
@@ -268,7 +270,7 @@
         .club-config .field-row{display:flex;gap:12px;flex-wrap:wrap}
         .club-config .field-row .field{flex:1;min-width:200px}
         .contador-chip{display:inline-block;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:20px;
-            padding:2px 10px;font-size:.74rem;color:var(--muted);margin-left:8px;font-family:'Inter',sans-serif;letter-spacing:0}
+            padding:2px 10px;font-size:.74rem;color:var(--muted);margin-left:8px;font-family:'Poppins',sans-serif;letter-spacing:0}
         @media (max-width:560px){.resena-adm{grid-template-columns:1fr}.acciones-col{flex-direction:row;flex-wrap:wrap}}
         /* ===== CLIENTES: sub-pestañas ===== */
         .cli-subnav{display:flex;gap:8px;flex-wrap:wrap;margin:-10px 0 22px;border-bottom:1px solid var(--line);padding-bottom:12px}
@@ -277,7 +279,7 @@
         .cli-subtab:hover{color:var(--cream)}
         .cli-subtab.active{color:#fff;background:rgba(255,102,0,.16);box-shadow:inset 0 -2px 0 var(--ember)}
         .cli-subtab .count:not(:empty){display:inline-block;min-width:20px;padding:1px 6px;margin-left:6px;border-radius:10px;
-            background:var(--ember-deep);color:#fff;font-size:.72rem;font-family:'Inter',sans-serif}
+            background:var(--ember-deep);color:#fff;font-size:.72rem;font-family:'Poppins',sans-serif}
 
         /* ===== TARJETA HORNILLA (sellos) ===== */
         .tj-lista{display:grid;gap:8px;margin-top:14px}
