@@ -302,7 +302,7 @@ function renderTipoPedido() {
 function bannerInicial() {
     if (tipoActual === 'local') return 'Selecciona una mesa para comenzar';
     if (tipoActual === 'llevar') return 'Escribe el nombre del cliente para el pedido para llevar';
-    return 'Escribe el nombre y la dirección para el domicilio';
+    return 'Escribe el nombre y el teléfono del cliente (la dirección es opcional)';
 }
 
 function actualizarBotonNuevo() {
@@ -372,7 +372,7 @@ function renderOrigen() {
             <label class="ficha-lbl">Teléfono del cliente
                 <input type="tel" id="telefonoInput" class="ficha-notas" placeholder="Ej. 7123-4567" maxlength="20" inputmode="tel" value="${esc(telefonoActual)}">
             </label>
-            <label class="ficha-lbl">Dirección de entrega
+            <label class="ficha-lbl">Dirección de entrega (opcional)
                 <input type="text" id="direccionInput" class="ficha-notas" placeholder="Ej. Col. Escalón, casa #12" maxlength="140" value="${esc(direccionActual)}">
             </label>
             <div class="ubicacion-bloque">
@@ -707,7 +707,7 @@ function datosDomicilioHTML() {
         </div>
         <div class="domicilio-dato">
             <span class="domicilio-dato-lbl">Dirección</span>
-            <span class="domicilio-dato-val">${esc(direccionActual.trim())}</span>
+            <span class="domicilio-dato-val">${esc(direccionActual.trim() || 'Sin dirección (coordinar por teléfono)')}</span>
         </div>
         <div class="domicilio-dato">
             <span class="domicilio-dato-lbl">Total del pedido</span>
@@ -745,7 +745,7 @@ document.getElementById('btnWhatsappDomicilio')?.addEventListener('click', () =>
         '',
         `👤 Cliente: ${clienteActual.trim()}`,
         `📞 Teléfono: ${telefonoActual.trim()}`,
-        `📍 Dirección: ${direccionActual.trim()}`,
+        direccionActual.trim() ? `📍 Dirección: ${direccionActual.trim()}` : '',
         enlaceMaps ? `🗺️ Ubicación: ${enlaceMaps}` : '',
         `💵 Total: ${money(totalCarritoActual())}`
     ].filter(Boolean).join('\n');
