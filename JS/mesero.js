@@ -801,53 +801,17 @@ document.getElementById('btnCapturaDomicilio')?.addEventListener('click', async 
     }
 });
 
-/* ===== ENCABEZADO QUE SE COLAPSA JUNTO CON EL SCROLL ===================
-   El bloque de mesa/cliente puede ocupar bastante alto (sobre todo en
-   domicilio, con teléfono + dirección + mapa). En vez de un interruptor
-   "abierto/cerrado" con animación de tiempo fijo (que "palpitaba" si se
-   soltaba el dedo a medio camino), la altura visible se controla en
-   cada evento de scroll y avanza exactamente lo mismo que se deslizó:
-   ni un pixel más. Así nunca queda a medio abrir tratando de terminar
-   una animación — siempre refleja el scroll actual, en ambas direcciones. */
-let ultimoScrollY = window.scrollY;
-let altoOcultoHeader = 0; // px ya "recogidos" del bloque colapsable (0 = totalmente visible)
-let scrollFramePendiente = false;
-
-function aplicarAltoHeaderColapsable() {
-    const outer = document.getElementById('kdsHeaderColapsable');
-    const inner = document.getElementById('kdsHeaderColapsableInner');
-    if (!outer || !inner) return;
-    const altoTotal = inner.scrollHeight;
-    altoOcultoHeader = Math.min(Math.max(altoOcultoHeader, 0), altoTotal);
-    if (altoOcultoHeader <= 0) {
-        outer.style.height = ''; // totalmente visible: alto natural, sin recorte
-    } else {
-        outer.style.height = Math.max(0, altoTotal - altoOcultoHeader) + 'px';
-    }
-}
-
-function procesarScroll() {
-    scrollFramePendiente = false;
-    const y = Math.max(0, window.scrollY);
-    const diferencia = y - ultimoScrollY;
-    ultimoScrollY = y;
-
-    if (y <= 0) {
-        altoOcultoHeader = 0; // en el tope: siempre expandido
-    } else {
-        altoOcultoHeader += diferencia; // sube con lo que se baja, baja con lo que se sube
-    }
-    aplicarAltoHeaderColapsable();
-}
-
-window.addEventListener('scroll', () => {
-    if (scrollFramePendiente) return;
-    scrollFramePendiente = true;
-    requestAnimationFrame(procesarScroll);
-}, { passive: true });
+/* (Antes aquí el bloque de mesa/cliente se encogía con el scroll. Eso
+   movía la página, el movimiento disparaba otro scroll y el encabezado
+   "brincaba". Ahora ese bloque va fuera del encabezado fijo y se desliza
+   normal con la página; arriba solo queda fija la barra corta.) */
 
 /* ===== INICIALIZACIÓN ================================================ */
+let meseroIniciado = false;
 document.addEventListener('DOMContentLoaded', () => {
+    /* Solo una vez: sesion-personal.js dispara DOMContentLoaded a mano al cargar */
+    if (meseroIniciado) return;
+    meseroIniciado = true;
     activarReconexionAutomatica();
 
     renderTipoPedido();
@@ -872,6 +836,15 @@ document.addEventListener('DOMContentLoaded', () => {
             t = setTimeout(() => { termino = buscar.value.trim().toLowerCase(); renderMenu(); }, 120);
         });
     }
+
+    /* Combos de la semana (promos.js manda el combo ya armado con su carne) */
+    document.addEventListener('hornilla:agregar-combo', e => {
+        const { platillo, precio, cantidad } = e.detail || {};
+        if (!platillo) return;
+        itemsCarrito.push({ platillo: String(platillo), cantidad: Math.max(1, Number(cantidad) || 1), notas: '', precio: Math.max(0, Number(precio) || 0) });
+        renderCarrito();
+        toast(`${platillo} agregado a la orden`);
+    });
 
     document.getElementById('btnEnviarPedido')?.addEventListener('click', enviarPedido);
     document.getElementById('btnImprimirTicket')?.addEventListener('click', imprimirTicket);

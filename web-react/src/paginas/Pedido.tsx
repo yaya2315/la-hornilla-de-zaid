@@ -23,7 +23,7 @@ import {
 } from '@/lib/datos'
 import { dinero, leerPrecio, medir, NEGOCIO, PAGINAS, SOLO_DELIVERY } from '@/lib/sitio'
 import { cn } from '@/lib/utils'
-import { CARNES, CATEGORIAS_CARNE_APARTE, CATEGORIAS_CARNE_GRUPO, CATEGORIAS_POR_ORDEN, esPromoTacosSueltos, llevaPina, nombreOrden, TACOS_SUELTOS, textoLinea, usarCarrito } from './pedido/carrito'
+import { CARNES, CARNES_COMBO, CATEGORIAS_CARNE_APARTE, CATEGORIAS_CARNE_GRUPO, CATEGORIAS_POR_ORDEN, esPromoTacosSueltos, llevaPina, nombreOrden, TACOS_SUELTOS, textoLinea, usarCarrito } from './pedido/carrito'
 import { ModalMapa } from './pedido/ModalMapa'
 
 type Agregar = (nombre: string, precio: number, cantidad: number) => void
@@ -149,23 +149,29 @@ function TarjetaPedido({ plato, coleccion, agregar }: { plato: Plato; coleccion:
 function PromoPedido({ promo, agregar }: { promo: Promo; agregar: Agregar }) {
   const id = useId()
   const precio = leerPrecio(promo.precio)
-  const [carne, setCarne] = useState(CARNES[0])
+  const [carne, setCarne] = useState(CARNES_COMBO[0])
   const [pina, setPina] = useState(false)
   const [cant, setCant] = useState(1)
   const sueltos = esPromoTacosSueltos(promo.nombre, precio)
-  const nombre = () => sueltos ? TACOS_SUELTOS : (promo.pideCarne && carne ? `${promo.nombre} — de ${carne}${llevaPina(carne) && pina ? ' con piña' : ''}` : promo.nombre)
+  /* Todos los combos piden carne (menos la promo de tacos sueltos, que son mixtos) */
+  const pideCarne = !sueltos
+  const nombre = () => {
+    if (sueltos) return TACOS_SUELTOS
+    const c = CARNES_COMBO.includes(carne) ? carne : CARNES_COMBO[0] // solo carnes permitidas en combos
+    return `${promo.nombre} — de ${c}${llevaPina(c) && pina ? ' con piña' : ''}`
+  }
   return (
     <TarjetaPromo promo={promo}>
       <div className="flex flex-wrap items-center justify-center gap-4 md:justify-start">
-        {promo.pideCarne && (
+        {pideCarne && (
           <div className="grid w-full max-w-56 gap-1.5">
             <label htmlFor={`${id}-c`} className={cn(rotulo, 'text-crema')}>Carne</label>
             <select id={`${id}-c`} className={control} value={carne} onChange={(e) => { setCarne(e.target.value); setPina(false) }}>
-              {CARNES.map((c) => <option key={c}>{c}</option>)}
+              {CARNES_COMBO.map((c) => <option key={c}>{c}</option>)}
             </select>
           </div>
         )}
-        {promo.pideCarne && llevaPina(carne) && <ConPina marcado={pina} cambiar={setPina} />}
+        {pideCarne && llevaPina(carne) && <ConPina marcado={pina} cambiar={setPina} />}
         <Cantidad valor={cant} cambiar={setCant} nombre={promo.nombre} />
         <BotonAgregar completo={false} onClick={() => { agregar(nombre(), precio, cant); setCant(1) }}>
           Agregar al pedido <span className="font-precio font-normal tracking-normal normal-case">{dinero(precio)}</span>

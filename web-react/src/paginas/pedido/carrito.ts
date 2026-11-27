@@ -41,6 +41,8 @@ export function usarCarrito() {
 export const CATEGORIAS_CARNE_GRUPO = ['Tacos', 'Burrito', 'Tortas', 'Nachos', 'Quesadillas']
 export const CATEGORIAS_CARNE_APARTE = ['Sopa de Tortilla']
 export const CARNES = ['Pastor', 'Pollo pastor', 'Suadero', 'Cochinita pibil', 'Birria']
+/** En TODOS los combos solo se ofrecen estas carnes (igual en el mesero: JS/promos.js) */
+export const CARNES_COMBO = ['Pollo', 'Pollo pastor', 'Suadero']
 /** La piña solo va con carnes "pastor" (Pastor, Pollo pastor) y no cuesta extra */
 export const llevaPina = (carne = '') => carne.toLowerCase().includes('pastor')
 

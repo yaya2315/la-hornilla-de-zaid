@@ -48,10 +48,32 @@ function seMuestraHoy(p, hoy) {
 }
 
 function esc(s = '') {
-    return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
-function tarjeta(p) {
+/* Carnes de los combos: en TODOS los combos solo se ofrecen estas tres
+   (igual en "Pedir en línea" de la web: web-react/src/paginas/pedido/carrito.ts). */
+export const CARNES_COMBO = ['Pollo', 'Pollo pastor', 'Suadero'];
+
+const precioNumero = (txt) => {
+    const n = parseFloat(String(txt ?? '').replace(/[^0-9.]/g, ''));
+    return Number.isFinite(n) ? n : 0;
+};
+/* La promo de tacos sueltos (ej. "Tacos a $0.99") no lleva carne: son tacos mixtos */
+const esTacosSueltos = (p) => /taco/i.test(p.nombre || '') && precioNumero(p.precio) > 0 && precioNumero(p.precio) < 1;
+
+function tarjeta(p, i, agregable) {
+    const conCarne = agregable && !esTacosSueltos(p);
+    const acciones = agregable ? `
+            <div class="combo-acciones">
+                ${conCarne ? `
+                <label class="combo-carne-lbl">Carne
+                    <select class="combo-carne" data-combo="${i}">
+                        ${CARNES_COMBO.map(c => `<option>${esc(c)}</option>`).join('')}
+                    </select>
+                </label>` : ''}
+                <button type="button" class="btn-agregar-comanda combo-agregar" data-combo="${i}">Agregar a la orden</button>
+            </div>` : '';
     return `
         <section class="combo-week" aria-label="Promoción">
             <span class="combo-badge"><span class="dot"></span> Combo de la semana</span>
@@ -65,27 +87,51 @@ function tarjeta(p) {
                     <small>Precio</small>
                     <span>${esc(p.precio || '')}</span>
                 </div>
-            </div>
+            </div>${acciones}
         </section>`;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     const wrap = document.getElementById('combosActivos');
     if (!wrap) return;   // esta página no tiene zona de promociones
+    /* Solo una vez, aunque DOMContentLoaded se dispare de nuevo (sesion-personal.js lo dispara a mano) */
+    if (wrap.dataset.iniciado === 'si') return;
+    wrap.dataset.iniciado = 'si';
 
     let ultimasPromos = RESPALDO;
+    let delDia = [];
+    /* En el mesero (data-agregar="si") cada combo trae carne + botón para la orden */
+    const agregable = wrap.dataset.agregar === 'si';
 
     function pintar() {
         const hoy = new Date().getDay();   // 0 = domingo … 6 = sábado
-        const delDia = ultimasPromos.filter(p => seMuestraHoy(p, hoy));
+        /* Si el mesero está eligiendo carne, no se repinta debajo de su dedo */
+        if (agregable && wrap.contains(document.activeElement) && document.activeElement.tagName === 'SELECT') return;
+        delDia = ultimasPromos.filter(p => seMuestraHoy(p, hoy));
 
         if (delDia.length === 0) {
             wrap.innerHTML = '';
             wrap.classList.remove('has-combos');   // sin promos hoy → no ocupa espacio
             return;
         }
-        wrap.innerHTML = delDia.map(tarjeta).join('');
+        wrap.innerHTML = delDia.map((p, i) => tarjeta(p, i, agregable)).join('');
         wrap.classList.add('has-combos');
+    }
+
+    /* "Agregar a la orden": avisa a mesero.js con un evento (cada archivo sigue por su lado) */
+    if (agregable) {
+        wrap.addEventListener('click', e => {
+            const btn = e.target.closest('.combo-agregar');
+            if (!btn) return;
+            const i = Number(btn.dataset.combo);
+            const p = delDia[i];
+            if (!p) return;
+            const sel = wrap.querySelector(`.combo-carne[data-combo="${i}"]`);
+            const carne = sel && CARNES_COMBO.includes(sel.value) ? sel.value : '';
+            document.dispatchEvent(new CustomEvent('hornilla:agregar-combo', {
+                detail: { platillo: carne ? `${p.nombre} — de ${carne}` : p.nombre, precio: precioNumero(p.precio), cantidad: 1 }
+            }));
+        });
     }
 
     onSnapshot(collection(db, COLECCION), snap => {

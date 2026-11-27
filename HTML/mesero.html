@@ -33,18 +33,17 @@
         </div>
 
         <div id="tipoPedidoWrap" class="tipo-pedido-wrap" role="tablist" aria-label="Tipo de pedido"></div>
-
-        <div id="kdsHeaderColapsable" class="kds-header-colapsable">
-            <div id="kdsHeaderColapsableInner" class="kds-header-colapsable-inner">
-                <div id="origenPedidoWrap"></div>
-                <p id="comandaBanner" class="comanda-banner" role="status" aria-live="polite">Selecciona una mesa para comenzar</p>
-            </div>
-        </div>
     </header>
+
+    <!-- Mesa / datos del cliente: se desliza con la página (no va en el encabezado fijo) -->
+    <div class="kds-origen">
+        <div id="origenPedidoWrap"></div>
+        <p id="comandaBanner" class="comanda-banner" role="status" aria-live="polite">Selecciona una mesa para comenzar</p>
+    </div>
 
     <main class="kds-layout">
         <section aria-label="Menú">
-            <div id="combosActivos" class="mesero-promos" aria-label="Promociones activas hoy"></div>
+            <div id="combosActivos" class="mesero-promos" data-agregar="si" aria-label="Promociones activas hoy"></div>
             <div class="menu-toolbar">
                 <div class="menu-search-wrap">
                     <input type="text" id="menuBuscar" placeholder="Buscar platillo, pupusa o bebida…" aria-label="Buscar en el menú">
