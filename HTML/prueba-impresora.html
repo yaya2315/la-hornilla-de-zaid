@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Prueba de impresora · La Hornilla de Zaid</title>
+    <link rel="icon" href="../Imagenes/favicon-32.png">
+    <style>
+        @font-face { font-family: Oswald; font-weight: 700; src: url(../enlaces/fuentes/oswald-700.woff2); }
+        @font-face { font-family: Oswald; font-weight: 600; src: url(../enlaces/fuentes/oswald-600.woff2); }
+        :root { --verde: #2f7424; --verde-o: #18420f; --lima: #d6e22b; --crema: #f6ecd2; --tinta: #141414; --rojo: #d9201f; }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: var(--verde-o); color: var(--crema); font: 600 18px/1.4 Oswald, Arial, sans-serif; }
+        main { max-width: 520px; margin: 0 auto; padding: 20px 16px 48px; }
+        h1 { margin: 6px 0 4px; font-size: 1.7rem; color: #fff; }
+        .sub { margin: 0 0 18px; opacity: .85; font-weight: 600; }
+        .paso { background: rgba(0,0,0,.25); border-radius: 18px; padding: 16px; margin-bottom: 14px; }
+        .paso h2 { margin: 0 0 8px; font-size: 1.15rem; color: var(--lima); letter-spacing: .03em; }
+        .paso p { margin: 0 0 12px; font-weight: 600; }
+        button { width: 100%; min-height: 64px; border: 0; border-radius: 16px; font: 700 1.3rem Oswald, Arial, sans-serif;
+                 letter-spacing: .04em; cursor: pointer; background: var(--lima); color: var(--tinta); }
+        button.secundario { min-height: 48px; font-size: 1rem; background: transparent; color: var(--crema); border: 2px solid rgba(246,236,210,.4); margin-top: 10px; }
+        button:disabled { opacity: .45; cursor: not-allowed; }
+        button:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+        .estado { margin: 14px 0 0; padding: 12px 14px; border-radius: 12px; background: rgba(255,255,255,.08); min-height: 3em; }
+        .estado.ok { background: rgba(214,226,43,.18); }
+        .estado.mal { background: rgba(217,32,31,.3); }
+        .barra { height: 10px; border-radius: 6px; background: rgba(255,255,255,.15); overflow: hidden; margin-top: 10px; }
+        .barra i { display: block; height: 100%; width: 0; background: var(--lima); transition: width .2s; }
+        details { margin-top: 14px; }
+        summary { cursor: pointer; opacity: .8; }
+        pre { white-space: pre-wrap; font: 13px/1.4 monospace; background: rgba(0,0,0,.35); padding: 10px; border-radius: 10px; color: #e8f5c8; }
+        .vista { display: block; margin: 12px auto 0; width: 100%; max-width: 384px; background: #fff; image-rendering: pixelated; border-radius: 6px; }
+        .aviso { background: var(--rojo); color: #fff; padding: 14px; border-radius: 14px; margin-bottom: 14px; display: none; }
+    </style>
+</head>
+<body>
+<main>
+    <h1>Prueba de la impresora</h1>
+    <p class="sub">Impresora térmica X6h · La Hornilla de Zaid</p>
+
+    <div class="aviso" id="sinBluetooth" role="alert">
+        Este navegador no puede usar Bluetooth. Abre esta página en <b>Google Chrome</b> en un celular <b>Android</b>.
+    </div>
+
+    <section class="paso">
+        <h2>1. Prepara la impresora</h2>
+        <p>Enciéndela, ponle papel y deja el Bluetooth del celular encendido. Si la app Tiny Print está abierta, ciérrala.</p>
+    </section>
+
+    <section class="paso">
+        <h2>2. Conecta</h2>
+        <p>Toca el botón y en la lista elige la que dice <b>X6h</b>.</p>
+        <button type="button" id="btnConectar">Conectar impresora</button>
+        <button type="button" class="secundario" id="btnTodas">No aparece en la lista</button>
+    </section>
+
+    <section class="paso">
+        <h2>3. Imprime un ticket de prueba</h2>
+        <p>Es un pedido de ejemplo con el diseño de La Hornilla.</p>
+        <button type="button" id="btnImprimir" disabled>Imprimir ticket de prueba</button>
+        <button type="button" class="secundario" id="btnSimple" disabled>Si salió en blanco o raro: probar modo simple</button>
+        <div class="barra" aria-hidden="true"><i id="progreso"></i></div>
+        <p class="estado" id="estado" role="status" aria-live="polite">Todavía no hay impresora conectada.</p>
+    </section>
+
+    <details>
+        <summary>Así se verá el ticket</summary>
+        <canvas class="vista" id="vista" width="384" height="10" aria-label="Vista previa del ticket"></canvas>
+    </details>
+    <details>
+        <summary>Detalles técnicos (para mandárselos a Leonardo)</summary>
+        <pre id="registro"></pre>
+    </details>
+</main>
+
+<script type="module">
+    import { hayBluetooth, conectar, conectada, dibujarTicket, canvasAPuntos, armarTrabajo, enviar, pintarVista } from '../JS/impresora.js';
+
+    const $ = id => document.getElementById(id);
+    const estado = (t, tipo = '') => { $('estado').textContent = t; $('estado').className = 'estado ' + tipo; };
+    const registro = t => { $('registro').textContent += `[${new Date().toLocaleTimeString('es-SV')}] ${t}\n`; };
+    registro(`Navegador: ${navigator.userAgent}`);
+
+    if (!hayBluetooth()) {
+        $('sinBluetooth').style.display = 'block';
+        $('btnConectar').disabled = $('btnTodas').disabled = true;
+        estado('Este navegador no tiene Bluetooth web.', 'mal');
+    }
+
+    const pedidoEjemplo = () => ({
+        numero: 'PRUEBA', tipo: 'Mesa 3', atendio: 'Mesero', fecha: new Date(),
+        items: [
+            { nombre: 'Tacos pastor (orden de 4)', cant: 2, precio: 4.00 },
+            { nombre: 'Quesadillas birria (orden de 3)', cant: 1, precio: 5.00 },
+            { nombre: 'Sopa de tortilla media', cant: 1, precio: 3.00 },
+            { nombre: 'Extra queso fundido', cant: 1, precio: 1.25 },
+            { nombre: 'Mini Pepsi', cant: 2, precio: 0.50 },
+        ],
+        ofertas: ['½ sopa + 2 tacos + bebida: $4.50', '½ sopa + ½ nachos + bebida: $4.50', 'Papa asada con carne a elección: $5.50'],
+    });
+
+    /* Vista previa: lo mismo que saldrá en papel */
+    (async () => {
+        try {
+            const { canvas, zonasFoto } = await dibujarTicket(pedidoEjemplo(), '../');
+            const v = $('vista'); v.height = canvas.height;
+            pintarVista(v, canvasAPuntos(canvas, zonasFoto));
+        } catch (e) { registro('Vista previa: ' + e.message); }
+    })();
+
+    async function conectarCon(todas) {
+        estado('Buscando impresoras…');
+        try {
+            await conectar({ todas, registro });
+            estado('Impresora conectada. Ya puedes imprimir.', 'ok');
+            $('btnImprimir').disabled = $('btnSimple').disabled = false;
+        } catch (e) {
+            registro('Error al conectar: ' + (e.name || '') + ' ' + e.message);
+            estado(e.name === 'NotFoundError' ? 'No se eligió ninguna impresora. Vuelve a intentarlo.' : 'No se pudo conectar: ' + e.message, 'mal');
+        }
+    }
+    $('btnConectar').addEventListener('click', () => conectarCon(false));
+    $('btnTodas').addEventListener('click', () => conectarCon(true));
+
+    async function imprimir(comprimir) {
+        if (!conectada()) { estado('La impresora se desconectó. Toca "Conectar impresora" otra vez.', 'mal'); $('btnImprimir').disabled = $('btnSimple').disabled = true; return; }
+        $('btnImprimir').disabled = $('btnSimple').disabled = true;
+        $('progreso').style.width = '0';
+        estado('Imprimiendo…');
+        try {
+            const { canvas, zonasFoto } = await dibujarTicket(pedidoEjemplo(), '../');
+            const trabajo = armarTrabajo(canvasAPuntos(canvas, zonasFoto), canvas.height, { comprimir });
+            registro(`Enviando ${trabajo.length} bytes (${comprimir ? 'comprimido' : 'simple'}), ${canvas.height} líneas.`);
+            await enviar(trabajo, { progreso: p => { $('progreso').style.width = Math.round(p * 100) + '%'; } });
+            estado('¡Listo! ¿Salió bien el ticket? Avísale a Leonardo.', 'ok');
+            registro('Envío terminado.');
+        } catch (e) {
+            registro('Error al imprimir: ' + (e.name || '') + ' ' + e.message);
+            estado('No se pudo imprimir: ' + e.message, 'mal');
+        } finally {
+            $('btnImprimir').disabled = $('btnSimple').disabled = !conectada();
+        }
+    }
+    $('btnImprimir').addEventListener('click', () => imprimir(true));
+    $('btnSimple').addEventListener('click', () => imprimir(false));
+</script>
+</body>
+</html>
